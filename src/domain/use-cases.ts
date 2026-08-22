@@ -334,3 +334,17 @@ export function nextRouteInstruction(
         : "Girás a la derecha";
   return { label: turn, distanceToTurn };
 }
+
+export function bearingToPoint(from: MapPoint, to: MapPoint) {
+  const bearing = (Math.atan2(to.x - from.x, -(to.z - from.z)) * 180) / Math.PI;
+  return (bearing + 360) % 360;
+}
+
+export function relativeBearing(
+  from: MapPoint,
+  to: MapPoint,
+  heading: number | null,
+) {
+  if (heading === null) return null;
+  return ((bearingToPoint(from, to) - heading + 540) % 360) - 180;
+}

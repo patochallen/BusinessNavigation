@@ -7,6 +7,7 @@ import {
   findBusiness,
   localPointFromGps,
   nextRouteInstruction,
+  bearingToPoint,
   nearestWaypoint,
   routeFromCoordinate,
   routeDistanceInMeters,
@@ -15,6 +16,7 @@ import {
   isOffRoute,
   routeToAttraction,
   progressOnRoute,
+  relativeBearing,
   shortestPath,
 } from "./use-cases";
 
@@ -162,11 +164,22 @@ describe("predio routing", () => {
 
   it("describes the next turn on a route", () => {
     const instruction = nextRouteInstruction(
-      [{ x: 0, z: 0 }, { x: 3, z: 0 }, { x: 3, z: 3 }],
+      [
+        { x: 0, z: 0 },
+        { x: 3, z: 0 },
+        { x: 3, z: 3 },
+      ],
       { x: 0, z: 0 },
       10,
     );
     expect(instruction?.label).toBe("Girás a la izquierda");
     expect(instruction?.distanceToTurn).toBe(30);
+  });
+
+  it("calculates direction relative to the phone heading", () => {
+    expect(bearingToPoint({ x: 0, z: 0 }, { x: 0, z: -1 })).toBe(0);
+    expect(bearingToPoint({ x: 0, z: 0 }, { x: 1, z: 0 })).toBe(90);
+    expect(relativeBearing({ x: 0, z: 0 }, { x: 1, z: 0 }, 0)).toBe(90);
+    expect(relativeBearing({ x: 0, z: 0 }, { x: 1, z: 0 }, 180)).toBe(-90);
   });
 });

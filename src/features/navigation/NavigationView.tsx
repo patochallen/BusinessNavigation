@@ -10,6 +10,7 @@ import {
   isOffRoute,
   localPointFromGps,
   nextRouteInstruction,
+  relativeBearing,
   progressOnRoute,
   routeDistanceInMeters,
   routeDistanceToAttraction,
@@ -97,6 +98,9 @@ export function NavigationView({
     userPoint,
     business.mapScaleMeters,
   );
+  const nextDirection = userPoint && progress.nextPoint
+    ? relativeBearing(userPoint, progress.nextPoint, heading)
+    : null;
   const networkDistance =
     userPoint && business.waypoints
       ? distanceToNetwork(
@@ -216,7 +220,8 @@ export function NavigationView({
       <div className="heading-panel">
         <Compass
           size={20}
-          style={{ transform: `rotate(${heading ?? 0}deg)` }}
+          className="direction-arrow"
+          style={{ transform: `rotate(${nextDirection ?? 0}deg)` }}
         />
         <div>
           <strong>
