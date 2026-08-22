@@ -1,7 +1,6 @@
 import { ArrowLeft, Camera, Compass, LocateFixed, Navigation } from 'lucide-react'
 import { useState } from 'react'
 import type { Attraction, Business, LocationPermission } from '../../domain/types'
-import { distanceInMeters } from '../../services/location'
 import {
   distanceToNetwork,
   isOffRoute,
@@ -52,9 +51,7 @@ export function NavigationView({
   const [cameraVisible, setCameraVisible] = useState(false)
   const camera = useCameraStream()
   const distance =
-    position && selected
-      ? getDistanceBetweenLocations(position.coords, selected.coordinates)?.toFixed(0)
-      : null //distanceInMeters(position, business, selected) : null
+    position && selected ? getDistanceBetweenLocations(position.coords, selected.coordinates) : null //distanceInMeters(position, business, selected) : null
   const navigationState =
     permission === 'requesting'
       ? 'locating'
@@ -132,9 +129,7 @@ export function NavigationView({
       <div className="route-card">
         <div className="route-map">
           <MapScene
-            attractions={business.attractions}
             business={business}
-            mapFeatures={business.mapFeatures}
             routePoints={routePoints}
             userPosition={routePoints[0]}
             selectedId={selected?.id}
@@ -144,7 +139,7 @@ export function NavigationView({
         </div>
         <div className="route-stats">
           <div>
-            <strong>{distance !== null ? `${distance} m` : '—'}</strong>
+            <strong>{distance !== null ? `${Math.round(distance)} m` : '—'}</strong>
             <span>distancia estimada</span>
           </div>
           <div>

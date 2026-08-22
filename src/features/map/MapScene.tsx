@@ -1,12 +1,10 @@
 import { Canvas } from '@react-three/fiber'
 import { Line, OrbitControls, PerspectiveCamera } from '@react-three/drei'
-import type { Attraction, Business, MapFeature } from '../../domain/types'
+import type { Business } from '../../domain/types'
 import { getAttractionMapPoint } from '../../domain/use-cases'
 
 type MapSceneProps = {
-  attractions: Attraction[]
   business: Business
-  mapFeatures?: MapFeature[]
   routePoints?: { x: number; z: number }[]
   userPosition?: { x: number; z: number }
   selectedId?: string
@@ -16,9 +14,7 @@ type MapSceneProps = {
 }
 
 export function MapScene({
-  attractions,
   business,
-  mapFeatures = [],
   routePoints = [],
   userPosition,
   selectedId,
@@ -34,14 +30,16 @@ export function MapScene({
           centerOnSelected
             ? getAttractionMapPoint(
                 business,
-                attractions.find((attraction) => attraction.id === selectedId) ?? attractions[0],
+                business.attractions.find((attraction) => attraction.id === selectedId) ??
+                  business.attractions[0],
               ).x
             : 0,
           12,
           centerOnSelected
             ? getAttractionMapPoint(
                 business,
-                attractions.find((attraction) => attraction.id === selectedId) ?? attractions[0],
+                business.attractions.find((attraction) => attraction.id === selectedId) ??
+                  business.attractions[0],
               ).z
             : 0,
         ]}
@@ -59,7 +57,7 @@ export function MapScene({
         rotation={[0, 0, 0]}
         position={[0, 0.02, 0]}
       />
-      {mapFeatures.map((feature) => {
+      {business.mapFeatures?.map((feature) => {
         if (feature.type === 'path') {
           return (
             <Line
@@ -100,7 +98,7 @@ export function MapScene({
           lineWidth={5}
         />
       )}
-      {attractions.map((attraction) => (
+      {business.attractions.map((attraction) => (
         <group
           key={attraction.id}
           position={[
