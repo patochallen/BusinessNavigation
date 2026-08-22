@@ -201,10 +201,20 @@
   background: #283a35;
   color: #f6f4ee;
 }
-.route-instruction svg { color: #e8b84a; }
-.route-instruction div { display: grid; gap: 4px; }
-.route-instruction strong { font-size: 13px; }
-.route-instruction span { color: #c6d0c8; font-size: 10px; }
+.route-instruction svg {
+  color: #e8b84a;
+}
+.route-instruction div {
+  display: grid;
+  gap: 4px;
+}
+.route-instruction strong {
+  font-size: 13px;
+}
+.route-instruction span {
+  color: #c6d0c8;
+  font-size: 10px;
+}
 .app-shell {
   max-width: 1180px;
   margin: 0 auto;
@@ -457,6 +467,32 @@ h2 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
+  .heading-panel {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #d8d5ca;
+    color: #477e78;
+  }
+  .heading-panel svg {
+    flex: 0 0 auto;
+    transition: transform 0.25s ease;
+  }
+  .heading-panel div {
+    display: grid;
+    flex: 1;
+    gap: 4px;
+  }
+  .heading-panel strong {
+    color: #34453f;
+    font-size: 12px;
+  }
+  .heading-panel span {
+    color: #879189;
+    font-size: 10px;
+  }
 }
 .attraction-card {
   display: flex;

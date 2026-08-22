@@ -1,4 +1,4 @@
-import { ArrowLeft, LocateFixed, Navigation } from "lucide-react";
+import { ArrowLeft, Compass, LocateFixed, Navigation } from "lucide-react";
 import type {
   Attraction,
   Business,
@@ -24,6 +24,9 @@ type NavigationViewProps = {
   position: GeolocationPosition | null;
   permission: LocationPermission;
   errorMessage: string | null;
+  heading: number | null;
+  headingPermission: LocationPermission;
+  enableHeading: () => Promise<void>;
   locate: () => void;
   onBack: () => void;
 };
@@ -34,6 +37,9 @@ export function NavigationView({
   position,
   permission,
   errorMessage,
+  heading,
+  headingPermission,
+  enableHeading,
   locate,
   onBack,
 }: NavigationViewProps) {
@@ -207,6 +213,32 @@ export function NavigationView({
         <Navigation size={15} /> Ruta visual directa. Seguí los senderos
         señalizados del predio.
       </p>
+      <div className="heading-panel">
+        <Compass
+          size={20}
+          style={{ transform: `rotate(${heading ?? 0}deg)` }}
+        />
+        <div>
+          <strong>
+            {heading === null
+              ? "Brújula sin señal"
+              : `${Math.round(heading)}° de orientación`}
+          </strong>
+          <span>
+            {headingPermission === "unavailable"
+              ? "Este dispositivo no informa orientación."
+              : "Orientación aproximada del dispositivo."}
+          </span>
+        </div>
+        {headingPermission !== "ready" &&
+          headingPermission !== "unavailable" && (
+            <button className="outline-button" onClick={enableHeading}>
+              {headingPermission === "requesting"
+                ? "Solicitando..."
+                : "Activar brújula"}
+            </button>
+          )}
+      </div>
     </section>
   );
 }

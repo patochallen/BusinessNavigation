@@ -12,6 +12,7 @@ import { Search } from "lucide-react";
 import "./App.css";
 import { demoBusinessRepository } from "./domain/business-repository";
 import { useGeolocation } from "./services/location";
+import { useDeviceHeading } from "./services/orientation";
 import { BusinessHome } from "./features/explorer/BusinessHome";
 import { AttractionDetail } from "./features/explorer/AttractionDetail";
 import { NavigationView } from "./features/navigation/NavigationView";
@@ -27,12 +28,13 @@ function AppContent() {
   const business = businessId
     ? demoBusinessRepository.findById(businessId)
     : undefined;
+  const isNavigation = location.pathname.endsWith("/navigate");
   const { position, permission, errorMessage, locate } = useGeolocation();
+  const headingState = useDeviceHeading(isNavigation);
   const attraction =
     business && attractionId
       ? demoBusinessRepository.findAttraction(business, attractionId)
       : business?.attractions[0];
-  const isNavigation = location.pathname.endsWith("/navigate");
   const mapAttractionId = searchParams.get("attraction") ?? undefined;
 
   if (!business || (attractionId && !attraction))
@@ -66,6 +68,9 @@ function AppContent() {
             position={position}
             permission={permission}
             errorMessage={errorMessage}
+            heading={headingState.heading}
+            headingPermission={headingState.permission}
+            enableHeading={headingState.enable}
             locate={locate}
             onBack={() =>
               navigate(`/b/${business.id}/a/${attraction?.id ?? ""}`)
