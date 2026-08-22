@@ -24,7 +24,7 @@ function AppContent() {
   const business = businessId
     ? demoBusinessRepository.findById(businessId)
     : undefined;
-  const { position, permission, locate } = useGeolocation();
+  const { position, permission, errorMessage, locate } = useGeolocation();
   const attraction =
     business && attractionId
       ? demoBusinessRepository.findAttraction(business, attractionId)
@@ -61,6 +61,7 @@ function AppContent() {
             selected={attraction}
             position={position}
             permission={permission}
+            errorMessage={errorMessage}
             locate={locate}
             onBack={() =>
               navigate(`/b/${business.id}/a/${attraction?.id ?? ""}`)

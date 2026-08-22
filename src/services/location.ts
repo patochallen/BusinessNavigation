@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type {
   Attraction,
   Business,
@@ -14,6 +14,8 @@ import {
 export function useGeolocation() {
   const [position, setPosition] = useState<GeolocationPosition | null>(null);
   const [permission, setPermission] = useState<LocationPermission>("idle");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const watchId = useRef<number | null>(null);
 
   const locate = () => {
     if (!navigator.geolocation) {
@@ -21,17 +23,35 @@ export function useGeolocation() {
       return;
     }
     setPermission("requesting");
-    navigator.geolocation.getCurrentPosition(
+    setErrorMessage(null);
+    if (watchId.current !== null) {
+      navigator.geolocation.clearWatch(watchId.current);
+    }
+    watchId.current = navigator.geolocation.watchPosition(
       (next) => {
         setPosition(next);
         setPermission("ready");
       },
-      () => setPermission("denied"),
+      (error) => {
+        setPermission(
+          error.code === error.PERMISSION_DENIED ? "denied" : "unavailable",
+        );
+        setErrorMessage(error.message);
+      },
       { enableHighAccuracy: true, timeout: 8000 },
     );
   };
 
-  return { position, permission, locate };
+  useEffect(
+    () => () => {
+      if (watchId.current !== null) {
+        navigator.geolocation?.clearWatch(watchId.current);
+      }
+    },
+    [],
+  );
+
+  return { position, permission, errorMessage, locate };
 }
 
 export function gpsToLocalMeters(

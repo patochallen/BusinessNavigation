@@ -12,6 +12,7 @@ type NavigationViewProps = {
   selected?: Attraction;
   position: GeolocationPosition | null;
   permission: LocationPermission;
+  errorMessage: string | null;
   locate: () => void;
   onBack: () => void;
 };
@@ -21,16 +22,36 @@ export function NavigationView({
   selected,
   position,
   permission,
+  errorMessage,
   locate,
   onBack,
 }: NavigationViewProps) {
+  const distance =
+    position && selected ? distanceInMeters(position, business, selected) : null;
+  const navigationState =
+    permission === "requesting"
+      ? "locating"
+      : permission !== "ready"
+        ? "idle"
+        : distance !== null && distance <= 20
+          ? "arrived"
+          : "navigating";
+
   return (
     <section className="navigation-view">
       <button className="back-link" onClick={onBack}>
         <ArrowLeft size={17} /> Volver al mapa
       </button>
       <div className="navigation-title">
-        <p className="eyebrow">Navegando hacia</p>
+        <p className="eyebrow">
+          {navigationState === "arrived"
+            ? "Llegaste"
+            : navigationState === "locating"
+              ? "Buscando tu ubicación"
+              : navigationState === "idle"
+                ? "Ubicación pendiente"
+                : "Navegando hacia"}
+        </p>
         <h1>{selected?.name ?? "un destino"}</h1>
         <span className="destination-tag" style={{ color: selected?.color }}>
           {selected?.tag}
@@ -49,8 +70,8 @@ export function NavigationView({
         <div className="route-stats">
           <div>
             <strong>
-              {position && selected
-                ? `${distanceInMeters(position, business, selected)} m`
+              {distance !== null
+                ? `${distance} m`
                 : "—"}
             </strong>
             <span>distancia estimada</span>
@@ -65,7 +86,7 @@ export function NavigationView({
             <LocateFixed size={20} />
             <div>
               <strong>Activá tu ubicación</strong>
-              <p>Para actualizar la distancia en tiempo real.</p>
+              <p>{errorMessage ?? "Para actualizar la distancia en tiempo real."}</p>
             </div>
             <button className="button button-dark" onClick={locate}>
               {permission === "requesting"
