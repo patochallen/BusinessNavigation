@@ -6,6 +6,8 @@ import {
   findAttraction,
   findBusiness,
   localPointFromGps,
+  nearestWaypoint,
+  routeFromCoordinate,
   routeToAttraction,
   shortestPath,
 } from "./use-cases";
@@ -69,6 +71,15 @@ describe("map coordinates", () => {
 });
 
 describe("predio routing", () => {
+  it("selects the closest waypoint to the visitor", () => {
+    expect(nearestWaypoint(valle.waypoints ?? [], { x: -5, z: 4 })?.id).toBe(
+      "entrada",
+    );
+    expect(nearestWaypoint(valle.waypoints ?? [], { x: 2, z: -1 })?.id).toBe(
+      "fuego",
+    );
+  });
+
   it("finds the shortest path through connected waypoints", () => {
     const route = shortestPath(
       valle.waypoints ?? [],
@@ -85,6 +96,12 @@ describe("predio routing", () => {
 
   it("resolves an attraction route from the business network", () => {
     expect(routeToAttraction(valle, mirador)).toHaveLength(3);
+  });
+
+  it("starts a route at the visitor coordinate", () => {
+    const route = routeFromCoordinate(valle, valle.mapOrigin, mirador);
+    expect(route[0]).toEqual({ x: 0, z: -0 });
+    expect(route.at(-1)).toEqual(mirador.position);
   });
 
   it("returns no route for an unknown destination", () => {

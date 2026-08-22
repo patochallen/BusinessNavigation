@@ -5,7 +5,7 @@ import type {
   LocationPermission,
 } from "../../domain/types";
 import { distanceInMeters } from "../../services/location";
-import { routeToAttraction } from "../../domain/use-cases";
+import { routeFromCoordinate, routeToAttraction } from "../../domain/use-cases";
 import { MapScene } from "../map/MapScene";
 
 type NavigationViewProps = {
@@ -39,7 +39,18 @@ export function NavigationView({
         : distance !== null && distance <= 20
           ? "arrived"
           : "navigating";
-  const routePoints = selected ? routeToAttraction(business, selected) : [];
+  const routePoints = selected
+    ? position
+      ? routeFromCoordinate(
+          business,
+          {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          },
+          selected,
+        )
+      : routeToAttraction(business, selected)
+    : [];
 
   return (
     <section className="navigation-view">
@@ -67,6 +78,7 @@ export function NavigationView({
             attractions={business.attractions}
             mapFeatures={business.mapFeatures}
             routePoints={routePoints}
+            userPosition={routePoints[0]}
             selectedId={selected?.id}
             onSelect={() => undefined}
             userActive={permission === "ready"}

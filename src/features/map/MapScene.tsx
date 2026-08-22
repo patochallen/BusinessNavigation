@@ -6,6 +6,7 @@ type MapSceneProps = {
   attractions: Attraction[];
   mapFeatures?: MapFeature[];
   routePoints?: { x: number; z: number }[];
+  userPosition?: { x: number; z: number };
   selectedId?: string;
   centerOnSelected?: boolean;
   onSelect: (id: string) => void;
@@ -16,6 +17,7 @@ export function MapScene({
   attractions,
   mapFeatures = [],
   routePoints = [],
+  userPosition,
   selectedId,
   centerOnSelected = false,
   onSelect,
@@ -27,11 +29,13 @@ export function MapScene({
         makeDefault
         position={[
           centerOnSelected
-            ? (attractions.find((attraction) => attraction.id === selectedId)?.position.x ?? 0)
+            ? (attractions.find((attraction) => attraction.id === selectedId)
+                ?.position.x ?? 0)
             : 0,
           12,
           centerOnSelected
-            ? (attractions.find((attraction) => attraction.id === selectedId)?.position.z ?? 0)
+            ? (attractions.find((attraction) => attraction.id === selectedId)
+                ?.position.z ?? 0)
             : 0,
         ]}
         rotation={[-Math.PI / 2, 0, 0]}
@@ -54,18 +58,52 @@ export function MapScene({
       </mesh>
       {mapFeatures.map((feature) => {
         if (feature.type === "path") {
-          return <Line key={feature.id} points={feature.points.map((point) => [point.x, 0.12, point.z])} color="#f3f0e7" lineWidth={4} />;
+          return (
+            <Line
+              key={feature.id}
+              points={feature.points.map((point) => [point.x, 0.12, point.z])}
+              color="#f3f0e7"
+              lineWidth={4}
+            />
+          );
         }
         if (feature.type === "building") {
-          return <mesh key={feature.id} position={[feature.position.x, 0.18, feature.position.z]}><boxGeometry args={[feature.size.x, 0.32, feature.size.z]} /><meshStandardMaterial color={feature.color} /></mesh>;
+          return (
+            <mesh
+              key={feature.id}
+              position={[feature.position.x, 0.18, feature.position.z]}
+            >
+              <boxGeometry args={[feature.size.x, 0.32, feature.size.z]} />
+              <meshStandardMaterial color={feature.color} />
+            </mesh>
+          );
         }
         const minX = Math.min(...feature.points.map((point) => point.x));
         const maxX = Math.max(...feature.points.map((point) => point.x));
         const minZ = Math.min(...feature.points.map((point) => point.z));
         const maxZ = Math.max(...feature.points.map((point) => point.z));
-        return <mesh key={feature.id} position={[(minX + maxX) / 2, 0.04, (minZ + maxZ) / 2]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[maxX - minX, maxZ - minZ]} /><meshBasicMaterial color={feature.color} transparent opacity={0.55} /></mesh>;
+        return (
+          <mesh
+            key={feature.id}
+            position={[(minX + maxX) / 2, 0.04, (minZ + maxZ) / 2]}
+            rotation={[-Math.PI / 2, 0, 0]}
+          >
+            <planeGeometry args={[maxX - minX, maxZ - minZ]} />
+            <meshBasicMaterial
+              color={feature.color}
+              transparent
+              opacity={0.55}
+            />
+          </mesh>
+        );
       })}
-      {routePoints.length > 1 && <Line points={routePoints.map((point) => [point.x, 0.2, point.z])} color="#e8b84a" lineWidth={5} />}
+      {routePoints.length > 1 && (
+        <Line
+          points={routePoints.map((point) => [point.x, 0.2, point.z])}
+          color="#e8b84a"
+          lineWidth={5}
+        />
+      )}
       {attractions.map((attraction) => (
         <group
           key={attraction.id}
@@ -90,7 +128,7 @@ export function MapScene({
         </group>
       ))}
       {userActive && (
-        <mesh position={[0, 0.3, 0]}>
+        <mesh position={[userPosition?.x ?? 0, 0.3, userPosition?.z ?? 0]}>
           <ringGeometry args={[0.18, 0.25, 24]} />
           <meshBasicMaterial color="#477e78" />
         </mesh>

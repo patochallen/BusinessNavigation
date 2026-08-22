@@ -12,11 +12,30 @@ export type MapPoint = {
 
 export type MapFeature =
   | { type: "path"; id: string; points: MapPoint[] }
-  | { type: "area"; id: string; label: string; points: MapPoint[]; color: string }
-  | { type: "building"; id: string; label: string; position: MapPoint; size: MapPoint; color: string };
+  | {
+      type: "area";
+      id: string;
+      label: string;
+      points: MapPoint[];
+      color: string;
+    }
+  | {
+      type: "building";
+      id: string;
+      label: string;
+      position: MapPoint;
+      size: MapPoint;
+      color: string;
+    };
 
 export type Waypoint = { id: string; position: MapPoint };
-export type PathSegment = { id: string; from: string; to: string; distanceInMeters: number; accessible?: boolean };
+export type PathSegment = {
+  id: string;
+  from: string;
+  to: string;
+  distanceInMeters: number;
+  accessible?: boolean;
+};
 
 export type Attraction = {
   id: string;
