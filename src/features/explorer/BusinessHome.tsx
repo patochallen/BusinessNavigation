@@ -38,8 +38,9 @@ export function BusinessHome({
   const [selectedId, setSelectedId] = useState(selectedAttractionId ?? "punto-encuentro");
   const [category, setCategory] = useState<"all" | Category>("all");
   const [query, setQuery] = useState("");
+  const activeSelectedId = selectedAttractionId ?? selectedId;
   const selected =
-    business.attractions.find((item) => item.id === selectedId) ??
+    business.attractions.find((item) => item.id === activeSelectedId) ??
     business.attractions[0];
   const filtered = useMemo(
     () => filterAttractions(business.attractions, category, query),
@@ -77,7 +78,13 @@ export function BusinessHome({
             attractions={business.attractions}
             selectedId={selected?.id}
             centerOnSelected={Boolean(selectedAttractionId)}
-            onSelect={setSelectedId}
+            onSelect={(attractionId) => {
+              setSelectedId(attractionId);
+              navigate(
+                `/b/${business.id}?attraction=${attractionId}`,
+                { replace: true },
+              );
+            }}
             userActive={permission === "ready"}
           />
           <div className="map-label label-top">MIRADOR NORTE</div>
