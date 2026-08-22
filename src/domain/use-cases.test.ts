@@ -6,6 +6,7 @@ import {
   findAttraction,
   findBusiness,
   localPointFromGps,
+  nextRouteInstruction,
   nearestWaypoint,
   routeFromCoordinate,
   routeDistanceInMeters,
@@ -157,5 +158,15 @@ describe("predio routing", () => {
     expect(progress.remainingMeters).toBe(30);
     expect(progress.ratio).toBe(0.5);
     expect(progress.nextPoint).toEqual({ x: 6, z: 0 });
+  });
+
+  it("describes the next turn on a route", () => {
+    const instruction = nextRouteInstruction(
+      [{ x: 0, z: 0 }, { x: 3, z: 0 }, { x: 3, z: 3 }],
+      { x: 0, z: 0 },
+      10,
+    );
+    expect(instruction?.label).toBe("Girás a la izquierda");
+    expect(instruction?.distanceToTurn).toBe(30);
   });
 });

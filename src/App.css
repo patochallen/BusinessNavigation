@@ -192,6 +192,19 @@
 .next-waypoint strong {
   color: #34453f;
 }
+.route-instruction {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 25px 25px;
+  padding: 15px;
+  background: #283a35;
+  color: #f6f4ee;
+}
+.route-instruction svg { color: #e8b84a; }
+.route-instruction div { display: grid; gap: 4px; }
+.route-instruction strong { font-size: 13px; }
+.route-instruction span { color: #c6d0c8; font-size: 10px; }
 .app-shell {
   max-width: 1180px;
   margin: 0 auto;

@@ -291,3 +291,46 @@ export function progressOnRoute(
     nextPoint: route[nearestIndex + 1],
   };
 }
+
+export function nextRouteInstruction(
+  route: MapPoint[],
+  position: MapPoint | null,
+  scaleMeters = 1,
+) {
+  if (route.length < 2) return null;
+  const nearestIndex = position
+    ? route.reduce(
+        (closest, point, index) =>
+          distanceBetweenPoints(position, point) <
+          distanceBetweenPoints(position, route[closest])
+            ? index
+            : closest,
+        0,
+      )
+    : 0;
+  const turnIndex = Math.min(nearestIndex + 1, route.length - 1);
+  const distanceToTurn = position
+    ? distanceBetweenPoints(position, route[turnIndex], scaleMeters)
+    : distanceBetweenPoints(route[0], route[turnIndex], scaleMeters);
+  if (turnIndex === route.length - 1) {
+    return { label: "Seguí hasta el destino", distanceToTurn };
+  }
+
+  const incoming = {
+    x: route[turnIndex].x - route[turnIndex - 1].x,
+    z: route[turnIndex].z - route[turnIndex - 1].z,
+  };
+  const outgoing = {
+    x: route[turnIndex + 1].x - route[turnIndex].x,
+    z: route[turnIndex + 1].z - route[turnIndex].z,
+  };
+  const cross = incoming.x * outgoing.z - incoming.z * outgoing.x;
+  const dot = incoming.x * outgoing.x + incoming.z * outgoing.z;
+  const turn =
+    Math.abs(cross) < Math.abs(dot) * 0.25
+      ? "Seguí derecho"
+      : cross > 0
+        ? "Girás a la izquierda"
+        : "Girás a la derecha";
+  return { label: turn, distanceToTurn };
+}

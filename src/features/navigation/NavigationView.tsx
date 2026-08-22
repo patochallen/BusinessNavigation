@@ -9,6 +9,7 @@ import {
   distanceToNetwork,
   isOffRoute,
   localPointFromGps,
+  nextRouteInstruction,
   progressOnRoute,
   routeDistanceInMeters,
   routeDistanceToAttraction,
@@ -84,6 +85,11 @@ export function NavigationView({
     (waypoint) =>
       waypoint.position.x === progress.nextPoint?.x &&
       waypoint.position.z === progress.nextPoint?.z,
+  );
+  const instruction = nextRouteInstruction(
+    referenceRoute,
+    userPoint,
+    business.mapScaleMeters,
   );
   const networkDistance =
     userPoint && business.waypoints
@@ -162,6 +168,15 @@ export function NavigationView({
             </span>
           )}
         </div>
+        {instruction && (
+          <div className="route-instruction">
+            <Navigation size={18} />
+            <div>
+              <strong>{instruction.label}</strong>
+              <span>{instruction.distanceToTurn} m aproximadamente</span>
+            </div>
+          </div>
+        )}
         {offRoute && (
           <div className="route-warning">
             <strong>Estás fuera del sendero</strong>
