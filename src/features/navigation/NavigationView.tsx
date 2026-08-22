@@ -129,6 +129,7 @@ export function NavigationView({
         <div className="route-map">
           <MapScene
             attractions={business.attractions}
+            business={business}
             mapFeatures={business.mapFeatures}
             routePoints={routePoints}
             userPosition={routePoints[0]}

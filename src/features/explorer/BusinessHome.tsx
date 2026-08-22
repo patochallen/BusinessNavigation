@@ -66,6 +66,7 @@ export function BusinessHome({
           <MapScene
             key={selectedAttractionId ?? 'overview'}
             attractions={business.attractions}
+            business={business}
             mapFeatures={business.mapFeatures}
             selectedId={selected?.id}
             centerOnSelected={Boolean(selectedAttractionId)}

@@ -43,6 +43,10 @@ export function localPointFromGps(
   }
 }
 
+export function getAttractionMapPoint(business: Business, attraction: Attraction) {
+  return localPointFromGps(business.mapOrigin, attraction.coordinates, business.mapScaleMeters)
+}
+
 export function distanceBetweenPoints(first: MapPoint, second: MapPoint, scaleMeters = 1) {
   const dx = (first.x - second.x) * scaleMeters
   const dz = (first.z - second.z) * scaleMeters
@@ -127,12 +131,13 @@ export function shortestPathDistance(
 
 export function routeToAttraction(business: Business, attraction: Attraction) {
   if (!business.waypoints || !business.pathSegments || !attraction.waypointId) return []
-  return shortestPath(
+  const waypointRoute = shortestPath(
     business.waypoints,
     business.pathSegments,
     business.entryWaypointId,
     attraction.waypointId,
   )
+  return [...waypointRoute, getAttractionMapPoint(business, attraction)]
 }
 
 export function routeDistanceToAttraction(
@@ -155,7 +160,17 @@ export function routeDistanceToAttraction(
   const approachDistance = position
     ? distanceBetweenPoints(position, start.position, business.mapScaleMeters)
     : 0
-  return networkDistance + approachDistance
+  const destinationWaypoint = business.waypoints.find(
+    (waypoint) => waypoint.id === attraction.waypointId,
+  )
+  const destinationDistance = destinationWaypoint
+    ? distanceBetweenPoints(
+        destinationWaypoint.position,
+        getAttractionMapPoint(business, attraction),
+        business.mapScaleMeters,
+      )
+    : 0
+  return networkDistance + approachDistance + destinationDistance
 }
 
 export function nearestWaypoint(waypoints: Waypoint[], position: MapPoint) {
@@ -177,10 +192,11 @@ export function routeFromCoordinate(
   const userPoint = localPointFromGps(business.mapOrigin, coordinate, business.mapScaleMeters)
   const start = nearestWaypoint(business.waypoints, userPoint)
   if (!start) return []
-  return [
+  const waypointRoute = [
     userPoint,
     ...shortestPath(business.waypoints, business.pathSegments, start.id, attraction.waypointId),
   ]
+  return [...waypointRoute, getAttractionMapPoint(business, attraction)]
 }
 
 export function routeDistanceInMeters(route: MapPoint[], scaleMeters = 1) {

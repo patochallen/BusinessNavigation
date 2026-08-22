@@ -6,6 +6,7 @@ import {
   findAttraction,
   findBusiness,
   localPointFromGps,
+  getAttractionMapPoint,
   nextRouteInstruction,
   bearingToPoint,
   nearestWaypoint,
@@ -95,13 +96,13 @@ describe('predio routing', () => {
   })
 
   it('resolves an attraction route from the business network', () => {
-    expect(routeToAttraction(valle, mirador)).toHaveLength(3)
+    expect(routeToAttraction(valle, mirador)).toHaveLength(4)
   })
 
   it('starts a route at the visitor coordinate', () => {
     const route = routeFromCoordinate(valle, valle.mapOrigin, mirador)
     expect(route[0]).toEqual({ x: 0, z: -0 })
-    expect(route.at(-1)).toEqual(mirador.position)
+    expect(route.at(-1)).toEqual(getAttractionMapPoint(valle, mirador))
   })
 
   it('returns no route for an unknown destination', () => {

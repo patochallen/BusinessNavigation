@@ -1,9 +1,11 @@
 import { Canvas } from '@react-three/fiber'
 import { Line, OrbitControls, PerspectiveCamera } from '@react-three/drei'
-import type { Attraction, MapFeature } from '../../domain/types'
+import type { Attraction, Business, MapFeature } from '../../domain/types'
+import { getAttractionMapPoint } from '../../domain/use-cases'
 
 type MapSceneProps = {
   attractions: Attraction[]
+  business: Business
   mapFeatures?: MapFeature[]
   routePoints?: { x: number; z: number }[]
   userPosition?: { x: number; z: number }
@@ -15,6 +17,7 @@ type MapSceneProps = {
 
 export function MapScene({
   attractions,
+  business,
   mapFeatures = [],
   routePoints = [],
   userPosition,
@@ -29,11 +32,17 @@ export function MapScene({
         makeDefault
         position={[
           centerOnSelected
-            ? (attractions.find((attraction) => attraction.id === selectedId)?.position.x ?? 0)
+            ? getAttractionMapPoint(
+                business,
+                attractions.find((attraction) => attraction.id === selectedId) ?? attractions[0],
+              ).x
             : 0,
           12,
           centerOnSelected
-            ? (attractions.find((attraction) => attraction.id === selectedId)?.position.z ?? 0)
+            ? getAttractionMapPoint(
+                business,
+                attractions.find((attraction) => attraction.id === selectedId) ?? attractions[0],
+              ).z
             : 0,
         ]}
         rotation={[-Math.PI / 2, 0, 0]}
@@ -52,7 +61,7 @@ export function MapScene({
       />
       <mesh position={[0, 0.05, 0]}>
         <boxGeometry args={[0.18, 0.08, 0.18]} />
-        <meshStandardMaterial color="#34413d" />
+        <meshStandardMaterial color="#ec4c0d" />
       </mesh>
       {mapFeatures.map((feature) => {
         if (feature.type === 'path') {
@@ -98,7 +107,11 @@ export function MapScene({
       {attractions.map((attraction) => (
         <group
           key={attraction.id}
-          position={[attraction.position.x, 0.22, attraction.position.z]}
+          position={[
+            getAttractionMapPoint(business, attraction).x,
+            0.22,
+            getAttractionMapPoint(business, attraction).z,
+          ]}
           onClick={(event) => {
             event.stopPropagation()
             onSelect(attraction.id)

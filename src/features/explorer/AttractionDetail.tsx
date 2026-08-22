@@ -30,7 +30,8 @@ export function AttractionDetail({ business, attraction }: AttractionDetailProps
       >
         <span className="detail-glyph">{detailIcons[attraction.category]}</span>
         <span className="detail-coordinate">
-          {attraction.position.x.toFixed(1)} / {attraction.position.z.toFixed(1)}
+          {attraction.coordinates.latitude.toFixed(5)} /{' '}
+          {attraction.coordinates.longitude.toFixed(5)}
         </span>
         <span className="detail-orbit detail-orbit-one" />
         <span className="detail-orbit detail-orbit-two" />

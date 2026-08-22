@@ -48,7 +48,9 @@ export type Attraction = {
   name: string
   category: Category
   description: string
-  position: MapPoint
+  coordinates: Coordinate
+  imageUrl?: string
+  iconUrl?: string
   color: string
   tag: string
   eta: string
