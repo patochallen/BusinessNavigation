@@ -5,6 +5,7 @@ import type { Attraction } from "../../domain/types";
 type MapSceneProps = {
   attractions: Attraction[];
   selectedId?: string;
+  centerOnSelected?: boolean;
   onSelect: (id: string) => void;
   userActive: boolean;
 };
@@ -12,6 +13,7 @@ type MapSceneProps = {
 export function MapScene({
   attractions,
   selectedId,
+  centerOnSelected = false,
   onSelect,
   userActive,
 }: MapSceneProps) {
@@ -19,7 +21,15 @@ export function MapScene({
     <Canvas className="map-canvas" dpr={[1, 2]}>
       <PerspectiveCamera
         makeDefault
-        position={[0, 12, 0]}
+        position={[
+          centerOnSelected
+            ? (attractions.find((attraction) => attraction.id === selectedId)?.position.x ?? 0)
+            : 0,
+          12,
+          centerOnSelected
+            ? (attractions.find((attraction) => attraction.id === selectedId)?.position.z ?? 0)
+            : 0,
+        ]}
         rotation={[-Math.PI / 2, 0, 0]}
         fov={42}
       />

@@ -87,7 +87,7 @@ export function AttractionDetail({
         </button>
         <button
           className="outline-button"
-          onClick={() => navigate(`/b/${business.id}`)}
+          onClick={() => navigate(`/b/${business.id}?attraction=${attraction.id}`)}
         >
           <MapPin size={16} /> Ver en el mapa
         </button>

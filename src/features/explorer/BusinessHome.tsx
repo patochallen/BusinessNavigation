@@ -18,6 +18,7 @@ import { MapScene } from "../map/MapScene";
 type BusinessHomeProps = {
   business: Business;
   permission: string;
+  selectedAttractionId?: string;
   locate: () => void;
 };
 const icons: Record<Category, typeof Compass> = {
@@ -30,10 +31,11 @@ const icons: Record<Category, typeof Compass> = {
 export function BusinessHome({
   business,
   permission,
+  selectedAttractionId,
   locate,
 }: BusinessHomeProps) {
   const navigate = useNavigate();
-  const [selectedId, setSelectedId] = useState("punto-encuentro");
+  const [selectedId, setSelectedId] = useState(selectedAttractionId ?? "punto-encuentro");
   const [category, setCategory] = useState<"all" | Category>("all");
   const [query, setQuery] = useState("");
   const selected =
@@ -74,6 +76,7 @@ export function BusinessHome({
           <MapScene
             attractions={business.attractions}
             selectedId={selected?.id}
+            centerOnSelected={Boolean(selectedAttractionId)}
             onSelect={setSelectedId}
             userActive={permission === "ready"}
           />

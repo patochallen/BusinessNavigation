@@ -6,6 +6,7 @@ import {
   useLocation,
   useNavigate,
   useParams,
+  useSearchParams,
 } from "react-router-dom";
 import { Search } from "lucide-react";
 import "./App.css";
@@ -22,6 +23,7 @@ function AppContent() {
   }>();
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const business = businessId
     ? demoBusinessRepository.findById(businessId)
     : undefined;
@@ -31,6 +33,7 @@ function AppContent() {
       ? demoBusinessRepository.findAttraction(business, attractionId)
       : business?.attractions[0];
   const isNavigation = location.pathname.endsWith("/navigate");
+  const mapAttractionId = searchParams.get("attraction") ?? undefined;
 
   if (!business || (attractionId && !attraction))
     return (
@@ -74,6 +77,7 @@ function AppContent() {
           <BusinessHome
             business={business}
             permission={permission}
+            selectedAttractionId={mapAttractionId}
             locate={locate}
           />
         )}
