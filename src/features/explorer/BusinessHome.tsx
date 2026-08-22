@@ -108,13 +108,7 @@ export function BusinessHome({
         </div>
       </section>
       <section className="explore-section">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">Explorá el valle</p>
-            <h2>Encontrá tu lugar</h2>
-          </div>
-          <span className="count">{filtered.length} lugares</span>
-        </div>
+        <p className="eyebrow">Attractions ({filtered.length})</p>
         <div className="search-field">
           <Search size={17} />
           <input

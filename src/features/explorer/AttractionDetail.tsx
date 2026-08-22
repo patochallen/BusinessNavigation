@@ -39,7 +39,7 @@ export function AttractionDetail({
   return (
     <section className="attraction-detail">
       <Link className="back-link" to={`/b/${business.id}`}>
-        <ArrowLeft size={17} /> Volver al mapa
+        <ArrowLeft size={17} /> Volver
       </Link>
       <div
         className="detail-visual"

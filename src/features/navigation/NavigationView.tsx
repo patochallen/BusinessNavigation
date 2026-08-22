@@ -109,7 +109,7 @@ export function NavigationView({
   return (
     <section className="navigation-view">
       <button className="back-link" onClick={onBack}>
-        <ArrowLeft size={17} /> Volver al mapa
+        <ArrowLeft size={17} /> Volver
       </button>
       <div className="navigation-title">
         <p className="eyebrow">

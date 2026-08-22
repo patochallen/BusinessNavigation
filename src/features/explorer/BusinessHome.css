@@ -37,13 +37,6 @@
   padding-bottom: 24px;
   background: #ece9df;
 }
-.section-heading {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 20px;
-  margin: 10px 0;
-}
 .map-frame {
   position: relative;
   height: 485px;
@@ -94,15 +87,11 @@
   padding-top: 24px;
   padding-bottom: 24px;
 }
-.count {
-  color: #9ca49d;
-  font-size: 11px;
-}
 .search-field {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 13px 14px;
+  padding: 10px;
   border-bottom: 1px solid #c6c8be;
   color: #86918a;
 }
@@ -160,9 +149,6 @@
   }
   .map-section {
     padding: 15px;
-  }
-  .section-heading {
-    align-items: start;
   }
   .map-frame {
     height: 320px;

@@ -7,6 +7,8 @@
   min-height: 100svh;
   margin: 0 auto;
   background: #f6f4ee;
+  display: flex;
+  flex-direction: column;
 }
 
 .topbar {
@@ -117,7 +119,7 @@ h2 {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 0;
+  padding: 5px;
   border: 0;
   background: transparent;
   color: #718079;

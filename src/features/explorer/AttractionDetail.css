@@ -104,7 +104,7 @@
 }
 @media (max-width: 640px) {
   .attraction-detail {
-    padding: 20px;
+    padding: 10px;
   }
   .detail-visual {
     height: 200px;
