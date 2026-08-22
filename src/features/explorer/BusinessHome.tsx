@@ -64,6 +64,7 @@ export function BusinessHome({
         </div>
         <div className="map-frame">
           <MapScene
+            key={selectedAttractionId ?? 'overview'}
             attractions={business.attractions}
             mapFeatures={business.mapFeatures}
             selectedId={selected?.id}
@@ -79,7 +80,12 @@ export function BusinessHome({
           <div className="map-legend">
             <span className="legend-dot" /> {business.attractions.length} puntos de interés
           </div>
-          <button className="north-button" aria-label="Norte">
+          <button
+            className="north-button"
+            aria-label="Restablecer vista del mapa"
+            title="Restablecer vista del mapa"
+            onClick={() => navigate(`/b/${business.id}`, { replace: true })}
+          >
             <Compass size={17} />
           </button>
         </div>
