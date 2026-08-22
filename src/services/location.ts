@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type {
   Attraction,
   Business,
@@ -19,12 +19,12 @@ export function useGeolocation() {
   const watchId = useRef<number | null>(null)
   const demoTimer = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  const stopDemo = () => {
+  const stopDemo = useCallback(() => {
     if (demoTimer.current !== null) clearInterval(demoTimer.current)
     demoTimer.current = null
-  }
+  }, [])
 
-  const locate = () => {
+  const startLocationTracking = useCallback(() => {
     if (import.meta.env.DEV && import.meta.env.VITE_DEMO_LOCATION === 'true') {
       stopDemo()
       setPermission('requesting')
@@ -70,19 +70,17 @@ export function useGeolocation() {
       },
       { enableHighAccuracy: true, timeout: 8000 },
     )
-  }
+  }, [stopDemo])
 
-  useEffect(
-    () => () => {
-      if (watchId.current !== null) {
-        navigator.geolocation?.clearWatch(watchId.current)
-      }
+  useEffect(() => {
+    startLocationTracking()
+    return () => {
+      if (watchId.current !== null) navigator.geolocation?.clearWatch(watchId.current)
       stopDemo()
-    },
-    [],
-  )
+    }
+  }, [startLocationTracking, stopDemo])
 
-  return { position, permission, errorMessage, locate }
+  return { position, permission, errorMessage }
 }
 
 export function gpsToLocalMeters(origin: Coordinate, coordinate: Coordinate): MapPoint {

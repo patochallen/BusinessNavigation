@@ -1,4 +1,4 @@
-import { Compass, Crosshair, LocateFixed, MapPin, Search, Utensils, Waves, Zap } from 'lucide-react'
+import { Compass, Crosshair, MapPin, Search, Utensils, Waves, Zap } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Business, Category } from '../../domain/types'
@@ -19,7 +19,6 @@ type BusinessHomeProps = {
   permission: string
   position: GeolocationPosition | null
   selectedAttractionId?: string
-  locate: () => void
 }
 
 const icons: Record<Category, typeof Compass> = {
@@ -34,7 +33,6 @@ export function BusinessHome({
   permission,
   position,
   selectedAttractionId,
-  locate,
 }: BusinessHomeProps) {
   const navigate = useNavigate()
   const [selectedId, setSelectedId] = useState(selectedAttractionId ?? 'punto-encuentro')
@@ -71,15 +69,6 @@ export function BusinessHome({
         </div>
       </section>
       <section className="map-section">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">Mapa del predio</p>
-            <h2>Tu próxima pausa</h2>
-          </div>
-          <button className="outline-button" onClick={locate} disabled={permission === 'ready'}>
-            <LocateFixed size={16} /> {permission === 'ready' ? 'Ubicación activa' : 'Ubicarme'}
-          </button>
-        </div>
         <div className="map-frame">
           <MapScene
             key={selectedAttractionId ?? 'overview'}

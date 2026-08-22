@@ -28,7 +28,7 @@ function AppContent() {
   const [searchParams] = useSearchParams()
   const business = businessId ? demoBusinessRepository.findById(businessId) : undefined
   const isNavigation = location.pathname.endsWith('/navigate')
-  const { position, permission, errorMessage, locate } = useGeolocation()
+  const { position, permission, errorMessage } = useGeolocation()
   const attraction =
     business && attractionId
       ? demoBusinessRepository.findAttraction(business, attractionId)
@@ -84,7 +84,6 @@ function AppContent() {
             enableHeading={headingState.enable}
             calibrateHeading={headingState.calibrate}
             headingStable={headingState.headingStable}
-            locate={locate}
             onBack={() => navigate(`/b/${business.id}/a/${attraction?.id ?? ''}`)}
           />
         ) : attractionId && attraction ? (
@@ -100,7 +99,6 @@ function AppContent() {
             permission={permission}
             position={position}
             selectedAttractionId={mapAttractionId}
-            locate={locate}
           />
         )}
       </main>

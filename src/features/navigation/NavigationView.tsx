@@ -32,7 +32,6 @@ type NavigationViewProps = {
   enableHeading: () => Promise<void>
   calibrateHeading: () => void
   headingStable: boolean
-  locate: () => void
   onBack: () => void
 }
 
@@ -47,7 +46,6 @@ export function NavigationView({
   enableHeading,
   calibrateHeading,
   headingStable,
-  locate,
   onBack,
 }: NavigationViewProps) {
   const [cameraVisible, setCameraVisible] = useState(false)
@@ -192,12 +190,11 @@ export function NavigationView({
           <div className="permission-box">
             <LocateFixed size={20} />
             <div>
-              <strong>Activá tu ubicación</strong>
-              <p>{errorMessage ?? 'Para actualizar la distancia en tiempo real.'}</p>
+              <strong>
+                {permission === 'requesting' ? 'Buscando tu ubicación' : 'Ubicación no disponible'}
+              </strong>
+              <p>{errorMessage ?? 'La navegación funciona sin distancia en tiempo real.'}</p>
             </div>
-            <button className="button button-dark" onClick={locate}>
-              {permission === 'requesting' ? 'Solicitando...' : 'Permitir ubicación'}
-            </button>
           </div>
         )}
       </div>
