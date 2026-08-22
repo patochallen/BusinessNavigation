@@ -15,6 +15,9 @@ export type MapFeature =
   | { type: "area"; id: string; label: string; points: MapPoint[]; color: string }
   | { type: "building"; id: string; label: string; position: MapPoint; size: MapPoint; color: string };
 
+export type Waypoint = { id: string; position: MapPoint };
+export type PathSegment = { id: string; from: string; to: string; distanceInMeters: number; accessible?: boolean };
+
 export type Attraction = {
   id: string;
   name: string;
@@ -24,6 +27,7 @@ export type Attraction = {
   color: string;
   tag: string;
   eta: string;
+  waypointId?: string;
 };
 
 export type Business = {
@@ -35,6 +39,8 @@ export type Business = {
   mapOrigin: Coordinate;
   mapScaleMeters: number;
   mapFeatures?: MapFeature[];
+  waypoints?: Waypoint[];
+  pathSegments?: PathSegment[];
   attractions: Attraction[];
 };
 

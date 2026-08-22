@@ -5,6 +5,7 @@ import type { Attraction, MapFeature } from "../../domain/types";
 type MapSceneProps = {
   attractions: Attraction[];
   mapFeatures?: MapFeature[];
+  routePoints?: { x: number; z: number }[];
   selectedId?: string;
   centerOnSelected?: boolean;
   onSelect: (id: string) => void;
@@ -14,6 +15,7 @@ type MapSceneProps = {
 export function MapScene({
   attractions,
   mapFeatures = [],
+  routePoints = [],
   selectedId,
   centerOnSelected = false,
   onSelect,
@@ -63,6 +65,7 @@ export function MapScene({
         const maxZ = Math.max(...feature.points.map((point) => point.z));
         return <mesh key={feature.id} position={[(minX + maxX) / 2, 0.04, (minZ + maxZ) / 2]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[maxX - minX, maxZ - minZ]} /><meshBasicMaterial color={feature.color} transparent opacity={0.55} /></mesh>;
       })}
+      {routePoints.length > 1 && <Line points={routePoints.map((point) => [point.x, 0.2, point.z])} color="#e8b84a" lineWidth={5} />}
       {attractions.map((attraction) => (
         <group
           key={attraction.id}

@@ -4,6 +4,8 @@ import type {
   Category,
   Coordinate,
   MapPoint,
+  PathSegment,
+  Waypoint,
 } from "./types";
 
 export function findBusiness(businesses: Business[], businessId: string) {
@@ -58,4 +60,45 @@ export function distanceBetweenPoints(
   const dx = (first.x - second.x) * scaleMeters;
   const dz = (first.z - second.z) * scaleMeters;
   return Math.round(Math.sqrt(dx * dx + dz * dz));
+}
+
+export function shortestPath(
+  waypoints: Waypoint[],
+  segments: PathSegment[],
+  startId: string,
+  endId: string,
+) {
+  if (!waypoints.some((waypoint) => waypoint.id === startId) || !waypoints.some((waypoint) => waypoint.id === endId)) return [];
+  const distances = new Map(waypoints.map((waypoint) => [waypoint.id, Infinity]));
+  const previous = new Map<string, string>();
+  const pending = new Set(waypoints.map((waypoint) => waypoint.id));
+  distances.set(startId, 0);
+
+  while (pending.size > 0) {
+    const current = [...pending].reduce((closest, id) => (distances.get(id)! < distances.get(closest)! ? id : closest));
+    pending.delete(current);
+    if (current === endId || distances.get(current) === Infinity) break;
+    const neighbors = segments.flatMap((segment) => {
+      if (segment.from === current) return [{ id: segment.to, distance: segment.distanceInMeters }];
+      if (segment.to === current) return [{ id: segment.from, distance: segment.distanceInMeters }];
+      return [];
+    });
+    neighbors.forEach((neighbor) => {
+      const candidate = distances.get(current)! + neighbor.distance;
+      if (candidate < distances.get(neighbor.id)!) {
+        distances.set(neighbor.id, candidate);
+        previous.set(neighbor.id, current);
+      }
+    });
+  }
+
+  if (startId !== endId && !previous.has(endId)) return [];
+  const pathIds = [endId];
+  while (pathIds[0] !== startId) pathIds.unshift(previous.get(pathIds[0])!);
+  return pathIds.map((id) => waypoints.find((waypoint) => waypoint.id === id)!.position);
+}
+
+export function routeToAttraction(business: Business, attraction: Attraction) {
+  if (!business.waypoints || !business.pathSegments || !attraction.waypointId) return [];
+  return shortestPath(business.waypoints, business.pathSegments, "entrada", attraction.waypointId);
 }

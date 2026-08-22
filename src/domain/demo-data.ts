@@ -10,6 +10,21 @@ export const businesses: Business[] = [
       "Un paisaje vivo para explorar a tu propio ritmo. Encontrá senderos, sabores y momentos que quedan.",
     mapOrigin: { latitude: -32.1342, longitude: -64.4801 },
     mapScaleMeters: 10,
+    waypoints: [
+      { id: "entrada", position: { x: -5.5, z: 4.5 } },
+      { id: "centro", position: { x: 0, z: 0 } },
+      { id: "fuego", position: { x: 2.4, z: -1.5 } },
+      { id: "mirador", position: { x: -4.2, z: -3.1 } },
+      { id: "arroyo", position: { x: 4.5, z: 2.6 } },
+      { id: "tirolesa", position: { x: -1.2, z: 3.8 } },
+    ],
+    pathSegments: [
+      { id: "entrada-centro", from: "entrada", to: "centro", distanceInMeters: 71 },
+      { id: "centro-fuego", from: "centro", to: "fuego", distanceInMeters: 28 },
+      { id: "centro-mirador", from: "centro", to: "mirador", distanceInMeters: 38 },
+      { id: "fuego-arroyo", from: "fuego", to: "arroyo", distanceInMeters: 48 },
+      { id: "centro-tirolesa", from: "centro", to: "tirolesa", distanceInMeters: 43 },
+    ],
     mapFeatures: [
       { type: "area", id: "bosque", label: "Bosque nativo", color: "#c7d2b8", points: [{ x: -6, z: -5 }, { x: -1, z: -5 }, { x: -1, z: -1 }, { x: -6, z: -1 }] },
       { type: "area", id: "arroyo", label: "Arroyo", color: "#b9d5d1", points: [{ x: 2, z: -5 }, { x: 6, z: -4 }, { x: 6, z: -2 }, { x: 2, z: -3 }] },
@@ -29,6 +44,7 @@ export const businesses: Business[] = [
         color: "#e8b84a",
         tag: "Imperdible",
         eta: "8 min",
+        waypointId: "mirador",
       },
       {
         id: "casa-del-fuego",
@@ -40,6 +56,7 @@ export const businesses: Business[] = [
         color: "#e87952",
         tag: "Abierto ahora",
         eta: "4 min",
+        waypointId: "fuego",
       },
       {
         id: "sendero-agua",
@@ -51,6 +68,7 @@ export const businesses: Business[] = [
         color: "#56a9a0",
         tag: "Tranquilo",
         eta: "12 min",
+        waypointId: "arroyo",
       },
       {
         id: "tirolesa",
@@ -62,6 +80,7 @@ export const businesses: Business[] = [
         color: "#d878a6",
         tag: "Reserva previa",
         eta: "10 min",
+        waypointId: "tirolesa",
       },
       {
         id: "punto-encuentro",
@@ -72,6 +91,7 @@ export const businesses: Business[] = [
         color: "#6b8cbd",
         tag: "Servicios",
         eta: "2 min",
+        waypointId: "centro",
       },
     ],
   },
@@ -84,6 +104,8 @@ export const businesses: Business[] = [
     mapOrigin: { latitude: -38.0055, longitude: -57.5426 },
     mapScaleMeters: 10,
     mapFeatures: [],
+    waypoints: [],
+    pathSegments: [],
     attractions: [],
   },
 ];
