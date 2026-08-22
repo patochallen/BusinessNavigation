@@ -8,6 +8,9 @@ import {
   localPointFromGps,
   nearestWaypoint,
   routeFromCoordinate,
+  routeDistanceInMeters,
+  distanceToNetwork,
+  isOffRoute,
   routeToAttraction,
   shortestPath,
 } from "./use-cases";
@@ -113,5 +116,21 @@ describe("predio routing", () => {
         "missing",
       ),
     ).toEqual([]);
+  });
+
+  it("calculates route distance and detects when a visitor leaves the network", () => {
+    const waypoints = valle.waypoints ?? [];
+    expect(
+      routeDistanceInMeters(
+        [
+          { x: 0, z: 0 },
+          { x: 3, z: 4 },
+        ],
+        10,
+      ),
+    ).toBe(50);
+    expect(distanceToNetwork(waypoints, { x: 2, z: 0 }, 10)).toBe(20);
+    expect(isOffRoute(waypoints, { x: 2, z: 0 }, 30, 10)).toBe(false);
+    expect(isOffRoute(waypoints, { x: 6, z: 6 }, 30, 10)).toBe(true);
   });
 });

@@ -155,3 +155,34 @@ export function routeFromCoordinate(
     ),
   ];
 }
+
+export function routeDistanceInMeters(route: MapPoint[], scaleMeters = 1) {
+  return route
+    .slice(1)
+    .reduce(
+      (total, point, index) =>
+        total + distanceBetweenPoints(route[index], point, scaleMeters),
+      0,
+    );
+}
+
+export function distanceToNetwork(
+  waypoints: Waypoint[],
+  position: MapPoint,
+  scaleMeters = 1,
+) {
+  const nearest = nearestWaypoint(waypoints, position);
+  return nearest
+    ? distanceBetweenPoints(position, nearest.position, scaleMeters)
+    : null;
+}
+
+export function isOffRoute(
+  waypoints: Waypoint[],
+  position: MapPoint,
+  thresholdMeters: number,
+  scaleMeters = 1,
+) {
+  const distance = distanceToNetwork(waypoints, position, scaleMeters);
+  return distance !== null && distance > thresholdMeters;
+}

@@ -5,7 +5,14 @@ import type {
   LocationPermission,
 } from "../../domain/types";
 import { distanceInMeters } from "../../services/location";
-import { routeFromCoordinate, routeToAttraction } from "../../domain/use-cases";
+import {
+  distanceToNetwork,
+  isOffRoute,
+  localPointFromGps,
+  routeDistanceInMeters,
+  routeFromCoordinate,
+  routeToAttraction,
+} from "../../domain/use-cases";
 import { MapScene } from "../map/MapScene";
 
 type NavigationViewProps = {
@@ -51,6 +58,32 @@ export function NavigationView({
         )
       : routeToAttraction(business, selected)
     : [];
+  const routeDistance = routeDistanceInMeters(
+    routePoints,
+    business.mapScaleMeters,
+  );
+  const userPoint = position
+    ? localPointFromGps(
+        business.mapOrigin,
+        {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        },
+        business.mapScaleMeters,
+      )
+    : null;
+  const networkDistance =
+    userPoint && business.waypoints
+      ? distanceToNetwork(
+          business.waypoints,
+          userPoint,
+          business.mapScaleMeters,
+        )
+      : null;
+  const offRoute =
+    userPoint && business.waypoints
+      ? isOffRoute(business.waypoints, userPoint, 30, business.mapScaleMeters)
+      : false;
 
   return (
     <section className="navigation-view">
@@ -93,7 +126,20 @@ export function NavigationView({
             <strong>{selected?.eta ?? "—"}</strong>
             <span>caminando</span>
           </div>
+          <div>
+            <strong>{routeDistance > 0 ? `${routeDistance} m` : "—"}</strong>
+            <span>ruta por senderos</span>
+          </div>
         </div>
+        {offRoute && (
+          <div className="route-warning">
+            <strong>Estás fuera del sendero</strong>
+            <span>
+              A {networkDistance} m de la red señalizada. Volvé al camino para
+              retomar la ruta.
+            </span>
+          </div>
+        )}
         {permission !== "ready" && (
           <div className="permission-box">
             <LocateFixed size={20} />

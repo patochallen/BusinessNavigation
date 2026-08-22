@@ -41,6 +41,21 @@
   box-shadow: 0 12px 28px rgba(38, 55, 48, 0.16);
 }
 .detail-coordinate {
+  .route-warning {
+    display: grid;
+    gap: 4px;
+    margin: 0 25px 25px;
+    padding: 13px 15px;
+    border-left: 3px solid #d87858;
+    background: #f6ddd1;
+    color: #7c584b;
+    font-size: 10px;
+    line-height: 1.45;
+  }
+  .route-warning strong {
+    color: #864b39;
+    font-size: 11px;
+  }
   position: absolute;
   right: 18px;
   bottom: 16px;
