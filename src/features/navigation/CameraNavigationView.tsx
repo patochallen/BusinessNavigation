@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Camera, LocateFixed, Navigation, X } from 'lucide-react'
 import type { Attraction, CameraPermission } from '../../domain/types'
+import './CameraNavigationView.css'
 
 type CameraNavigationViewProps = {
   stream: MediaStream | null

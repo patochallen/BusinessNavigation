@@ -2,6 +2,7 @@ import { Canvas } from '@react-three/fiber'
 import { Line, OrbitControls, PerspectiveCamera } from '@react-three/drei'
 import type { Business } from '../../domain/types'
 import { getAttractionMapPoint } from '../../domain/use-cases'
+import './MapScene.css'
 
 type MapSceneProps = {
   business: Business

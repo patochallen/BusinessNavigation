@@ -18,6 +18,7 @@ import {
 import { MapScene } from '../map/MapScene'
 import { CameraNavigationView } from './CameraNavigationView'
 import { useCameraStream } from '../../services/camera'
+import './NavigationView.css'
 import { getDistanceBetweenLocations } from '../../utils/location'
 
 type NavigationViewProps = {

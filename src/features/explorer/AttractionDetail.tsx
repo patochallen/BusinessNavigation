@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import type { Attraction, Business } from '../../domain/types'
 import { categoryLabels } from '../../domain/demo-data'
+import './AttractionDetail.css'
 import { routeDistanceToAttraction, walkingEtaFromDistance } from '../../domain/use-cases'
 import { getDistanceAndHeadingBetweenLocations } from '../../utils/location'
 
