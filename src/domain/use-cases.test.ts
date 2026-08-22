@@ -19,6 +19,7 @@ import {
   relativeBearing,
   shortestPath,
   cameraOverlayPosition,
+  circularAngleSpread,
 } from './use-cases'
 
 const valle = businesses[0]
@@ -171,5 +172,10 @@ describe('predio routing', () => {
     expect(cameraOverlayPosition(0, 100)).toEqual({ left: 50, top: 31.2, scale: 1.115 })
     expect(cameraOverlayPosition(180, 0).left).toBe(86)
     expect(cameraOverlayPosition(-180, 500).left).toBe(14)
+  })
+
+  it('measures angular spread across the 360 degree boundary', () => {
+    expect(circularAngleSpread([358, 0, 2])).toBe(4)
+    expect(circularAngleSpread([10, 40, 90])).toBe(80)
   })
 })

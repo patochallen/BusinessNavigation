@@ -295,3 +295,15 @@ export function cameraOverlayPosition(relativeAngle: number | null, distanceMete
     scale: 1.15 - (safeDistance / 1000) * 0.35,
   }
 }
+
+export function circularAngleSpread(angles: number[]) {
+  if (angles.length < 2) return 0
+  const normalized = angles
+    .map((angle) => (angle + 360) % 360)
+    .sort((first, second) => first - second)
+  let largestGap = normalized[0] + 360 - normalized[normalized.length - 1]
+  for (let index = 1; index < normalized.length; index += 1) {
+    largestGap = Math.max(largestGap, normalized[index] - normalized[index - 1])
+  }
+  return 360 - largestGap
+}

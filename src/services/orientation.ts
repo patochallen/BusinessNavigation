@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { LocationPermission } from '../domain/types'
+import { circularAngleSpread } from '../domain/use-cases'
 
 type CompassEvent = DeviceOrientationEvent & { webkitCompassHeading?: number }
 type PermissionCapableOrientation = typeof DeviceOrientationEvent & {
@@ -42,7 +43,7 @@ export function useDeviceHeading(enabled = true) {
         rawHeadingRef.current = normalized
         const calibrated = (normalized - calibrationOffset + 360) % 360
         samplesRef.current = [...samplesRef.current.slice(-7), calibrated]
-        const spread = Math.max(...samplesRef.current) - Math.min(...samplesRef.current)
+        const spread = circularAngleSpread(samplesRef.current)
         setHeadingStable(samplesRef.current.length >= 3 && spread < 12)
         setHeading(calibrated)
       }

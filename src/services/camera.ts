@@ -15,8 +15,9 @@ export function useCameraStream() {
   }
 
   const start = async () => {
-    if (!navigator.mediaDevices?.getUserMedia) {
+    if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
       setPermission('unavailable')
+      setErrorMessage('La cámara requiere HTTPS o localhost.')
       return
     }
     setPermission('requesting')
