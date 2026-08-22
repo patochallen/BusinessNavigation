@@ -16,6 +16,7 @@ import {
   distanceToNetwork,
   isOffRoute,
   routeToAttraction,
+  walkingEtaFromDistance,
   progressOnRoute,
   relativeBearing,
   shortestPath,
@@ -130,6 +131,13 @@ describe('predio routing', () => {
   it('uses segment weights for the route distance', () => {
     expect(routeDistanceToAttraction(valle, mirador)).toBe(109)
     expect(routeDistanceToAttraction(valle, mirador, { x: -5, z: 4 })).toBe(116)
+  })
+
+  it('calculates a walking ETA from distance', () => {
+    expect(walkingEtaFromDistance(0)).toBe('Ahora')
+    expect(walkingEtaFromDistance(80)).toBe('1 min')
+    expect(walkingEtaFromDistance(81)).toBe('2 min')
+    expect(walkingEtaFromDistance(null)).toBeNull()
   })
 
   it('reports completed and remaining route progress', () => {

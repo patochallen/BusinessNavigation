@@ -13,6 +13,7 @@ import {
   routeDistanceToAttraction,
   routeFromCoordinate,
   routeToAttraction,
+  walkingEtaFromDistance,
 } from '../../domain/use-cases'
 import { MapScene } from '../map/MapScene'
 import { CameraNavigationView } from './CameraNavigationView'
@@ -143,7 +144,7 @@ export function NavigationView({
             <span>distancia estimada</span>
           </div>
           <div>
-            <strong>{selected?.eta ?? '—'}</strong>
+            <strong>{walkingEtaFromDistance(routeDistance) ?? '—'}</strong>
             <span>caminando</span>
           </div>
           <div>

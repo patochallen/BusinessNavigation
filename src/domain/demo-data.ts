@@ -1,5 +1,5 @@
 import type { Business, Category } from './types'
-import { localPointFromGps } from './use-cases'
+import { localPointFromGps } from './coordinates'
 
 const parqueSaavedraOrigin = { latitude: -34.550539413457, longitude: -58.48003697685765 }
 const parqueSaavedraScaleMeters = 35
@@ -122,7 +122,6 @@ export const businesses: Business[] = [
         coordinates: { latitude: -32.1339219, longitude: -64.4805455 },
         color: '#e8b84a',
         tag: 'Imperdible',
-        eta: '8 min',
         waypointId: 'mirador',
       },
       {
@@ -133,7 +132,6 @@ export const businesses: Business[] = [
         coordinates: { latitude: -32.1340653, longitude: -64.4798455 },
         color: '#e87952',
         tag: 'Abierto ahora',
-        eta: '4 min',
         waypointId: 'fuego',
       },
       {
@@ -144,7 +142,6 @@ export const businesses: Business[] = [
         coordinates: { latitude: -32.1344333, longitude: -64.479623 },
         color: '#56a9a0',
         tag: 'Tranquilo',
-        eta: '12 min',
         waypointId: 'arroyo',
       },
       {
@@ -155,7 +152,6 @@ export const businesses: Business[] = [
         coordinates: { latitude: -32.134541, longitude: -64.4802272 },
         color: '#d878a6',
         tag: 'Reserva previa',
-        eta: '10 min',
         waypointId: 'tirolesa',
       },
       {
@@ -166,7 +162,6 @@ export const businesses: Business[] = [
         coordinates: { latitude: -32.1342, longitude: -64.4801 },
         color: '#6b8cbd',
         tag: 'Servicios',
-        eta: '2 min',
         waypointId: 'centro',
       },
     ],
@@ -343,7 +338,6 @@ export const businesses: Business[] = [
         iconUrl: '/carousel.png',
         color: '#d878a6',
         tag: 'Para toda la familia',
-        eta: '4 min',
         waypointId: 'calesita',
       },
       {
@@ -356,7 +350,6 @@ export const businesses: Business[] = [
           'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSbbFTO2Be3H5gUHhOgPxjoEzZ5iG5_9RPKbK50vSiHtXMnmdEM',
         color: '#e8b84a',
         tag: 'Juegos infantiles',
-        eta: '6 min',
         waypointId: 'barco-pirata',
       },
       {
@@ -369,7 +362,6 @@ export const businesses: Business[] = [
           'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSbbFTO2Be3H5gUHhOgPxjoEzZ5iG5_9RPKbK50vSiHtXMnmdEM',
         color: '#56a9a0',
         tag: 'Sombra y descanso',
-        eta: '8 min',
         waypointId: 'camion-juegos',
       },
       {
@@ -382,7 +374,6 @@ export const businesses: Business[] = [
           'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSbbFTO2Be3H5gUHhOgPxjoEzZ5iG5_9RPKbK50vSiHtXMnmdEM',
         color: '#6b8cbd',
         tag: 'Actividad libre',
-        eta: '7 min',
         waypointId: 'tobogan',
       },
       {
@@ -395,7 +386,6 @@ export const businesses: Business[] = [
           'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSbbFTO2Be3H5gUHhOgPxjoEzZ5iG5_9RPKbK50vSiHtXMnmdEM',
         color: '#e87952',
         tag: 'Fines de semana',
-        eta: '5 min',
         waypointId: 'arenero',
       },
       {
@@ -408,7 +398,6 @@ export const businesses: Business[] = [
           'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSbbFTO2Be3H5gUHhOgPxjoEzZ5iG5_9RPKbK50vSiHtXMnmdEM',
         color: '#8b9dba',
         tag: 'Servicios',
-        eta: '2 min',
         waypointId: 'cancha-futbol',
       },
       {
@@ -421,7 +410,6 @@ export const businesses: Business[] = [
           'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSbbFTO2Be3H5gUHhOgPxjoEzZ5iG5_9RPKbK50vSiHtXMnmdEM',
         color: '#8b9dba',
         tag: 'Servicios',
-        eta: '5 min',
         waypointId: 'banos-publicos',
       },
       {
@@ -434,7 +422,6 @@ export const businesses: Business[] = [
           'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSbbFTO2Be3H5gUHhOgPxjoEzZ5iG5_9RPKbK50vSiHtXMnmdEM',
         color: '#6b8cbd',
         tag: 'Seguridad',
-        eta: '6 min',
         waypointId: 'comisaria',
       },
     ],

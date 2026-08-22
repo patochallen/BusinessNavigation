@@ -1,10 +1,26 @@
-import { Compass, Crosshair, LocateFixed, MapPin, Search, Utensils, Waves, Zap } from 'lucide-react'
+import {
+  Compass,
+  Crosshair,
+  LocateFixed,
+  MapPin,
+  Search,
+  Utensils,
+  Waves,
+  Zap,
+  ArrowUp,
+} from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Business, Category } from '../../domain/types'
 import { categoryLabels } from '../../domain/demo-data'
-import { filterAttractions, localPointFromGps } from '../../domain/use-cases'
+import {
+  filterAttractions,
+  localPointFromGps,
+  routeDistanceToAttraction,
+  walkingEtaFromDistance,
+} from '../../domain/use-cases'
 import { MapScene } from '../map/MapScene'
+import { getDistanceAndHeadingBetweenLocations } from '../../utils/location'
 
 type BusinessHomeProps = {
   business: Business
@@ -149,6 +165,10 @@ export function BusinessHome({
         <div className="attraction-list">
           {filtered.map((item) => {
             const Icon = icons[item.category]
+            const { distanceMeters, headingDegrees } = getDistanceAndHeadingBetweenLocations(
+              position?.coords ?? business.mapOrigin,
+              item.coordinates,
+            )
             return (
               <button
                 className={`attraction-card ${selected?.id === item.id ? 'selected' : ''}`}
@@ -162,16 +182,23 @@ export function BusinessHome({
                   <Icon size={18} />
                 </span>
                 <span className="attraction-copy">
-                  <span className="attraction-top">
-                    <strong>{item.name}</strong>
-                    <span className="card-arrow">↗</span>
-                  </span>
+                  <strong className="attraction-top">{item.name}</strong>
                   <span>{item.description}</span>
                   <span className="attraction-meta">
                     <span>{categoryLabels[item.category]}</span>
                     <span>•</span>
-                    <span>{item.eta} a pie</span>
+                    <span>
+                      {walkingEtaFromDistance(routeDistanceToAttraction(business, item)) ?? '—'} a
+                      pie
+                    </span>
                   </span>
+                </span>
+                <span className="card-distance">
+                  <ArrowUp
+                    className="card-arrow"
+                    style={{ transform: `rotate(${headingDegrees}deg)` }}
+                  />
+                  <span>{Math.round(distanceMeters)} m.</span>
                 </span>
               </button>
             )

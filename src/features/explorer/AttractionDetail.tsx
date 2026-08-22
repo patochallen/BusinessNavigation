@@ -1,23 +1,23 @@
-import { ArrowLeft, Clock3, MapPin, Navigation, ShieldCheck } from 'lucide-react'
+import { ArrowLeft, ArrowUp, Clock3, MapPin, Navigation, ShieldCheck } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import type { Attraction, Business } from '../../domain/types'
 import { categoryLabels } from '../../domain/demo-data'
+import { routeDistanceToAttraction, walkingEtaFromDistance } from '../../domain/use-cases'
+import { getDistanceAndHeadingBetweenLocations } from '../../utils/location'
 
 type AttractionDetailProps = {
   business: Business
   attraction: Attraction
+  position?: GeolocationPosition | null
 }
 
-const detailIcons = {
-  nature: '✦',
-  food: '◌',
-  adventure: '↗',
-  services: '＋',
-}
-
-export function AttractionDetail({ business, attraction }: AttractionDetailProps) {
+export function AttractionDetail({ business, attraction, position }: AttractionDetailProps) {
   const navigate = useNavigate()
+  const { distanceMeters, headingDegrees } = getDistanceAndHeadingBetweenLocations(
+    position?.coords ?? business.mapOrigin,
+    attraction.coordinates,
+  )
 
   return (
     <section className="attraction-detail">
@@ -28,11 +28,10 @@ export function AttractionDetail({ business, attraction }: AttractionDetailProps
         className="detail-visual"
         style={{ '--detail-color': attraction.color } as CSSProperties}
       >
-        <span className="detail-glyph">{detailIcons[attraction.category]}</span>
-        <span className="detail-coordinate">
-          {attraction.coordinates.latitude.toFixed(5)} /{' '}
-          {attraction.coordinates.longitude.toFixed(5)}
+        <span className="detail-glyph">
+          <ArrowUp size={60} style={{ transform: `rotate(${headingDegrees}deg)` }} />
         </span>
+        <span className="detail-coordinate">{distanceMeters.toFixed(1)} m.</span>
         <span className="detail-orbit detail-orbit-one" />
         <span className="detail-orbit detail-orbit-two" />
       </div>
@@ -51,7 +50,10 @@ export function AttractionDetail({ business, attraction }: AttractionDetailProps
         <div>
           <Clock3 size={17} />
           <span>
-            <strong>{attraction.eta}</strong> a pie
+            <strong>
+              {walkingEtaFromDistance(routeDistanceToAttraction(business, attraction)) ?? '—'}
+            </strong>{' '}
+            a pie
           </span>
         </div>
         <div>

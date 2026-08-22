@@ -81,7 +81,7 @@ function AppContent() {
             onBack={() => navigate(`/b/${business.id}/a/${attraction?.id ?? ''}`)}
           />
         ) : attractionId && attraction ? (
-          <AttractionDetail business={business} attraction={attraction} />
+          <AttractionDetail business={business} attraction={attraction} position={position} />
         ) : (
           <BusinessHome
             business={business}

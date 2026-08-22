@@ -12,6 +12,7 @@
   overflow: hidden;
   border: 1px solid #c9cbbd;
   background: radial-gradient(circle at 50% 45%, var(--detail-color), #e7e5dc 70%);
+  align-content: space-evenly;
 }
 .detail-visual::before {
   position: absolute;
@@ -26,15 +27,22 @@
   z-index: 1;
   display: grid;
   place-items: center;
-  width: 82px;
-  height: 82px;
+  width: 90px;
+  height: 90px;
   border: 1px solid rgba(255, 255, 255, 0.7);
   border-radius: 50%;
   background: var(--detail-color);
   color: #fff;
   font-family: Georgia, serif;
   font-size: 38px;
-  box-shadow: 0 12px 28px rgba(38, 55, 48, 0.16);
+  box-shadow: 0 6px 20px rgba(38, 55, 48, 0.3);
+}
+.detail-coordinate {
+  color: #fff;
+  font-size: 30px;
+  font-weight: 600;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.8);
+  z-index: 1;
 }
 .route-warning {
   display: grid;
@@ -635,7 +643,7 @@ h2 {
 .attraction-card {
   display: flex;
   gap: 14px;
-  min-height: 128px;
+  min-height: 90px;
   padding: 10px;
   text-align: left;
   border: 1px solid #dfded5;
@@ -661,7 +669,7 @@ h2 {
 }
 .attraction-copy {
   display: flex;
-  min-width: 0;
+  /* width: 100%; */
   flex-direction: column;
   gap: 4px;
   font-size: 11px;
@@ -674,10 +682,21 @@ h2 {
   color: #30403a;
   font-size: 14px;
 }
+.card-distance {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  gap: 6px;
+  margin-left: auto;
+  font-size: 10px;
+  line-height: 10px;
+}
 .card-arrow {
   color: #9da59b;
-  font-size: 18px;
-  line-height: 12px;
+  width: 20px;
+  height: 20px;
 }
 .attraction-meta {
   display: flex;
@@ -858,7 +877,7 @@ footer {
     grid-template-columns: 1fr;
   }
   .attraction-card {
-    min-height: 95px;
+    min-height: 80px;
   }
   .explore-section {
     padding: 10px;

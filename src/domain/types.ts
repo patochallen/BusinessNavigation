@@ -54,7 +54,6 @@ export type Attraction = {
   iconUrl?: string
   color: string
   tag: string
-  eta: string
   waypointId?: string
 }
 

@@ -7,6 +7,9 @@ import type {
   PathSegment,
   Waypoint,
 } from './types'
+import { localPointFromGps } from './coordinates'
+
+export { localPointFromGps } from './coordinates'
 
 export function findBusiness(businesses: Business[], businessId: string) {
   return businesses.find((business) => business.id === businessId)
@@ -27,20 +30,6 @@ export function filterAttractions(
     const matchesQuery = attraction.name.toLocaleLowerCase().includes(normalizedQuery)
     return matchesCategory && matchesQuery
   })
-}
-
-export function localPointFromGps(
-  origin: Coordinate,
-  coordinate: Coordinate,
-  scaleMeters: number,
-): MapPoint {
-  const metersPerDegreeLatitude = 111_320
-  const metersPerDegreeLongitude =
-    metersPerDegreeLatitude * Math.cos((origin.latitude * Math.PI) / 180)
-  return {
-    x: ((coordinate.longitude - origin.longitude) * metersPerDegreeLongitude) / scaleMeters,
-    z: -((coordinate.latitude - origin.latitude) * metersPerDegreeLatitude) / scaleMeters,
-  }
 }
 
 export function getAttractionMapPoint(business: Business, attraction: Attraction) {
@@ -206,6 +195,14 @@ export function routeDistanceInMeters(route: MapPoint[], scaleMeters = 1) {
       (total, point, index) => total + distanceBetweenPoints(route[index], point, scaleMeters),
       0,
     )
+}
+
+const WALKING_METERS_PER_MINUTE = 80
+
+export function walkingEtaFromDistance(distanceMeters: number | null) {
+  if (distanceMeters === null || !Number.isFinite(distanceMeters)) return null
+  if (distanceMeters <= 0) return 'Ahora'
+  return `${Math.max(1, Math.ceil(distanceMeters / WALKING_METERS_PER_MINUTE))} min`
 }
 
 export function projectPointOnSegment(point: MapPoint, start: MapPoint, end: MapPoint) {
