@@ -34,7 +34,7 @@ export function useDeviceHeading(enabled = true) {
   }
 
   useEffect(() => {
-    if (!enabled || !supported) return
+    if (!enabled || !supported || permission !== 'ready') return
     const onOrientation = (event: CompassEvent) => {
       const rawHeading =
         event.webkitCompassHeading ?? (event.alpha === null ? null : 360 - event.alpha)
@@ -50,12 +50,14 @@ export function useDeviceHeading(enabled = true) {
     }
     window.addEventListener('deviceorientation', onOrientation)
     return () => window.removeEventListener('deviceorientation', onOrientation)
-  }, [calibrationOffset, enabled, supported])
+  }, [calibrationOffset, enabled, permission, supported])
 
   const calibrate = () => {
     if (rawHeadingRef.current === null) return
     setCalibrationOffset(rawHeadingRef.current)
     setHeading(0)
+    samplesRef.current = []
+    setHeadingStable(false)
   }
 
   return {

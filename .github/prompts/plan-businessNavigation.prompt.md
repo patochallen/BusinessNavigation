@@ -1,12 +1,16 @@
 ## Plan: Business Navigation MVP
 
+**Estado actual — 2026-08-21**
+
+El MVP público está implementado y validado con Vite, React, TypeScript, Three.js y un emulador Android conectado por `adb`. Se probaron home, detalle, navegación, permisos de cámara, stream de cámara, overlay AR aproximado y estados de ubicación. La red de caminos, waypoints, recalculo, progreso, instrucciones, heading, calibración y HTTPS local ya están implementados. La simulación GPS mediante `adb emu geo fix` no está disponible en la instancia actual; se agregó `VITE_DEMO_LOCATION=true` para reproducir una ruta demo durante desarrollo.
+
 Construir una app React + Vite + TypeScript, mobile-first, para que una persona llegue desde un QR a un negocio o atraccion, explore categorias y puntos de interes, y consulte un mapa cenital 3D. La primera version usara datos locales tipados y una ruta visual directa entre la ubicacion del usuario y la atraccion; no intentara calcular caminos reales ni dependera de una API de mapas.
 
 **Steps**
 
 1. **Base del proyecto**
    - Inicializar Vite con React y TypeScript en `/Users/patricio.challen/React/BusinessNavigation`.
-   - Configurar scripts de desarrollo, build y lint/typecheck segun el stack elegido.
+   - Configurar scripts de desarrollo, build, lint/typecheck, tests, HTTPS local y ubicación demo.
    - Incorporar React Router para rutas publicas por QR y `three` junto con `@react-three/fiber` y `@react-three/drei` para la escena interactiva. Mantener la UI y la escena separadas para que Three.js no gobierne el estado de negocio.
    - Definir tokens visuales y una composicion mobile-first orientada a uso en exteriores: contraste alto, controles grandes, estados de permiso/error visibles y carga rapida.
 
@@ -67,13 +71,15 @@ Construir una app React + Vite + TypeScript, mobile-first, para que una persona 
 - Stack recomendado: Vite + React + TypeScript; se prioriza tipado porque el dominio multi-negocio y la futura migracion a API necesitan contratos claros.
 - El QR se modela como un destino de URL con `businessId` y opcionalmente `attractionId`; no se implementa un lector QR dentro de la app en esta etapa.
 - Datos iniciales locales tipados; no se agrega backend ni panel de administracion al MVP.
-- La navegacion inicial es una linea directa entre puntos, util para validar la experiencia visual pero no equivalente a indicaciones reales.
+  - La navegación usa una red local de waypoints y segmentos en los fixtures; si no existe red, conserva el fallback visual.
 - No se usa API de mapas; Three.js se limita a la visualizacion espacial y la UI conserva la informacion accesible fuera del canvas.
-- Incluido: exploracion publica, mapa 3D cenital, multi-negocio por ruta, geolocalizacion opcional, distancia y modo de ruta visual directa.
-- Excluido por ahora: caminos reales, recalculo, heading confiable, AR con camara, offline/PWA, cuentas, CMS, pagos, analitica y dominios personalizados.
+- Incluido: exploracion publica, mapa 3D cenital, multi-negocio por ruta, geolocalizacion opcional, red de caminos, distancia, progreso, heading y cámara AR aproximada.
+- Excluido por ahora: datos de producción, offline/PWA, cuentas, CMS, pagos, analítica, dominios personalizados, posicionamiento AR preciso y pruebas GPS automatizadas con el emulador.
 
 **Further Considerations**
 
 1. Antes de implementar la fase 2, decidir si cada negocio cargara una red de caminos/waypoints o si se integrara un motor externo; recomendacion: waypoints propios primero para conservar el requisito de no usar APIs de mapas.
 2. Las coordenadas de produccion necesitaran un sistema local y un origen/escala definidos por negocio; no conviene mezclar coordenadas GPS sin transformacion con posiciones artisticas del mapa.
 3. Para probar heading y camara sera necesario validar iOS Safari y Android Chrome en dispositivos reales, no solo emulacion de escritorio.
+4. El emulador Android validó cámara y UI, pero su ubicación entregada no correspondió al predio y `adb emu geo fix` devolvió comando desconocido; usar Android Studio Location Controls, GPX o un dispositivo real para validar recorrido.
+5. El certificado `mkcert` funciona en la Mac; Chrome Android mostró advertencia de confianza, por lo que la CA debe instalarse en dispositivos de prueba o debe usarse un dominio HTTPS real.

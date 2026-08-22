@@ -187,6 +187,20 @@ export function routeDistanceInMeters(route: MapPoint[], scaleMeters = 1) {
     )
 }
 
+export function projectPointOnSegment(point: MapPoint, start: MapPoint, end: MapPoint) {
+  const dx = end.x - start.x
+  const dz = end.z - start.z
+  const lengthSquared = dx * dx + dz * dz
+  const ratio =
+    lengthSquared === 0
+      ? 0
+      : Math.max(
+          0,
+          Math.min(1, ((point.x - start.x) * dx + (point.z - start.z) * dz) / lengthSquared),
+        )
+  return { point: { x: start.x + dx * ratio, z: start.z + dz * ratio }, ratio }
+}
+
 export function distanceToNetwork(waypoints: Waypoint[], position: MapPoint, scaleMeters = 1) {
   const nearest = nearestWaypoint(waypoints, position)
   return nearest ? distanceBetweenPoints(position, nearest.position, scaleMeters) : null
@@ -218,19 +232,35 @@ export function progressOnRoute(route: MapPoint[], position: MapPoint | null, sc
       ratio: 0,
       nextPoint: route[1],
     }
-  const nearestIndex = route.reduce(
-    (closest, point, index) =>
-      distanceBetweenPoints(position, point) < distanceBetweenPoints(position, route[closest])
-        ? index
-        : closest,
-    0,
+  const nearestSegment = route
+    .slice(1)
+    .reduce<{ index: number; distance: number; ratio: number } | undefined>(
+      (nearest, end, index) => {
+        const projection = projectPointOnSegment(position, route[index], end)
+        const distance = distanceBetweenPoints(position, projection.point)
+        return !nearest || distance <= nearest.distance
+          ? { index, distance, ratio: projection.ratio }
+          : nearest
+      },
+      undefined,
+    )
+  if (!nearestSegment)
+    return { completedMeters: 0, remainingMeters: totalMeters, ratio: 0, nextPoint: route[1] }
+  const segmentMeters = distanceBetweenPoints(
+    route[nearestSegment.index],
+    route[nearestSegment.index + 1],
+    scaleMeters,
   )
-  const completedMeters = routeDistanceInMeters(route.slice(0, nearestIndex + 1), scaleMeters)
+  const completedBeforeSegment = routeDistanceInMeters(
+    route.slice(0, nearestSegment.index + 1),
+    scaleMeters,
+  )
+  const completedMeters = completedBeforeSegment + Math.round(segmentMeters * nearestSegment.ratio)
   return {
     completedMeters,
     remainingMeters: Math.max(0, totalMeters - completedMeters),
     ratio: totalMeters === 0 ? 1 : Math.min(1, completedMeters / totalMeters),
-    nextPoint: route[nearestIndex + 1],
+    nextPoint: route[nearestSegment.index + 1],
   }
 }
 
