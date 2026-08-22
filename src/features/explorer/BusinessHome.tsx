@@ -76,6 +76,7 @@ export function BusinessHome({
         <div className="map-frame">
           <MapScene
             attractions={business.attractions}
+            mapFeatures={business.mapFeatures}
             selectedId={selected?.id}
             centerOnSelected={Boolean(selectedAttractionId)}
             onSelect={(attractionId) => {

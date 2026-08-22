@@ -10,6 +10,14 @@ export const businesses: Business[] = [
       "Un paisaje vivo para explorar a tu propio ritmo. Encontrá senderos, sabores y momentos que quedan.",
     mapOrigin: { latitude: -32.1342, longitude: -64.4801 },
     mapScaleMeters: 10,
+    mapFeatures: [
+      { type: "area", id: "bosque", label: "Bosque nativo", color: "#c7d2b8", points: [{ x: -6, z: -5 }, { x: -1, z: -5 }, { x: -1, z: -1 }, { x: -6, z: -1 }] },
+      { type: "area", id: "arroyo", label: "Arroyo", color: "#b9d5d1", points: [{ x: 2, z: -5 }, { x: 6, z: -4 }, { x: 6, z: -2 }, { x: 2, z: -3 }] },
+      { type: "path", id: "sendero-central", points: [{ x: -5.5, z: 4.5 }, { x: -2, z: 1.2 }, { x: 0, z: 0 }, { x: 2.4, z: -1.5 }, { x: 4.8, z: -2.8 }] },
+      { type: "path", id: "sendero-mirador", points: [{ x: 0, z: 0 }, { x: -2, z: -1.5 }, { x: -4.2, z: -3.1 }] },
+      { type: "building", id: "entrada", label: "Entrada", position: { x: -5.5, z: 4.5 }, size: { x: 1.2, z: 0.8 }, color: "#d8b46b" },
+      { type: "building", id: "casa-fuego", label: "Casa del Fuego", position: { x: 2.4, z: -1.5 }, size: { x: 1.1, z: 0.9 }, color: "#d4a078" },
+    ],
     attractions: [
       {
         id: "mirador-norte",
@@ -75,6 +83,7 @@ export const businesses: Business[] = [
     description: "Mar, deporte y cocina frente al horizonte.",
     mapOrigin: { latitude: -38.0055, longitude: -57.5426 },
     mapScaleMeters: 10,
+    mapFeatures: [],
     attractions: [],
   },
 ];

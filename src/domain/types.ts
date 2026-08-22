@@ -10,6 +10,11 @@ export type MapPoint = {
   z: number;
 };
 
+export type MapFeature =
+  | { type: "path"; id: string; points: MapPoint[] }
+  | { type: "area"; id: string; label: string; points: MapPoint[]; color: string }
+  | { type: "building"; id: string; label: string; position: MapPoint; size: MapPoint; color: string };
+
 export type Attraction = {
   id: string;
   name: string;
@@ -29,6 +34,7 @@ export type Business = {
   eyebrow: string;
   mapOrigin: Coordinate;
   mapScaleMeters: number;
+  mapFeatures?: MapFeature[];
   attractions: Attraction[];
 };
 

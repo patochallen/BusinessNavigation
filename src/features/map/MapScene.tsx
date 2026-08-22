@@ -1,9 +1,10 @@
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
-import type { Attraction } from "../../domain/types";
+import { Line, OrbitControls, PerspectiveCamera } from "@react-three/drei";
+import type { Attraction, MapFeature } from "../../domain/types";
 
 type MapSceneProps = {
   attractions: Attraction[];
+  mapFeatures?: MapFeature[];
   selectedId?: string;
   centerOnSelected?: boolean;
   onSelect: (id: string) => void;
@@ -12,6 +13,7 @@ type MapSceneProps = {
 
 export function MapScene({
   attractions,
+  mapFeatures = [],
   selectedId,
   centerOnSelected = false,
   onSelect,
@@ -48,6 +50,19 @@ export function MapScene({
         <boxGeometry args={[0.18, 0.08, 0.18]} />
         <meshStandardMaterial color="#34413d" />
       </mesh>
+      {mapFeatures.map((feature) => {
+        if (feature.type === "path") {
+          return <Line key={feature.id} points={feature.points.map((point) => [point.x, 0.12, point.z])} color="#f3f0e7" lineWidth={4} />;
+        }
+        if (feature.type === "building") {
+          return <mesh key={feature.id} position={[feature.position.x, 0.18, feature.position.z]}><boxGeometry args={[feature.size.x, 0.32, feature.size.z]} /><meshStandardMaterial color={feature.color} /></mesh>;
+        }
+        const minX = Math.min(...feature.points.map((point) => point.x));
+        const maxX = Math.max(...feature.points.map((point) => point.x));
+        const minZ = Math.min(...feature.points.map((point) => point.z));
+        const maxZ = Math.max(...feature.points.map((point) => point.z));
+        return <mesh key={feature.id} position={[(minX + maxX) / 2, 0.04, (minZ + maxZ) / 2]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[maxX - minX, maxZ - minZ]} /><meshBasicMaterial color={feature.color} transparent opacity={0.55} /></mesh>;
+      })}
       {attractions.map((attraction) => (
         <group
           key={attraction.id}

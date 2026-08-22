@@ -63,6 +63,7 @@ export function NavigationView({
         <div className="route-map">
           <MapScene
             attractions={business.attractions}
+            mapFeatures={business.mapFeatures}
             selectedId={selected?.id}
             onSelect={() => undefined}
             userActive={permission === "ready"}
