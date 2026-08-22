@@ -1,0 +1,81 @@
+.attraction-card {
+  display: flex;
+  gap: 14px;
+  min-height: 90px;
+  width: 100%;
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #dfded5;
+  background: #faf9f5;
+  color: #7a867f;
+  transition:
+    transform 0.2s,
+    border-color 0.2s;
+}
+
+.attraction-card:hover,
+.attraction-card.selected {
+  transform: translateY(-2px);
+  border-color: #b7b8a5;
+}
+
+.attraction-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 35px;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  color: #fff;
+}
+
+.attraction-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.attraction-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: #30403a;
+  font-size: 14px;
+}
+
+.card-distance {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 10px;
+}
+
+.card-arrow {
+  width: 20px;
+  height: 20px;
+  color: #9da59b;
+}
+
+.attraction-meta {
+  display: flex;
+  gap: 7px;
+  margin-top: auto;
+  color: #a0a79d;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+@media (max-width: 640px) {
+  .attraction-card {
+    min-height: 80px;
+  }
+}

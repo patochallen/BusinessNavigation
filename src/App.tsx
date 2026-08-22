@@ -16,6 +16,7 @@ import { useDeviceHeading } from './services/orientation'
 import { BusinessHome } from './features/explorer/BusinessHome'
 import { AttractionDetail } from './features/explorer/AttractionDetail'
 import { NavigationView } from './features/navigation/NavigationView'
+import { useEffect } from 'react'
 
 function AppContent() {
   const { businessId, attractionId } = useParams<{
@@ -28,11 +29,11 @@ function AppContent() {
   const business = businessId ? demoBusinessRepository.findById(businessId) : undefined
   const isNavigation = location.pathname.endsWith('/navigate')
   const { position, permission, errorMessage, locate } = useGeolocation()
-  const headingState = useDeviceHeading(isNavigation)
   const attraction =
     business && attractionId
       ? demoBusinessRepository.findAttraction(business, attractionId)
       : business?.attractions[0]
+  const headingState = useDeviceHeading(true) // isNavigation || (attractionId !== undefined && attraction !== undefined),
   const mapAttractionId = searchParams.get('attraction') ?? undefined
   const businessMark = business?.name
     .split(/\s+/)
@@ -40,6 +41,12 @@ function AppContent() {
     .join('')
     .slice(0, 2)
     .toUpperCase()
+
+  useEffect(() => {
+    headingState.enable()
+  }, [])
+
+  console.log('headingState', headingState.heading)
 
   if (!business || (attractionId && !attraction))
     return (
@@ -81,7 +88,12 @@ function AppContent() {
             onBack={() => navigate(`/b/${business.id}/a/${attraction?.id ?? ''}`)}
           />
         ) : attractionId && attraction ? (
-          <AttractionDetail business={business} attraction={attraction} position={position} />
+          <AttractionDetail
+            business={business}
+            attraction={attraction}
+            position={position}
+            heading={headingState.heading}
+          />
         ) : (
           <BusinessHome
             business={business}

@@ -1,14 +1,4 @@
-import {
-  Compass,
-  Crosshair,
-  LocateFixed,
-  MapPin,
-  Search,
-  Utensils,
-  Waves,
-  Zap,
-  ArrowUp,
-} from 'lucide-react'
+import { Compass, Crosshair, LocateFixed, MapPin, Search, Utensils, Waves, Zap } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Business, Category } from '../../domain/types'
@@ -21,6 +11,7 @@ import {
 } from '../../domain/use-cases'
 import { MapScene } from '../map/MapScene'
 import { getDistanceAndHeadingBetweenLocations } from '../../utils/location'
+import { AttractionItemList } from './AttractionItemList'
 
 type BusinessHomeProps = {
   business: Business
@@ -29,6 +20,7 @@ type BusinessHomeProps = {
   selectedAttractionId?: string
   locate: () => void
 }
+
 const icons: Record<Category, typeof Compass> = {
   food: Utensils,
   adventure: Zap,
@@ -164,43 +156,30 @@ export function BusinessHome({
         </div>
         <div className="attraction-list">
           {filtered.map((item) => {
-            const Icon = icons[item.category]
             const { distanceMeters, headingDegrees } = getDistanceAndHeadingBetweenLocations(
               position?.coords ?? business.mapOrigin,
               item.coordinates,
             )
+            const Icon = icons[item.category]
             return (
-              <button
-                className={`attraction-card ${selected?.id === item.id ? 'selected' : ''}`}
+              <AttractionItemList
                 key={item.id}
+                selected={item.id === selectedAttractionId}
+                color={item.color}
+                name={item.name}
+                description={item.description}
+                category={categoryLabels[item.category]}
+                walkingEta={
+                  walkingEtaFromDistance(routeDistanceToAttraction(business, item)) ?? '—'
+                }
+                distanceMeters={`${Math.round(distanceMeters)} m.`}
+                headingDegrees={headingDegrees}
+                icon={Icon}
                 onClick={() => {
                   setSelectedId(item.id)
                   navigate(`/b/${business.id}/a/${item.id}`)
                 }}
-              >
-                <span className="attraction-icon" style={{ background: item.color }}>
-                  <Icon size={18} />
-                </span>
-                <span className="attraction-copy">
-                  <strong className="attraction-top">{item.name}</strong>
-                  <span>{item.description}</span>
-                  <span className="attraction-meta">
-                    <span>{categoryLabels[item.category]}</span>
-                    <span>•</span>
-                    <span>
-                      {walkingEtaFromDistance(routeDistanceToAttraction(business, item)) ?? '—'} a
-                      pie
-                    </span>
-                  </span>
-                </span>
-                <span className="card-distance">
-                  <ArrowUp
-                    className="card-arrow"
-                    style={{ transform: `rotate(${headingDegrees}deg)` }}
-                  />
-                  <span>{Math.round(distanceMeters)} m.</span>
-                </span>
-              </button>
+              />
             )
           })}
         </div>

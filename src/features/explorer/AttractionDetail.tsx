@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowUp, Clock3, MapPin, Navigation, ShieldCheck } from 'lucide-react'
+import { ArrowLeft, ArrowUp, Clock3, MapPin, Navigation, Ruler, ShieldCheck } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import type { Attraction, Business } from '../../domain/types'
@@ -10,13 +10,29 @@ type AttractionDetailProps = {
   business: Business
   attraction: Attraction
   position?: GeolocationPosition | null
+  heading?: number | null
 }
 
-export function AttractionDetail({ business, attraction, position }: AttractionDetailProps) {
+export function AttractionDetail({
+  business,
+  attraction,
+  position,
+  heading,
+}: AttractionDetailProps) {
   const navigate = useNavigate()
-  const { distanceMeters, headingDegrees } = getDistanceAndHeadingBetweenLocations(
-    position?.coords ?? business.mapOrigin,
-    attraction.coordinates,
+  const { distanceMeters, headingDegrees: calculatedHeadingDegrees } =
+    getDistanceAndHeadingBetweenLocations(
+      position?.coords ?? business.mapOrigin,
+      attraction.coordinates,
+    )
+  const deg = heading ? (calculatedHeadingDegrees - heading + 360) % 360 : calculatedHeadingDegrees
+  const headingDegrees = deg
+  console.log(
+    'heading',
+    heading,
+    calculatedHeadingDegrees.toFixed(0),
+    '->',
+    headingDegrees.toFixed(0),
   )
 
   return (
@@ -57,15 +73,15 @@ export function AttractionDetail({ business, attraction, position }: AttractionD
           </span>
         </div>
         <div>
-          <MapPin size={17} />
+          <Ruler size={17} />
           <span>
-            <strong>Predio</strong> {business.name}
+            <strong>Distance</strong> {distanceMeters.toFixed(1)} m.
           </span>
         </div>
         <div>
           <ShieldCheck size={17} />
           <span>
-            <strong>Acceso</strong> señalizado
+            <strong>Heading</strong> {headingDegrees.toFixed(0)}° N
           </span>
         </div>
       </div>
