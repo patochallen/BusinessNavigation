@@ -1,17 +1,17 @@
-import { Canvas } from "@react-three/fiber";
-import { Line, OrbitControls, PerspectiveCamera } from "@react-three/drei";
-import type { Attraction, MapFeature } from "../../domain/types";
+import { Canvas } from '@react-three/fiber'
+import { Line, OrbitControls, PerspectiveCamera } from '@react-three/drei'
+import type { Attraction, MapFeature } from '../../domain/types'
 
 type MapSceneProps = {
-  attractions: Attraction[];
-  mapFeatures?: MapFeature[];
-  routePoints?: { x: number; z: number }[];
-  userPosition?: { x: number; z: number };
-  selectedId?: string;
-  centerOnSelected?: boolean;
-  onSelect: (id: string) => void;
-  userActive: boolean;
-};
+  attractions: Attraction[]
+  mapFeatures?: MapFeature[]
+  routePoints?: { x: number; z: number }[]
+  userPosition?: { x: number; z: number }
+  selectedId?: string
+  centerOnSelected?: boolean
+  onSelect: (id: string) => void
+  userActive: boolean
+}
 
 export function MapScene({
   attractions,
@@ -29,13 +29,11 @@ export function MapScene({
         makeDefault
         position={[
           centerOnSelected
-            ? (attractions.find((attraction) => attraction.id === selectedId)
-                ?.position.x ?? 0)
+            ? (attractions.find((attraction) => attraction.id === selectedId)?.position.x ?? 0)
             : 0,
           12,
           centerOnSelected
-            ? (attractions.find((attraction) => attraction.id === selectedId)
-                ?.position.z ?? 0)
+            ? (attractions.find((attraction) => attraction.id === selectedId)?.position.z ?? 0)
             : 0,
         ]}
         rotation={[-Math.PI / 2, 0, 0]}
@@ -48,7 +46,7 @@ export function MapScene({
         <meshStandardMaterial color="#e7e1d4" />
       </mesh>
       <gridHelper
-        args={[15, 15, "#bdb7a8", "#d7d1c4"]}
+        args={[15, 15, '#bdb7a8', '#d7d1c4']}
         rotation={[0, 0, 0]}
         position={[0, 0.02, 0]}
       />
@@ -57,7 +55,7 @@ export function MapScene({
         <meshStandardMaterial color="#34413d" />
       </mesh>
       {mapFeatures.map((feature) => {
-        if (feature.type === "path") {
+        if (feature.type === 'path') {
           return (
             <Line
               key={feature.id}
@@ -65,23 +63,20 @@ export function MapScene({
               color="#f3f0e7"
               lineWidth={4}
             />
-          );
+          )
         }
-        if (feature.type === "building") {
+        if (feature.type === 'building') {
           return (
-            <mesh
-              key={feature.id}
-              position={[feature.position.x, 0.18, feature.position.z]}
-            >
+            <mesh key={feature.id} position={[feature.position.x, 0.18, feature.position.z]}>
               <boxGeometry args={[feature.size.x, 0.32, feature.size.z]} />
               <meshStandardMaterial color={feature.color} />
             </mesh>
-          );
+          )
         }
-        const minX = Math.min(...feature.points.map((point) => point.x));
-        const maxX = Math.max(...feature.points.map((point) => point.x));
-        const minZ = Math.min(...feature.points.map((point) => point.z));
-        const maxZ = Math.max(...feature.points.map((point) => point.z));
+        const minX = Math.min(...feature.points.map((point) => point.x))
+        const maxX = Math.max(...feature.points.map((point) => point.x))
+        const minZ = Math.min(...feature.points.map((point) => point.z))
+        const maxZ = Math.max(...feature.points.map((point) => point.z))
         return (
           <mesh
             key={feature.id}
@@ -89,13 +84,9 @@ export function MapScene({
             rotation={[-Math.PI / 2, 0, 0]}
           >
             <planeGeometry args={[maxX - minX, maxZ - minZ]} />
-            <meshBasicMaterial
-              color={feature.color}
-              transparent
-              opacity={0.55}
-            />
+            <meshBasicMaterial color={feature.color} transparent opacity={0.55} />
           </mesh>
-        );
+        )
       })}
       {routePoints.length > 1 && (
         <Line
@@ -109,8 +100,8 @@ export function MapScene({
           key={attraction.id}
           position={[attraction.position.x, 0.22, attraction.position.z]}
           onClick={(event) => {
-            event.stopPropagation();
-            onSelect(attraction.id);
+            event.stopPropagation()
+            onSelect(attraction.id)
           }}
         >
           <mesh scale={selectedId === attraction.id ? 1.35 : 1}>
@@ -133,12 +124,7 @@ export function MapScene({
           <meshBasicMaterial color="#477e78" />
         </mesh>
       )}
-      <OrbitControls
-        enableRotate={false}
-        minZoom={35}
-        maxZoom={80}
-        zoomSpeed={0.8}
-      />
+      <OrbitControls enableRotate={false} minZoom={35} maxZoom={80} zoomSpeed={0.8} />
     </Canvas>
-  );
+  )
 }

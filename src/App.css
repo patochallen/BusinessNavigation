@@ -11,18 +11,14 @@
   margin: 35px 0 42px;
   overflow: hidden;
   border: 1px solid #c9cbbd;
-  background: radial-gradient(
-    circle at 50% 45%,
-    var(--detail-color),
-    #e7e5dc 70%
-  );
+  background: radial-gradient(circle at 50% 45%, var(--detail-color), #e7e5dc 70%);
 }
 .detail-visual::before {
   position: absolute;
   inset: 18%;
   border: 1px solid rgba(255, 255, 255, 0.7);
   border-radius: 50%;
-  content: "";
+  content: '';
   transform: rotate(-18deg) scaleX(1.7);
 }
 .detail-glyph {
@@ -275,12 +271,7 @@
   padding-top: 74px;
   padding-bottom: 63px;
   background:
-    radial-gradient(
-      circle at 91% 12%,
-      rgba(231, 190, 91, 0.24),
-      transparent 23%
-    ),
-    #f6f4ee;
+    radial-gradient(circle at 91% 12%, rgba(231, 190, 91, 0.24), transparent 23%), #f6f4ee;
 }
 .eyebrow {
   margin: 0 0 10px;

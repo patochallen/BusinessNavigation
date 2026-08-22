@@ -1,32 +1,23 @@
-import {
-  ArrowLeft,
-  Clock3,
-  MapPin,
-  Navigation,
-  ShieldCheck,
-} from "lucide-react";
-import type { CSSProperties } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import type { Attraction, Business } from "../../domain/types";
-import { categoryLabels } from "../../domain/demo-data";
+import { ArrowLeft, Clock3, MapPin, Navigation, ShieldCheck } from 'lucide-react'
+import type { CSSProperties } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import type { Attraction, Business } from '../../domain/types'
+import { categoryLabels } from '../../domain/demo-data'
 
 type AttractionDetailProps = {
-  business: Business;
-  attraction: Attraction;
-};
+  business: Business
+  attraction: Attraction
+}
 
 const detailIcons = {
-  nature: "✦",
-  food: "◌",
-  adventure: "↗",
-  services: "＋",
-};
+  nature: '✦',
+  food: '◌',
+  adventure: '↗',
+  services: '＋',
+}
 
-export function AttractionDetail({
-  business,
-  attraction,
-}: AttractionDetailProps) {
-  const navigate = useNavigate();
+export function AttractionDetail({ business, attraction }: AttractionDetailProps) {
+  const navigate = useNavigate()
 
   return (
     <section className="attraction-detail">
@@ -35,12 +26,11 @@ export function AttractionDetail({
       </Link>
       <div
         className="detail-visual"
-        style={{ "--detail-color": attraction.color } as CSSProperties}
+        style={{ '--detail-color': attraction.color } as CSSProperties}
       >
         <span className="detail-glyph">{detailIcons[attraction.category]}</span>
         <span className="detail-coordinate">
-          {attraction.position.x.toFixed(1)} /{" "}
-          {attraction.position.z.toFixed(1)}
+          {attraction.position.x.toFixed(1)} / {attraction.position.z.toFixed(1)}
         </span>
         <span className="detail-orbit detail-orbit-one" />
         <span className="detail-orbit detail-orbit-two" />
@@ -79,9 +69,7 @@ export function AttractionDetail({
       <div className="detail-actions">
         <button
           className="button button-dark"
-          onClick={() =>
-            navigate(`/b/${business.id}/a/${attraction.id}/navigate`)
-          }
+          onClick={() => navigate(`/b/${business.id}/a/${attraction.id}/navigate`)}
         >
           <Navigation size={17} /> Comenzar navegación
         </button>
@@ -93,5 +81,5 @@ export function AttractionDetail({
         </button>
       </div>
     </section>
-  );
+  )
 }

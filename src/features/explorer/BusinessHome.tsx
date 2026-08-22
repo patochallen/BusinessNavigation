@@ -1,32 +1,23 @@
-import {
-  Compass,
-  Crosshair,
-  LocateFixed,
-  MapPin,
-  Search,
-  Utensils,
-  Waves,
-  Zap,
-} from "lucide-react";
-import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import type { Business, Category } from "../../domain/types";
-import { categoryLabels } from "../../domain/demo-data";
-import { filterAttractions } from "../../domain/use-cases";
-import { MapScene } from "../map/MapScene";
+import { Compass, Crosshair, LocateFixed, MapPin, Search, Utensils, Waves, Zap } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import type { Business, Category } from '../../domain/types'
+import { categoryLabels } from '../../domain/demo-data'
+import { filterAttractions } from '../../domain/use-cases'
+import { MapScene } from '../map/MapScene'
 
 type BusinessHomeProps = {
-  business: Business;
-  permission: string;
-  selectedAttractionId?: string;
-  locate: () => void;
-};
+  business: Business
+  permission: string
+  selectedAttractionId?: string
+  locate: () => void
+}
 const icons: Record<Category, typeof Compass> = {
   food: Utensils,
   adventure: Zap,
   services: Crosshair,
   nature: Waves,
-};
+}
 
 export function BusinessHome({
   business,
@@ -34,18 +25,17 @@ export function BusinessHome({
   selectedAttractionId,
   locate,
 }: BusinessHomeProps) {
-  const navigate = useNavigate();
-  const [selectedId, setSelectedId] = useState(selectedAttractionId ?? "punto-encuentro");
-  const [category, setCategory] = useState<"all" | Category>("all");
-  const [query, setQuery] = useState("");
-  const activeSelectedId = selectedAttractionId ?? selectedId;
+  const navigate = useNavigate()
+  const [selectedId, setSelectedId] = useState(selectedAttractionId ?? 'punto-encuentro')
+  const [category, setCategory] = useState<'all' | Category>('all')
+  const [query, setQuery] = useState('')
+  const activeSelectedId = selectedAttractionId ?? selectedId
   const selected =
-    business.attractions.find((item) => item.id === activeSelectedId) ??
-    business.attractions[0];
+    business.attractions.find((item) => item.id === activeSelectedId) ?? business.attractions[0]
   const filtered = useMemo(
     () => filterAttractions(business.attractions, category, query),
     [business.attractions, category, query],
-  );
+  )
   return (
     <>
       <section className="intro">
@@ -69,8 +59,7 @@ export function BusinessHome({
             <h2>Tu próxima pausa</h2>
           </div>
           <button className="outline-button" onClick={locate}>
-            <LocateFixed size={16} />{" "}
-            {permission === "ready" ? "Ubicación activa" : "Ubicarme"}
+            <LocateFixed size={16} /> {permission === 'ready' ? 'Ubicación activa' : 'Ubicarme'}
           </button>
         </div>
         <div className="map-frame">
@@ -80,19 +69,15 @@ export function BusinessHome({
             selectedId={selected?.id}
             centerOnSelected={Boolean(selectedAttractionId)}
             onSelect={(attractionId) => {
-              setSelectedId(attractionId);
-              navigate(
-                `/b/${business.id}?attraction=${attractionId}`,
-                { replace: true },
-              );
+              setSelectedId(attractionId)
+              navigate(`/b/${business.id}?attraction=${attractionId}`, { replace: true })
             }}
-            userActive={permission === "ready"}
+            userActive={permission === 'ready'}
           />
           <div className="map-label label-top">MIRADOR NORTE</div>
           <div className="map-label label-bottom">ENTRADA PRINCIPAL</div>
           <div className="map-legend">
-            <span className="legend-dot" /> {business.attractions.length} puntos
-            de interés
+            <span className="legend-dot" /> {business.attractions.length} puntos de interés
           </div>
           <button className="north-button" aria-label="Norte">
             <Compass size={17} />
@@ -117,41 +102,38 @@ export function BusinessHome({
         </div>
         <div className="category-row">
           <button
-            className={category === "all" ? "category active" : "category"}
-            onClick={() => setCategory("all")}
+            className={category === 'all' ? 'category active' : 'category'}
+            onClick={() => setCategory('all')}
           >
             Todos
           </button>
           {(Object.keys(categoryLabels) as Category[]).map((key) => {
-            const Icon = icons[key];
+            const Icon = icons[key]
             return (
               <button
                 key={key}
-                className={category === key ? "category active" : "category"}
+                className={category === key ? 'category active' : 'category'}
                 onClick={() => setCategory(key)}
               >
                 <Icon size={15} />
                 {categoryLabels[key]}
               </button>
-            );
+            )
           })}
         </div>
         <div className="attraction-list">
           {filtered.map((item) => {
-            const Icon = icons[item.category];
+            const Icon = icons[item.category]
             return (
               <button
-                className={`attraction-card ${selected?.id === item.id ? "selected" : ""}`}
+                className={`attraction-card ${selected?.id === item.id ? 'selected' : ''}`}
                 key={item.id}
                 onClick={() => {
-                  setSelectedId(item.id);
-                  navigate(`/b/${business.id}/a/${item.id}`);
+                  setSelectedId(item.id)
+                  navigate(`/b/${business.id}/a/${item.id}`)
                 }}
               >
-                <span
-                  className="attraction-icon"
-                  style={{ background: item.color }}
-                >
+                <span className="attraction-icon" style={{ background: item.color }}>
                   <Icon size={18} />
                 </span>
                 <span className="attraction-copy">
@@ -167,10 +149,10 @@ export function BusinessHome({
                   </span>
                 </span>
               </button>
-            );
+            )
           })}
         </div>
       </section>
     </>
-  );
+  )
 }

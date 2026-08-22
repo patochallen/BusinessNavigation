@@ -7,35 +7,33 @@ import {
   useNavigate,
   useParams,
   useSearchParams,
-} from "react-router-dom";
-import { Search } from "lucide-react";
-import "./App.css";
-import { demoBusinessRepository } from "./domain/business-repository";
-import { useGeolocation } from "./services/location";
-import { useDeviceHeading } from "./services/orientation";
-import { BusinessHome } from "./features/explorer/BusinessHome";
-import { AttractionDetail } from "./features/explorer/AttractionDetail";
-import { NavigationView } from "./features/navigation/NavigationView";
+} from 'react-router-dom'
+import { Search } from 'lucide-react'
+import './App.css'
+import { demoBusinessRepository } from './domain/business-repository'
+import { useGeolocation } from './services/location'
+import { useDeviceHeading } from './services/orientation'
+import { BusinessHome } from './features/explorer/BusinessHome'
+import { AttractionDetail } from './features/explorer/AttractionDetail'
+import { NavigationView } from './features/navigation/NavigationView'
 
 function AppContent() {
   const { businessId, attractionId } = useParams<{
-    businessId: string;
-    attractionId?: string;
-  }>();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const business = businessId
-    ? demoBusinessRepository.findById(businessId)
-    : undefined;
-  const isNavigation = location.pathname.endsWith("/navigate");
-  const { position, permission, errorMessage, locate } = useGeolocation();
-  const headingState = useDeviceHeading(isNavigation);
+    businessId: string
+    attractionId?: string
+  }>()
+  const location = useLocation()
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const business = businessId ? demoBusinessRepository.findById(businessId) : undefined
+  const isNavigation = location.pathname.endsWith('/navigate')
+  const { position, permission, errorMessage, locate } = useGeolocation()
+  const headingState = useDeviceHeading(isNavigation)
   const attraction =
     business && attractionId
       ? demoBusinessRepository.findAttraction(business, attractionId)
-      : business?.attractions[0];
-  const mapAttractionId = searchParams.get("attraction") ?? undefined;
+      : business?.attractions[0]
+  const mapAttractionId = searchParams.get('attraction') ?? undefined
 
   if (!business || (attractionId && !attraction))
     return (
@@ -47,7 +45,7 @@ function AppContent() {
           Volver a Valle Lúmina
         </Link>
       </main>
-    );
+    )
 
   return (
     <div className="app-shell">
@@ -72,9 +70,7 @@ function AppContent() {
             headingPermission={headingState.permission}
             enableHeading={headingState.enable}
             locate={locate}
-            onBack={() =>
-              navigate(`/b/${business.id}/a/${attraction?.id ?? ""}`)
-            }
+            onBack={() => navigate(`/b/${business.id}/a/${attraction?.id ?? ''}`)}
           />
         ) : attractionId && attraction ? (
           <AttractionDetail business={business} attraction={attraction} />
@@ -92,7 +88,7 @@ function AppContent() {
         <span>Tu mapa, tu ritmo.</span>
       </footer>
     </div>
-  );
+  )
 }
 
 function App() {
@@ -101,13 +97,10 @@ function App() {
       <Routes>
         <Route path="/b/:businessId" element={<AppContent />} />
         <Route path="/b/:businessId/a/:attractionId" element={<AppContent />} />
-        <Route
-          path="/b/:businessId/a/:attractionId/navigate"
-          element={<AppContent />}
-        />
+        <Route path="/b/:businessId/a/:attractionId/navigate" element={<AppContent />} />
         <Route path="*" element={<AppContent />} />
       </Routes>
     </BrowserRouter>
-  );
+  )
 }
-export default App;
+export default App
