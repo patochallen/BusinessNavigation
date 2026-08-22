@@ -12,6 +12,7 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Business, Category } from "../../domain/types";
 import { categoryLabels } from "../../domain/demo-data";
+import { filterAttractions } from "../../domain/use-cases";
 import { MapScene } from "../map/MapScene";
 
 type BusinessHomeProps = {
@@ -39,13 +40,8 @@ export function BusinessHome({
     business.attractions.find((item) => item.id === selectedId) ??
     business.attractions[0];
   const filtered = useMemo(
-    () =>
-      business.attractions.filter(
-        (item) =>
-          (category === "all" || item.category === category) &&
-          item.name.toLowerCase().includes(query.toLowerCase()),
-      ),
-    [business, category, query],
+    () => filterAttractions(business.attractions, category, query),
+    [business.attractions, category, query],
   );
   return (
     <>

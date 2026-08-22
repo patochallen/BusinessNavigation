@@ -1,5 +1,6 @@
 import { businesses } from "./demo-data";
 import type { Business } from "./types";
+import { findAttraction, findBusiness } from "./use-cases";
 
 export interface BusinessRepository {
   findById(id: string): Business | undefined;
@@ -10,7 +11,6 @@ export interface BusinessRepository {
 }
 
 export const demoBusinessRepository: BusinessRepository = {
-  findById: (id) => businesses.find((business) => business.id === id),
-  findAttraction: (business, attractionId) =>
-    business.attractions.find((attraction) => attraction.id === attractionId),
+  findById: (id) => findBusiness(businesses, id),
+  findAttraction: (business, attractionId) => findAttraction(business, attractionId),
 };
