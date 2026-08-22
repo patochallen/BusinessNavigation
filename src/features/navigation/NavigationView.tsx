@@ -50,7 +50,7 @@ export function NavigationView({
           <div>
             <strong>
               {position && selected
-                ? `${distanceInMeters(position, selected)} m`
+                ? `${distanceInMeters(position, business, selected)} m`
                 : "—"}
             </strong>
             <span>distancia estimada</span>

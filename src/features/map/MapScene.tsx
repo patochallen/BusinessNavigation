@@ -41,7 +41,7 @@ export function MapScene({
       {attractions.map((attraction) => (
         <group
           key={attraction.id}
-          position={[attraction.x, 0.22, attraction.z]}
+          position={[attraction.position.x, 0.22, attraction.position.z]}
           onClick={(event) => {
             event.stopPropagation();
             onSelect(attraction.id);
