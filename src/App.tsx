@@ -12,6 +12,7 @@ import "./App.css";
 import { demoBusinessRepository } from "./domain/business-repository";
 import { useGeolocation } from "./services/location";
 import { BusinessHome } from "./features/explorer/BusinessHome";
+import { AttractionDetail } from "./features/explorer/AttractionDetail";
 import { NavigationView } from "./features/navigation/NavigationView";
 
 function AppContent() {
@@ -67,6 +68,8 @@ function AppContent() {
               navigate(`/b/${business.id}/a/${attraction?.id ?? ""}`)
             }
           />
+        ) : attractionId && attraction ? (
+          <AttractionDetail business={business} attraction={attraction} />
         ) : (
           <BusinessHome
             business={business}

@@ -12,5 +12,6 @@ export interface BusinessRepository {
 
 export const demoBusinessRepository: BusinessRepository = {
   findById: (id) => findBusiness(businesses, id),
-  findAttraction: (business, attractionId) => findAttraction(business, attractionId),
+  findAttraction: (business, attractionId) =>
+    findAttraction(business, attractionId),
 };

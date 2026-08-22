@@ -27,7 +27,9 @@ export function NavigationView({
   onBack,
 }: NavigationViewProps) {
   const distance =
-    position && selected ? distanceInMeters(position, business, selected) : null;
+    position && selected
+      ? distanceInMeters(position, business, selected)
+      : null;
   const navigationState =
     permission === "requesting"
       ? "locating"
@@ -69,11 +71,7 @@ export function NavigationView({
         </div>
         <div className="route-stats">
           <div>
-            <strong>
-              {distance !== null
-                ? `${distance} m`
-                : "—"}
-            </strong>
+            <strong>{distance !== null ? `${distance} m` : "—"}</strong>
             <span>distancia estimada</span>
           </div>
           <div>
@@ -86,7 +84,9 @@ export function NavigationView({
             <LocateFixed size={20} />
             <div>
               <strong>Activá tu ubicación</strong>
-              <p>{errorMessage ?? "Para actualizar la distancia en tiempo real."}</p>
+              <p>
+                {errorMessage ?? "Para actualizar la distancia en tiempo real."}
+              </p>
             </div>
             <button className="button button-dark" onClick={locate}>
               {permission === "requesting"

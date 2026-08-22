@@ -6,10 +6,7 @@ import type {
   LocationPermission,
   MapPoint,
 } from "../domain/types";
-import {
-  distanceBetweenPoints,
-  localPointFromGps,
-} from "../domain/use-cases";
+import { distanceBetweenPoints, localPointFromGps } from "../domain/use-cases";
 
 export function useGeolocation() {
   const [position, setPosition] = useState<GeolocationPosition | null>(null);
@@ -71,5 +68,9 @@ export function distanceInMeters(
     latitude: position.coords.latitude,
     longitude: position.coords.longitude,
   });
-  return distanceBetweenPoints(userPoint, attraction.position, business.mapScaleMeters);
+  return distanceBetweenPoints(
+    userPoint,
+    attraction.position,
+    business.mapScaleMeters,
+  );
 }
