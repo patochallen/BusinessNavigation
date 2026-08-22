@@ -18,6 +18,7 @@ import {
   progressOnRoute,
   relativeBearing,
   shortestPath,
+  cameraOverlayPosition,
 } from './use-cases'
 
 const valle = businesses[0]
@@ -164,5 +165,11 @@ describe('predio routing', () => {
     expect(bearingToPoint({ x: 0, z: 0 }, { x: 1, z: 0 })).toBe(90)
     expect(relativeBearing({ x: 0, z: 0 }, { x: 1, z: 0 }, 0)).toBe(90)
     expect(relativeBearing({ x: 0, z: 0 }, { x: 1, z: 0 }, 180)).toBe(-90)
+  })
+
+  it('keeps the camera destination inside a stable viewport', () => {
+    expect(cameraOverlayPosition(0, 100)).toEqual({ left: 50, top: 31.2, scale: 1.115 })
+    expect(cameraOverlayPosition(180, 0).left).toBe(86)
+    expect(cameraOverlayPosition(-180, 500).left).toBe(14)
   })
 })

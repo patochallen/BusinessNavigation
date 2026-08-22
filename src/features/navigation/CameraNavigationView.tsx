@@ -8,6 +8,8 @@ type CameraNavigationViewProps = {
   errorMessage: string | null
   attraction?: Attraction
   direction: number | null
+  distanceMeters: number | null
+  overlayPosition: { left: number; top: number; scale: number }
   onStart: () => void
   onStop: () => void
 }
@@ -18,6 +20,8 @@ export function CameraNavigationView({
   errorMessage,
   attraction,
   direction,
+  distanceMeters,
+  overlayPosition,
   onStart,
   onStop,
 }: CameraNavigationViewProps) {
@@ -42,11 +46,15 @@ export function CameraNavigationView({
       {stream ? (
         <div
           className="camera-destination"
-          style={{ transform: `translate(-50%, -50%) rotate(${direction ?? 0}deg)` }}
+          style={{
+            left: `${overlayPosition.left}%`,
+            top: `${overlayPosition.top}%`,
+            transform: `translate(-50%, -50%) scale(${overlayPosition.scale})`,
+          }}
         >
           <Navigation size={32} />
           <strong>{attraction?.name ?? 'Destino'}</strong>
-          <span>{direction === null ? 'Orientación pendiente' : 'Seguí la dirección'}</span>
+          <span>{direction === null ? 'Orientación pendiente' : `${distanceMeters ?? '—'} m`}</span>
         </div>
       ) : (
         <div className="camera-empty">

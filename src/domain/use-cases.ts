@@ -285,3 +285,13 @@ export function relativeBearing(from: MapPoint, to: MapPoint, heading: number | 
   if (heading === null) return null
   return ((bearingToPoint(from, to) - heading + 540) % 360) - 180
 }
+
+export function cameraOverlayPosition(relativeAngle: number | null, distanceMeters: number | null) {
+  const safeAngle = Math.max(-75, Math.min(75, relativeAngle ?? 0))
+  const safeDistance = Math.max(0, Math.min(1000, distanceMeters ?? 100))
+  return {
+    left: 50 + (safeAngle / 75) * 36,
+    top: 42 - (1 - safeDistance / 1000) * 12,
+    scale: 1.15 - (safeDistance / 1000) * 0.35,
+  }
+}

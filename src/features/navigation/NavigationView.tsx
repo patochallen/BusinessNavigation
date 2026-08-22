@@ -6,6 +6,7 @@ import {
   distanceToNetwork,
   isOffRoute,
   localPointFromGps,
+  cameraOverlayPosition,
   nextRouteInstruction,
   relativeBearing,
   progressOnRoute,
@@ -90,6 +91,7 @@ export function NavigationView({
   const instruction = nextRouteInstruction(referenceRoute, userPoint, business.mapScaleMeters)
   const nextDirection =
     userPoint && progress.nextPoint ? relativeBearing(userPoint, progress.nextPoint, heading) : null
+  const overlayPosition = cameraOverlayPosition(nextDirection, distance)
   const networkDistance =
     userPoint && business.waypoints
       ? distanceToNetwork(business.waypoints, userPoint, business.mapScaleMeters)
@@ -225,6 +227,8 @@ export function NavigationView({
           errorMessage={camera.errorMessage}
           attraction={selected}
           direction={nextDirection}
+          distanceMeters={distance}
+          overlayPosition={overlayPosition}
           onStart={camera.start}
           onStop={() => {
             camera.stop()
