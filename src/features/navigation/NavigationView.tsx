@@ -28,6 +28,8 @@ type NavigationViewProps = {
   heading: number | null
   headingPermission: LocationPermission
   enableHeading: () => Promise<void>
+  calibrateHeading: () => void
+  headingStable: boolean
   locate: () => void
   onBack: () => void
 }
@@ -41,6 +43,8 @@ export function NavigationView({
   heading,
   headingPermission,
   enableHeading,
+  calibrateHeading,
+  headingStable,
   locate,
   onBack,
 }: NavigationViewProps) {
@@ -211,14 +215,22 @@ export function NavigationView({
           <span>
             {headingPermission === 'unavailable'
               ? 'Este dispositivo no informa orientación.'
-              : 'Orientación aproximada del dispositivo.'}
+              : heading === null
+                ? 'Activá la brújula para orientar el destino.'
+                : headingStable
+                  ? 'Orientación estable.'
+                  : 'Mantené el teléfono quieto para estabilizar.'}
           </span>
         </div>
-        {headingPermission !== 'ready' && headingPermission !== 'unavailable' && (
+        {headingPermission !== 'ready' && headingPermission !== 'unavailable' ? (
           <button className="outline-button" onClick={enableHeading}>
             {headingPermission === 'requesting' ? 'Solicitando...' : 'Activar brújula'}
           </button>
-        )}
+        ) : headingPermission === 'ready' ? (
+          <button className="outline-button" onClick={calibrateHeading}>
+            Calibrar
+          </button>
+        ) : null}
       </div>
       {cameraVisible ? (
         <CameraNavigationView

@@ -69,6 +69,8 @@ function AppContent() {
             heading={headingState.heading}
             headingPermission={headingState.permission}
             enableHeading={headingState.enable}
+            calibrateHeading={headingState.calibrate}
+            headingStable={headingState.headingStable}
             locate={locate}
             onBack={() => navigate(`/b/${business.id}/a/${attraction?.id ?? ''}`)}
           />
