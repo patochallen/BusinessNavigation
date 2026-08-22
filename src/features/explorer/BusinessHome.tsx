@@ -67,7 +67,7 @@ export function BusinessHome({
             <p className="eyebrow">Mapa del predio</p>
             <h2>Tu próxima pausa</h2>
           </div>
-          <button className="outline-button" onClick={locate}>
+          <button className="outline-button" onClick={locate} disabled={permission === 'ready'}>
             <LocateFixed size={16} /> {permission === 'ready' ? 'Ubicación activa' : 'Ubicarme'}
           </button>
         </div>

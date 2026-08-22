@@ -139,7 +139,7 @@ export function MapScene({
           </mesh>
         </group>
       )}
-      <OrbitControls enableRotate={false} minZoom={35} maxZoom={80} zoomSpeed={0.8} />
+      <OrbitControls enableRotate={false} minDistance={5} maxDistance={80} zoomSpeed={0.8} />
     </Canvas>
   )
 }
