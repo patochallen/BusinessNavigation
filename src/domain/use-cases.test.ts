@@ -9,6 +9,7 @@ import {
   nearestWaypoint,
   routeFromCoordinate,
   routeDistanceInMeters,
+  routeDistanceToAttraction,
   distanceToNetwork,
   isOffRoute,
   routeToAttraction,
@@ -132,5 +133,12 @@ describe("predio routing", () => {
     expect(distanceToNetwork(waypoints, { x: 2, z: 0 }, 10)).toBe(20);
     expect(isOffRoute(waypoints, { x: 2, z: 0 }, 30, 10)).toBe(false);
     expect(isOffRoute(waypoints, { x: 6, z: 6 }, 30, 10)).toBe(true);
+  });
+
+  it("uses segment weights for the route distance", () => {
+    expect(routeDistanceToAttraction(valle, mirador)).toBe(109);
+    expect(routeDistanceToAttraction(valle, mirador, { x: -5, z: 4 })).toBe(
+      116,
+    );
   });
 });

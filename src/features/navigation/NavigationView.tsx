@@ -10,6 +10,7 @@ import {
   isOffRoute,
   localPointFromGps,
   routeDistanceInMeters,
+  routeDistanceToAttraction,
   routeFromCoordinate,
   routeToAttraction,
 } from "../../domain/use-cases";
@@ -58,10 +59,6 @@ export function NavigationView({
         )
       : routeToAttraction(business, selected)
     : [];
-  const routeDistance = routeDistanceInMeters(
-    routePoints,
-    business.mapScaleMeters,
-  );
   const userPoint = position
     ? localPointFromGps(
         business.mapOrigin,
@@ -72,6 +69,10 @@ export function NavigationView({
         business.mapScaleMeters,
       )
     : null;
+  const routeDistance = selected
+    ? (routeDistanceToAttraction(business, selected, userPoint ?? undefined) ??
+      routeDistanceInMeters(routePoints, business.mapScaleMeters))
+    : 0;
   const networkDistance =
     userPoint && business.waypoints
       ? distanceToNetwork(

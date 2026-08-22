@@ -110,6 +110,47 @@ export function shortestPath(
   );
 }
 
+export function shortestPathDistance(
+  waypoints: Waypoint[],
+  segments: PathSegment[],
+  startId: string,
+  endId: string,
+) {
+  if (
+    !waypoints.some((waypoint) => waypoint.id === startId) ||
+    !waypoints.some((waypoint) => waypoint.id === endId)
+  )
+    return null;
+  const distances = new Map(
+    waypoints.map((waypoint) => [waypoint.id, Infinity]),
+  );
+  const pending = new Set(waypoints.map((waypoint) => waypoint.id));
+  distances.set(startId, 0);
+
+  while (pending.size > 0) {
+    const current = [...pending].reduce((closest, id) =>
+      distances.get(id)! < distances.get(closest)! ? id : closest,
+    );
+    pending.delete(current);
+    if (current === endId || distances.get(current) === Infinity) break;
+    segments.forEach((segment) => {
+      const neighborId =
+        segment.from === current
+          ? segment.to
+          : segment.to === current
+            ? segment.from
+            : undefined;
+      if (!neighborId) return;
+      const candidate = distances.get(current)! + segment.distanceInMeters;
+      if (candidate < distances.get(neighborId)!)
+        distances.set(neighborId, candidate);
+    });
+  }
+
+  const distance = distances.get(endId);
+  return distance === Infinity ? null : distance;
+}
+
 export function routeToAttraction(business: Business, attraction: Attraction) {
   if (!business.waypoints || !business.pathSegments || !attraction.waypointId)
     return [];
@@ -119,6 +160,30 @@ export function routeToAttraction(business: Business, attraction: Attraction) {
     "entrada",
     attraction.waypointId,
   );
+}
+
+export function routeDistanceToAttraction(
+  business: Business,
+  attraction: Attraction,
+  position?: MapPoint,
+) {
+  if (!business.waypoints || !business.pathSegments || !attraction.waypointId)
+    return null;
+  const start = position
+    ? nearestWaypoint(business.waypoints, position)
+    : business.waypoints.find((waypoint) => waypoint.id === "entrada");
+  if (!start) return null;
+  const networkDistance = shortestPathDistance(
+    business.waypoints,
+    business.pathSegments,
+    start.id,
+    attraction.waypointId,
+  );
+  if (networkDistance === null || networkDistance === undefined) return null;
+  const approachDistance = position
+    ? distanceBetweenPoints(position, start.position, business.mapScaleMeters)
+    : 0;
+  return networkDistance + approachDistance;
 }
 
 export function nearestWaypoint(waypoints: Waypoint[], position: MapPoint) {
