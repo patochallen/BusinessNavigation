@@ -20,6 +20,7 @@ import { CameraNavigationView } from './CameraNavigationView'
 import { useCameraStream } from '../../services/camera'
 import './NavigationView.css'
 import { getDistanceBetweenLocations } from '../../utils/location'
+import { useTranslation } from 'react-i18next'
 
 type NavigationViewProps = {
   business: Business
@@ -48,6 +49,7 @@ export function NavigationView({
   headingStable,
   onBack,
 }: NavigationViewProps) {
+  const { t } = useTranslation()
   const [cameraVisible, setCameraVisible] = useState(false)
   const camera = useCameraStream()
   const distance =
@@ -109,17 +111,17 @@ export function NavigationView({
   return (
     <section className="navigation-view">
       <button className="back-link" onClick={onBack}>
-        <ArrowLeft size={17} /> Volver
+        <ArrowLeft size={17} /> {t('common.back')}
       </button>
       <div className="navigation-title">
         <p className="eyebrow">
           {navigationState === 'arrived'
-            ? 'Llegaste'
+            ? t('navigation.arrived')
             : navigationState === 'locating'
-              ? 'Buscando tu ubicación'
+              ? t('navigation.locating')
               : navigationState === 'idle'
-                ? 'Ubicación pendiente'
-                : 'Navegando hacia'}
+                ? t('navigation.pending')
+                : t('navigation.headingTo')}
         </p>
         <h1>{selected?.name ?? 'un destino'}</h1>
         <span className="destination-tag" style={{ color: selected?.color }}>
@@ -140,32 +142,32 @@ export function NavigationView({
         <div className="route-stats">
           <div>
             <strong>{distance !== null ? `${Math.round(distance)} m` : '—'}</strong>
-            <span>distancia estimada</span>
+            <span>{t('navigation.estimatedDistance')}</span>
           </div>
           <div>
             <strong>{walkingEtaFromDistance(routeDistance) ?? '—'}</strong>
-            <span>caminando</span>
+            <span>{t('navigation.walking')}</span>
           </div>
           <div>
             <strong>{routeDistance > 0 ? `${routeDistance} m` : '—'}</strong>
-            <span>ruta por senderos</span>
+            <span>{t('navigation.trailRoute')}</span>
           </div>
         </div>
         <div className="route-progress">
           <div className="route-progress-heading">
-            <span>Progreso del recorrido</span>
+            <span>{t('navigation.progress')}</span>
             <strong>{Math.round(progress.ratio * 100)}%</strong>
           </div>
           <div className="progress-track">
             <span style={{ width: `${progress.ratio * 100}%` }} />
           </div>
           <div className="route-progress-meta">
-            <span>{progress.completedMeters} m recorridos</span>
-            <span>{progress.remainingMeters} m restantes</span>
+            <span>{t('navigation.completed', { count: progress.completedMeters })}</span>
+            <span>{t('navigation.remaining', { count: progress.remainingMeters })}</span>
           </div>
           {nextWaypoint && (
             <span className="next-waypoint">
-              Siguiente referencia: <strong>{nextWaypoint.id}</strong>
+              {t('navigation.nextReference', { name: nextWaypoint.id })}
             </span>
           )}
         </div>
@@ -180,10 +182,8 @@ export function NavigationView({
         )}
         {offRoute && (
           <div className="route-warning">
-            <strong>Estás fuera del sendero</strong>
-            <span>
-              A {networkDistance} m de la red señalizada. Volvé al camino para retomar la ruta.
-            </span>
+            <strong>{t('navigation.offRouteTitle')}</strong>
+            <span>{t('navigation.offRouteDescription', { count: networkDistance })}</span>
           </div>
         )}
         {permission !== 'ready' && (
@@ -191,15 +191,17 @@ export function NavigationView({
             <LocateFixed size={20} />
             <div>
               <strong>
-                {permission === 'requesting' ? 'Buscando tu ubicación' : 'Ubicación no disponible'}
+                {permission === 'requesting'
+                  ? t('navigation.locating')
+                  : t('navigation.locationUnavailable')}
               </strong>
-              <p>{errorMessage ?? 'La navegación funciona sin distancia en tiempo real.'}</p>
+              <p>{errorMessage ?? t('navigation.locationFallback')}</p>
             </div>
           </div>
         )}
       </div>
       <p className="route-note">
-        <Navigation size={15} /> Ruta visual directa. Seguí los senderos señalizados del predio.
+        <Navigation size={15} /> {t('navigation.directRoute')}
       </p>
       <div className="heading-panel">
         <Compass
@@ -209,25 +211,27 @@ export function NavigationView({
         />
         <div>
           <strong>
-            {heading === null ? 'Brújula sin señal' : `${Math.round(heading)}° de orientación`}
+            {heading === null ? t('navigation.compassNoSignal') : `${Math.round(heading)}°`}
           </strong>
           <span>
             {headingPermission === 'unavailable'
-              ? 'Este dispositivo no informa orientación.'
+              ? t('navigation.noOrientation')
               : heading === null
-                ? 'Activá la brújula para orientar el destino.'
+                ? t('navigation.activateCompassDescription')
                 : headingStable
-                  ? 'Orientación estable.'
-                  : 'Mantené el teléfono quieto para estabilizar.'}
+                  ? t('navigation.stableOrientation')
+                  : t('navigation.stabilizeOrientation')}
           </span>
         </div>
         {headingPermission !== 'ready' && headingPermission !== 'unavailable' ? (
           <button className="outline-button" onClick={enableHeading}>
-            {headingPermission === 'requesting' ? 'Solicitando...' : 'Activar brújula'}
+            {headingPermission === 'requesting'
+              ? t('camera.requesting')
+              : t('navigation.activateCompass')}
           </button>
         ) : headingPermission === 'ready' ? (
           <button className="outline-button" onClick={calibrateHeading}>
-            Calibrar
+            {t('navigation.calibrate')}
           </button>
         ) : null}
       </div>
@@ -248,7 +252,7 @@ export function NavigationView({
         />
       ) : (
         <button className="camera-launch" onClick={() => setCameraVisible(true)}>
-          <Camera size={17} /> Ver con cámara
+          <Camera size={17} /> {t('navigation.camera')}
         </button>
       )}
     </section>

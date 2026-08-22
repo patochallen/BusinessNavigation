@@ -1,4 +1,5 @@
 import { ArrowUp, Compass } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import './AttractionItemList.css'
 
 type AttractionItemListProps = {
@@ -26,6 +27,7 @@ export const AttractionItemList = ({
   icon: Icon,
   onClick,
 }: AttractionItemListProps) => {
+  const { t } = useTranslation()
   return (
     <button
       className={`attraction-card ${selected ? 'selected' : ''}`}
@@ -41,7 +43,9 @@ export const AttractionItemList = ({
         <span className="attraction-meta">
           <span>{category}</span>
           <span>•</span>
-          <span>{walkingEta} a pie</span>
+          <span>
+            {walkingEta} {t('common.walking')}
+          </span>
         </span>
       </span>
       <span className="card-distance">

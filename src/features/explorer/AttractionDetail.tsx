@@ -6,6 +6,7 @@ import { categoryLabels } from '../../domain/demo-data'
 import './AttractionDetail.css'
 import { routeDistanceToAttraction, walkingEtaFromDistance } from '../../domain/use-cases'
 import { getDistanceAndHeadingBetweenLocations } from '../../utils/location'
+import { useTranslation } from 'react-i18next'
 
 type AttractionDetailProps = {
   business: Business
@@ -21,6 +22,7 @@ export function AttractionDetail({
   heading,
 }: AttractionDetailProps) {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const { distanceMeters, headingDegrees: calculatedHeadingDegrees } =
     getDistanceAndHeadingBetweenLocations(
       position?.coords ?? business.mapOrigin,
@@ -39,7 +41,7 @@ export function AttractionDetail({
   return (
     <section className="attraction-detail">
       <Link className="back-link" to={`/b/${business.id}`}>
-        <ArrowLeft size={17} /> Volver
+        <ArrowLeft size={17} /> {t('common.back')}
       </Link>
       <div
         className="detail-visual"
@@ -70,19 +72,19 @@ export function AttractionDetail({
             <strong>
               {walkingEtaFromDistance(routeDistanceToAttraction(business, attraction)) ?? '—'}
             </strong>{' '}
-            a pie
+            {t('common.walking')}
           </span>
         </div>
         <div>
           <Ruler size={17} />
           <span>
-            <strong>Distance</strong> {distanceMeters.toFixed(1)} m.
+            <strong>{t('detail.distance')}</strong> {distanceMeters.toFixed(1)} m.
           </span>
         </div>
         <div>
           <ShieldCheck size={17} />
           <span>
-            <strong>Heading</strong> {headingDegrees.toFixed(0)}° N
+            <strong>{t('detail.heading')}</strong> {headingDegrees.toFixed(0)}° N
           </span>
         </div>
       </div>
@@ -91,13 +93,13 @@ export function AttractionDetail({
           className="button button-dark"
           onClick={() => navigate(`/b/${business.id}/a/${attraction.id}/navigate`)}
         >
-          <Navigation size={17} /> Comenzar navegación
+          <Navigation size={17} /> {t('detail.startNavigation')}
         </button>
         <button
           className="outline-button"
           onClick={() => navigate(`/b/${business.id}?attraction=${attraction.id}`)}
         >
-          <MapPin size={16} /> Ver en el mapa
+          <MapPin size={16} /> {t('detail.viewMap')}
         </button>
       </div>
     </section>

@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { Camera, LocateFixed, Navigation, X } from 'lucide-react'
 import type { Attraction, CameraPermission } from '../../domain/types'
 import './CameraNavigationView.css'
+import { useTranslation } from 'react-i18next'
 
 type CameraNavigationViewProps = {
   stream: MediaStream | null
@@ -26,6 +27,7 @@ export function CameraNavigationView({
   onStart,
   onStop,
 }: CameraNavigationViewProps) {
+  const { t } = useTranslation()
   const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
@@ -38,9 +40,9 @@ export function CameraNavigationView({
       <div className="camera-scrim" />
       <div className="camera-topbar">
         <span className="camera-live">
-          <span /> Vista del predio
+          <span /> {t('camera.liveView')}
         </span>
-        <button className="camera-close" aria-label="Cerrar cámara" onClick={onStop}>
+        <button className="camera-close" aria-label={t('camera.close')} onClick={onStop}>
           <X size={19} />
         </button>
       </div>
@@ -60,20 +62,20 @@ export function CameraNavigationView({
       ) : (
         <div className="camera-empty">
           <Camera size={28} />
-          <strong>Vista de navegación</strong>
+          <strong>{t('camera.viewTitle')}</strong>
           <p>
             {permission === 'unavailable'
-              ? 'Este navegador no permite usar la cámara.'
-              : (errorMessage ?? 'Usá la cámara para ver una referencia sobre el entorno.')}
+              ? t('camera.unavailable')
+              : (errorMessage ?? t('camera.description'))}
           </p>
           {permission !== 'requesting' && (
             <button className="button button-light" onClick={onStart}>
-              <Camera size={17} /> Activar cámara
+              <Camera size={17} /> {t('camera.activate')}
             </button>
           )}
           {permission === 'requesting' && (
             <span className="camera-status">
-              <LocateFixed size={15} /> Solicitando permiso...
+              <LocateFixed size={15} /> {t('camera.requesting')}
             </span>
           )}
         </div>
@@ -82,7 +84,7 @@ export function CameraNavigationView({
         <span>
           <LocateFixed size={15} /> {attraction?.tag ?? 'Navegación'}
         </span>
-        <small>La cámara no reemplaza las señales del predio.</small>
+        <small>{t('camera.warning')}</small>
       </div>
     </section>
   )

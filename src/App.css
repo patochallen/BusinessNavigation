@@ -14,10 +14,15 @@
 .topbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
+  gap: 14px;
   height: 78px;
   padding: 0 5.5vw;
   border-bottom: 1px solid #e2dfd5;
+}
+
+.topbar .wordmark {
+  margin-right: auto;
 }
 
 .wordmark {

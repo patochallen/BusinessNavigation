@@ -13,6 +13,7 @@ import { MapScene } from '../map/MapScene'
 import './BusinessHome.css'
 import { getDistanceAndHeadingBetweenLocations } from '../../utils/location'
 import { AttractionItemList } from './AttractionItemList'
+import { useTranslation } from 'react-i18next'
 
 type BusinessHomeProps = {
   business: Business
@@ -34,6 +35,7 @@ export function BusinessHome({
   position,
   selectedAttractionId,
 }: BusinessHomeProps) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [selectedId, setSelectedId] = useState(selectedAttractionId ?? 'punto-encuentro')
   const [category, setCategory] = useState<'all' | Category>('all')
@@ -95,12 +97,13 @@ export function BusinessHome({
             </div>
           ))}
           <div className="map-legend">
-            <span className="legend-dot" /> {business.attractions.length} puntos de interés
+            <span className="legend-dot" />{' '}
+            {t('explorer.pointsOfInterest', { count: business.attractions.length })}
           </div>
           <button
             className="north-button"
-            aria-label="Restablecer vista del mapa"
-            title="Restablecer vista del mapa"
+            aria-label={t('explorer.resetMap')}
+            title={t('explorer.resetMap')}
             onClick={() => navigate(`/b/${business.id}`, { replace: true })}
           >
             <Compass size={17} />
@@ -108,13 +111,15 @@ export function BusinessHome({
         </div>
       </section>
       <section className="explore-section">
-        <p className="eyebrow">Attractions ({filtered.length})</p>
+        <p className="eyebrow">
+          {t('explorer.exploreTitle')} ({filtered.length})
+        </p>
         <div className="search-field">
           <Search size={17} />
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar una atracción"
+            placeholder={t('explorer.searchPlaceholder')}
           />
         </div>
         <div className="category-row">
@@ -122,7 +127,7 @@ export function BusinessHome({
             className={category === 'all' ? 'category active' : 'category'}
             onClick={() => setCategory('all')}
           >
-            Todos
+            {t('categories.all')}
           </button>
           {(Object.keys(categoryLabels) as Category[]).map((key) => {
             const Icon = icons[key]
@@ -133,7 +138,7 @@ export function BusinessHome({
                 onClick={() => setCategory(key)}
               >
                 <Icon size={15} />
-                {categoryLabels[key]}
+                {t(`categories.${key}`)}
               </button>
             )
           })}
@@ -152,7 +157,7 @@ export function BusinessHome({
                 color={item.color}
                 name={item.name}
                 description={item.description}
-                category={categoryLabels[item.category]}
+                category={t(`categories.${item.category}`)}
                 walkingEta={
                   walkingEtaFromDistance(routeDistanceToAttraction(business, item)) ?? '—'
                 }

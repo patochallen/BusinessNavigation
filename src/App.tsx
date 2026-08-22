@@ -17,8 +17,11 @@ import { BusinessHome } from './features/explorer/BusinessHome'
 import { AttractionDetail } from './features/explorer/AttractionDetail'
 import { NavigationView } from './features/navigation/NavigationView'
 import { useEffect } from 'react'
+import { LanguageSwitcher } from './i18n/LanguageSwitcher'
+import { useTranslation } from 'react-i18next'
 
 function AppContent() {
+  const { t } = useTranslation()
   const { businessId, attractionId } = useParams<{
     businessId: string
     attractionId?: string
@@ -52,10 +55,10 @@ function AppContent() {
     return (
       <main className="not-found">
         <span className="brand-mark">{businessMark ?? 'BN'}</span>
-        <h1>Este lugar no aparece en el mapa</h1>
-        <p>Revisá el código QR e intentá nuevamente.</p>
+        <h1>{t('app.notFoundTitle')}</h1>
+        <p>{t('app.notFoundDescription')}</p>
         <Link className="button button-dark" to="/">
-          Volver al inicio
+          {t('app.backHome')}
         </Link>
       </main>
     )
@@ -67,7 +70,8 @@ function AppContent() {
           <span className="brand-mark">{businessMark}</span>
           <span>{business.name}</span>
         </Link>
-        <button className="icon-button" aria-label="Buscar">
+        <LanguageSwitcher />
+        <button className="icon-button" aria-label={t('common.search')}>
           <Search size={19} />
         </button>
       </header>
@@ -104,7 +108,7 @@ function AppContent() {
       </main>
       <footer>
         <span>{business.name}</span>
-        <span>Tu mapa, tu ritmo.</span>
+        <span>{t('app.mapTagline')}</span>
       </footer>
     </div>
   )
