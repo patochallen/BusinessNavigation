@@ -86,6 +86,7 @@ function AppContent() {
           <BusinessHome
             business={business}
             permission={permission}
+            position={position}
             selectedAttractionId={mapAttractionId}
             locate={locate}
           />

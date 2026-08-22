@@ -18,6 +18,7 @@ import {
 import { MapScene } from '../map/MapScene'
 import { CameraNavigationView } from './CameraNavigationView'
 import { useCameraStream } from '../../services/camera'
+import { getDistanceBetweenLocations } from '../../utils/location'
 
 type NavigationViewProps = {
   business: Business
@@ -50,7 +51,10 @@ export function NavigationView({
 }: NavigationViewProps) {
   const [cameraVisible, setCameraVisible] = useState(false)
   const camera = useCameraStream()
-  const distance = position && selected ? distanceInMeters(position, business, selected) : null
+  const distance =
+    position && selected
+      ? getDistanceBetweenLocations(position.coords, selected.coordinates)?.toFixed(0)
+      : null //distanceInMeters(position, business, selected) : null
   const navigationState =
     permission === 'requesting'
       ? 'locating'

@@ -59,10 +59,6 @@ export function MapScene({
         rotation={[0, 0, 0]}
         position={[0, 0.02, 0]}
       />
-      <mesh position={[0, 0.05, 0]}>
-        <boxGeometry args={[0.18, 0.08, 0.18]} />
-        <meshStandardMaterial color="#ec4c0d" />
-      </mesh>
       {mapFeatures.map((feature) => {
         if (feature.type === 'path') {
           return (
@@ -131,11 +127,17 @@ export function MapScene({
           </mesh>
         </group>
       ))}
-      {userActive && (
-        <mesh position={[userPosition?.x ?? 0, 0.3, userPosition?.z ?? 0]}>
-          <ringGeometry args={[0.18, 0.25, 24]} />
-          <meshBasicMaterial color="#477e78" />
-        </mesh>
+      {userActive && userPosition && (
+        <group position={[userPosition.x, 0.3, userPosition.z]}>
+          <mesh>
+            <coneGeometry args={[0.2, 0.45, 16]} />
+            <meshStandardMaterial color="#477e78" emissive="#477e78" emissiveIntensity={0.25} />
+          </mesh>
+          <mesh position={[0, -0.2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[0.24, 0.32, 24]} />
+            <meshBasicMaterial color="#477e78" transparent opacity={0.7} />
+          </mesh>
+        </group>
       )}
       <OrbitControls enableRotate={false} minZoom={35} maxZoom={80} zoomSpeed={0.8} />
     </Canvas>

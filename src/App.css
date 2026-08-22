@@ -268,12 +268,12 @@
 .map-section,
 .explore-section,
 .navigation-view {
-  padding-left: 10%;
-  padding-right: 10%;
+  padding-left: 5%;
+  padding-right: 5%;
 }
 .intro {
-  padding-top: 74px;
-  padding-bottom: 63px;
+  padding-top: 24px;
+  padding-bottom: 24px;
   background:
     radial-gradient(circle at 91% 12%, rgba(231, 190, 91, 0.24), transparent 23%), #f6f4ee;
 }
@@ -327,8 +327,8 @@ h2 {
   color: #b8bcb3;
 }
 .map-section {
-  padding-top: 48px;
-  padding-bottom: 72px;
+  padding-top: 24px;
+  padding-bottom: 24px;
   background: #ece9df;
 }
 .section-heading {
@@ -411,8 +411,8 @@ h2 {
   background: rgba(246, 244, 238, 0.78);
 }
 .explore-section {
-  padding-top: 70px;
-  padding-bottom: 86px;
+  padding-top: 24px;
+  padding-bottom: 24px;
 }
 .count {
   color: #9ca49d;

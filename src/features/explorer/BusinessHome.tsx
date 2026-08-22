@@ -3,12 +3,13 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Business, Category } from '../../domain/types'
 import { categoryLabels } from '../../domain/demo-data'
-import { filterAttractions } from '../../domain/use-cases'
+import { filterAttractions, localPointFromGps } from '../../domain/use-cases'
 import { MapScene } from '../map/MapScene'
 
 type BusinessHomeProps = {
   business: Business
   permission: string
+  position: GeolocationPosition | null
   selectedAttractionId?: string
   locate: () => void
 }
@@ -22,6 +23,7 @@ const icons: Record<Category, typeof Compass> = {
 export function BusinessHome({
   business,
   permission,
+  position,
   selectedAttractionId,
   locate,
 }: BusinessHomeProps) {
@@ -32,6 +34,13 @@ export function BusinessHome({
   const activeSelectedId = selectedAttractionId ?? selectedId
   const selected =
     business.attractions.find((item) => item.id === activeSelectedId) ?? business.attractions[0]
+  const userPosition = position
+    ? localPointFromGps(
+        business.mapOrigin,
+        { latitude: position.coords.latitude, longitude: position.coords.longitude },
+        business.mapScaleMeters,
+      )
+    : undefined
   const filtered = useMemo(
     () => filterAttractions(business.attractions, category, query),
     [business.attractions, category, query],
@@ -67,6 +76,7 @@ export function BusinessHome({
             key={selectedAttractionId ?? 'overview'}
             attractions={business.attractions}
             business={business}
+            userPosition={userPosition}
             mapFeatures={business.mapFeatures}
             selectedId={selected?.id}
             centerOnSelected={Boolean(selectedAttractionId)}

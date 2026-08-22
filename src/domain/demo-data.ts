@@ -182,11 +182,11 @@ export const businesses: Business[] = [
     mapOrigin: parqueSaavedraOrigin,
     mapScaleMeters: parqueSaavedraScaleMeters,
     entryWaypointId: 'entrada-avenida-garcia-del-rio',
-    mapLabels: [
-      { id: 'entrada-label', label: 'Entrada principal', position: { x: -6, z: 5 } },
-      { id: 'calesita-label', label: 'Calesita', position: { x: -1.5, z: -2 } },
-      { id: 'juegos-label', label: 'Patios de juego', position: { x: 3.5, z: 1.5 } },
-    ],
+    // mapLabels: [
+    //   { id: 'entrada-label', label: 'Entrada principal', position: { x: -6, z: 5 } },
+    //   { id: 'calesita-label', label: 'Calesita', position: { x: -1.5, z: -2 } },
+    //   { id: 'juegos-label', label: 'Patios de juego', position: { x: 3.5, z: 1.5 } },
+    // ],
     waypoints: [
       { id: 'entrada-avenida-garcia-del-rio', position: { x: -6, z: 5 } },
       { id: 'rotonda-central', position: { x: 0, z: 0 } },
