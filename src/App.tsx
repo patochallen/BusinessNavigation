@@ -34,15 +34,21 @@ function AppContent() {
       ? demoBusinessRepository.findAttraction(business, attractionId)
       : business?.attractions[0]
   const mapAttractionId = searchParams.get('attraction') ?? undefined
+  const businessMark = business?.name
+    .split(/\s+/)
+    .map((word) => word[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
 
   if (!business || (attractionId && !attraction))
     return (
       <main className="not-found">
-        <span className="brand-mark">VL</span>
+        <span className="brand-mark">{businessMark ?? 'BN'}</span>
         <h1>Este lugar no aparece en el mapa</h1>
         <p>Revisá el código QR e intentá nuevamente.</p>
-        <Link className="button button-dark" to="/b/valle-lumina">
-          Volver a Valle Lúmina
+        <Link className="button button-dark" to="/">
+          Volver al inicio
         </Link>
       </main>
     )
@@ -51,8 +57,8 @@ function AppContent() {
     <div className="app-shell">
       <header className="topbar">
         <Link to={`/b/${business.id}`} className="wordmark">
-          <span className="brand-mark">VL</span>
-          <span>Valle Lúmina</span>
+          <span className="brand-mark">{businessMark}</span>
+          <span>{business.name}</span>
         </Link>
         <button className="icon-button" aria-label="Buscar">
           <Search size={19} />
@@ -86,7 +92,7 @@ function AppContent() {
         )}
       </main>
       <footer>
-        <span>Valle Lúmina</span>
+        <span>{business.name}</span>
         <span>Tu mapa, tu ritmo.</span>
       </footer>
     </div>

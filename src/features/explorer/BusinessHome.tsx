@@ -49,7 +49,7 @@ export function BusinessHome({
           <MapPin size={16} />
           <span>{business.location}</span>
           <span className="dot">•</span>
-          <span>Abierto hoy</span>
+          <span>{business.statusLabel}</span>
         </div>
       </section>
       <section className="map-section">
@@ -75,8 +75,18 @@ export function BusinessHome({
             }}
             userActive={permission === 'ready'}
           />
-          <div className="map-label label-top">MIRADOR NORTE</div>
-          <div className="map-label label-bottom">ENTRADA PRINCIPAL</div>
+          {business.mapLabels?.map((mapLabel) => (
+            <div
+              className="map-label"
+              key={mapLabel.id}
+              style={{
+                left: `${50 + mapLabel.position.x * 5}%`,
+                top: `${50 + mapLabel.position.z * 5}%`,
+              }}
+            >
+              {mapLabel.label.toUpperCase()}
+            </div>
+          ))}
           <div className="map-legend">
             <span className="legend-dot" /> {business.attractions.length} puntos de interés
           </div>

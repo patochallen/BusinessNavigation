@@ -10,6 +10,12 @@ export type MapPoint = {
   z: number
 }
 
+export type MapLabel = {
+  id: string
+  label: string
+  position: MapPoint
+}
+
 export type MapFeature =
   | { type: 'path'; id: string; points: MapPoint[] }
   | {
@@ -55,8 +61,11 @@ export type Business = {
   location: string
   description: string
   eyebrow: string
+  statusLabel: string
   mapOrigin: Coordinate
   mapScaleMeters: number
+  entryWaypointId: string
+  mapLabels?: MapLabel[]
   mapFeatures?: MapFeature[]
   waypoints?: Waypoint[]
   pathSegments?: PathSegment[]

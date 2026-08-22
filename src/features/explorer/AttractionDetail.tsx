@@ -56,7 +56,7 @@ export function AttractionDetail({ business, attraction }: AttractionDetailProps
         <div>
           <MapPin size={17} />
           <span>
-            <strong>Predio</strong> Valle Lúmina
+            <strong>Predio</strong> {business.name}
           </span>
         </div>
         <div>

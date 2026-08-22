@@ -127,7 +127,12 @@ export function shortestPathDistance(
 
 export function routeToAttraction(business: Business, attraction: Attraction) {
   if (!business.waypoints || !business.pathSegments || !attraction.waypointId) return []
-  return shortestPath(business.waypoints, business.pathSegments, 'entrada', attraction.waypointId)
+  return shortestPath(
+    business.waypoints,
+    business.pathSegments,
+    business.entryWaypointId,
+    attraction.waypointId,
+  )
 }
 
 export function routeDistanceToAttraction(
@@ -138,7 +143,7 @@ export function routeDistanceToAttraction(
   if (!business.waypoints || !business.pathSegments || !attraction.waypointId) return null
   const start = position
     ? nearestWaypoint(business.waypoints, position)
-    : business.waypoints.find((waypoint) => waypoint.id === 'entrada')
+    : business.waypoints.find((waypoint) => waypoint.id === business.entryWaypointId)
   if (!start) return null
   const networkDistance = shortestPathDistance(
     business.waypoints,
