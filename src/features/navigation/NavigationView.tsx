@@ -1,4 +1,5 @@
-import { ArrowLeft, Compass, LocateFixed, Navigation } from 'lucide-react'
+import { ArrowLeft, Camera, Compass, LocateFixed, Navigation } from 'lucide-react'
+import { useState } from 'react'
 import type { Attraction, Business, LocationPermission } from '../../domain/types'
 import { distanceInMeters } from '../../services/location'
 import {
@@ -14,6 +15,8 @@ import {
   routeToAttraction,
 } from '../../domain/use-cases'
 import { MapScene } from '../map/MapScene'
+import { CameraNavigationView } from './CameraNavigationView'
+import { useCameraStream } from '../../services/camera'
 
 type NavigationViewProps = {
   business: Business
@@ -40,6 +43,8 @@ export function NavigationView({
   locate,
   onBack,
 }: NavigationViewProps) {
+  const [cameraVisible, setCameraVisible] = useState(false)
+  const camera = useCameraStream()
   const distance = position && selected ? distanceInMeters(position, business, selected) : null
   const navigationState =
     permission === 'requesting'
@@ -213,6 +218,24 @@ export function NavigationView({
           </button>
         )}
       </div>
+      {cameraVisible ? (
+        <CameraNavigationView
+          stream={camera.stream}
+          permission={camera.permission}
+          errorMessage={camera.errorMessage}
+          attraction={selected}
+          direction={nextDirection}
+          onStart={camera.start}
+          onStop={() => {
+            camera.stop()
+            setCameraVisible(false)
+          }}
+        />
+      ) : (
+        <button className="camera-launch" onClick={() => setCameraVisible(true)}>
+          <Camera size={17} /> Ver con cámara
+        </button>
+      )}
     </section>
   )
 }

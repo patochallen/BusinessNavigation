@@ -64,3 +64,5 @@ export type Business = {
 }
 
 export type LocationPermission = 'idle' | 'requesting' | 'ready' | 'denied' | 'unavailable'
+
+export type CameraPermission = 'idle' | 'requesting' | 'ready' | 'denied' | 'unavailable' | 'error'
