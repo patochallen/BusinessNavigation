@@ -13,6 +13,7 @@ import {
   distanceToNetwork,
   isOffRoute,
   routeToAttraction,
+  progressOnRoute,
   shortestPath,
 } from "./use-cases";
 
@@ -140,5 +141,21 @@ describe("predio routing", () => {
     expect(routeDistanceToAttraction(valle, mirador, { x: -5, z: 4 })).toBe(
       116,
     );
+  });
+
+  it("reports completed and remaining route progress", () => {
+    const progress = progressOnRoute(
+      [
+        { x: 0, z: 0 },
+        { x: 3, z: 0 },
+        { x: 6, z: 0 },
+      ],
+      { x: 3, z: 0 },
+      10,
+    );
+    expect(progress.completedMeters).toBe(30);
+    expect(progress.remainingMeters).toBe(30);
+    expect(progress.ratio).toBe(0.5);
+    expect(progress.nextPoint).toEqual({ x: 6, z: 0 });
   });
 });

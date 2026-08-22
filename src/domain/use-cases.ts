@@ -251,3 +251,43 @@ export function isOffRoute(
   const distance = distanceToNetwork(waypoints, position, scaleMeters);
   return distance !== null && distance > thresholdMeters;
 }
+
+export function progressOnRoute(
+  route: MapPoint[],
+  position: MapPoint | null,
+  scaleMeters = 1,
+) {
+  if (route.length < 2)
+    return {
+      completedMeters: 0,
+      remainingMeters: 0,
+      ratio: 0,
+      nextPoint: undefined,
+    };
+  const totalMeters = routeDistanceInMeters(route, scaleMeters);
+  if (!position)
+    return {
+      completedMeters: 0,
+      remainingMeters: totalMeters,
+      ratio: 0,
+      nextPoint: route[1],
+    };
+  const nearestIndex = route.reduce(
+    (closest, point, index) =>
+      distanceBetweenPoints(position, point) <
+      distanceBetweenPoints(position, route[closest])
+        ? index
+        : closest,
+    0,
+  );
+  const completedMeters = routeDistanceInMeters(
+    route.slice(0, nearestIndex + 1),
+    scaleMeters,
+  );
+  return {
+    completedMeters,
+    remainingMeters: Math.max(0, totalMeters - completedMeters),
+    ratio: totalMeters === 0 ? 1 : Math.min(1, completedMeters / totalMeters),
+    nextPoint: route[nearestIndex + 1],
+  };
+}

@@ -149,6 +149,49 @@
 #root {
   min-height: 100svh;
 }
+.route-progress {
+  margin: 0 25px 25px;
+  padding: 16px 0 0;
+  border-top: 1px solid #d8d5ca;
+}
+.route-progress-heading,
+.route-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: #879189;
+  font-size: 10px;
+}
+.route-progress-heading strong {
+  color: #477e78;
+  font-size: 12px;
+}
+.progress-track {
+  height: 6px;
+  margin: 10px 0 8px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #d5d3c9;
+}
+.progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #e8b84a;
+  transition: width 0.35s ease;
+}
+.route-progress-meta {
+  font-size: 9px;
+}
+.next-waypoint {
+  display: block;
+  margin-top: 12px;
+  color: #8b948c;
+  font-size: 10px;
+}
+.next-waypoint strong {
+  color: #34453f;
+}
 .app-shell {
   max-width: 1180px;
   margin: 0 auto;

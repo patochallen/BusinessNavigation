@@ -9,6 +9,7 @@ import {
   distanceToNetwork,
   isOffRoute,
   localPointFromGps,
+  progressOnRoute,
   routeDistanceInMeters,
   routeDistanceToAttraction,
   routeFromCoordinate,
@@ -73,6 +74,17 @@ export function NavigationView({
     ? (routeDistanceToAttraction(business, selected, userPoint ?? undefined) ??
       routeDistanceInMeters(routePoints, business.mapScaleMeters))
     : 0;
+  const referenceRoute = selected ? routeToAttraction(business, selected) : [];
+  const progress = progressOnRoute(
+    referenceRoute,
+    userPoint,
+    business.mapScaleMeters,
+  );
+  const nextWaypoint = business.waypoints?.find(
+    (waypoint) =>
+      waypoint.position.x === progress.nextPoint?.x &&
+      waypoint.position.z === progress.nextPoint?.z,
+  );
   const networkDistance =
     userPoint && business.waypoints
       ? distanceToNetwork(
@@ -131,6 +143,24 @@ export function NavigationView({
             <strong>{routeDistance > 0 ? `${routeDistance} m` : "—"}</strong>
             <span>ruta por senderos</span>
           </div>
+        </div>
+        <div className="route-progress">
+          <div className="route-progress-heading">
+            <span>Progreso del recorrido</span>
+            <strong>{Math.round(progress.ratio * 100)}%</strong>
+          </div>
+          <div className="progress-track">
+            <span style={{ width: `${progress.ratio * 100}%` }} />
+          </div>
+          <div className="route-progress-meta">
+            <span>{progress.completedMeters} m recorridos</span>
+            <span>{progress.remainingMeters} m restantes</span>
+          </div>
+          {nextWaypoint && (
+            <span className="next-waypoint">
+              Siguiente referencia: <strong>{nextWaypoint.id}</strong>
+            </span>
+          )}
         </div>
         {offRoute && (
           <div className="route-warning">
