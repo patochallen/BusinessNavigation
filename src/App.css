@@ -12,12 +12,16 @@
 }
 
 .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 14px;
   height: 78px;
   padding: 0 5.5vw;
+  background: #f6f4ee;
   border-bottom: 1px solid #e2dfd5;
 }
 
