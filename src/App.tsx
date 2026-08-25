@@ -40,6 +40,7 @@ function AppContent() {
       ? demoBusinessRepository.findAttraction(business, attractionId)
       : business?.attractions[0]
   const headingState = useDeviceHeading(true)
+  const enableHeading = headingState.enable
   const mapAttractionId = searchParams.get('attraction') ?? undefined
   const businessMark = business?.name
     .split(/\s+/)
@@ -50,10 +51,8 @@ function AppContent() {
   const shouldShowHeaderBack = isSettings || isNavigation || isAttractionDetail
 
   useEffect(() => {
-    headingState.enable()
-  }, [])
-
-  console.log('headingState', headingState.heading)
+    void enableHeading()
+  }, [enableHeading])
 
   if (!business || (attractionId && !attraction))
     return (
@@ -95,7 +94,7 @@ function AppContent() {
             errorMessage={errorMessage}
             heading={headingState.heading}
             headingPermission={headingState.permission}
-            enableHeading={headingState.enable}
+            enableHeading={enableHeading}
             calibrateHeading={headingState.calibrate}
             headingStable={headingState.headingStable}
           />

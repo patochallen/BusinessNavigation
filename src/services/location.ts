@@ -14,7 +14,11 @@ import {
 
 export function useGeolocation() {
   const [position, setPosition] = useState<GeolocationPosition | null>(null)
-  const [permission, setPermission] = useState<LocationPermission>('idle')
+  const [permission, setPermission] = useState<LocationPermission>(() => {
+    if (typeof navigator === 'undefined') return 'idle'
+    if (import.meta.env.DEV && import.meta.env.VITE_DEMO_LOCATION === 'true') return 'requesting'
+    return navigator.geolocation ? 'requesting' : 'unavailable'
+  })
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const watchId = useRef<number | null>(null)
   const demoTimer = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -27,7 +31,6 @@ export function useGeolocation() {
   const startLocationTracking = useCallback(() => {
     if (import.meta.env.DEV && import.meta.env.VITE_DEMO_LOCATION === 'true') {
       stopDemo()
-      setPermission('requesting')
       const demoPath = [
         { latitude: -32.1342, longitude: -64.4801 },
         { latitude: -32.13415, longitude: -64.47995 },
@@ -49,12 +52,7 @@ export function useGeolocation() {
       demoTimer.current = setInterval(emit, 1500)
       return
     }
-    if (!navigator.geolocation) {
-      setPermission('unavailable')
-      return
-    }
-    setPermission('requesting')
-    setErrorMessage(null)
+    if (!navigator.geolocation) return
     if (watchId.current !== null) {
       navigator.geolocation.clearWatch(watchId.current)
     }

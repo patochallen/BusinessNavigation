@@ -32,13 +32,6 @@ export function AttractionDetail({
     )
   const deg = heading ? (calculatedHeadingDegrees - heading + 360) % 360 : calculatedHeadingDegrees
   const headingDegrees = deg
-  console.log(
-    'heading',
-    heading,
-    calculatedHeadingDegrees.toFixed(0),
-    '->',
-    headingDegrees.toFixed(0),
-  )
 
   return (
     <section className="attraction-detail">
