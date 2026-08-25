@@ -1,6 +1,5 @@
 import { ArrowLeft, ArrowUp, Clock3, MapPin, Navigation, Ruler, ShieldCheck } from 'lucide-react'
 import type { CSSProperties } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
 import type { Attraction, Business } from '../../domain/types'
 import { categoryLabels } from '../../domain/demo-data'
 import './AttractionDetail.css'
@@ -13,6 +12,9 @@ type AttractionDetailProps = {
   attraction: Attraction
   position?: GeolocationPosition | null
   heading?: number | null
+  onBack: () => void
+  onNavigate: () => void
+  onViewMap: () => void
 }
 
 export function AttractionDetail({
@@ -20,8 +22,10 @@ export function AttractionDetail({
   attraction,
   position,
   heading,
+  onBack,
+  onNavigate,
+  onViewMap,
 }: AttractionDetailProps) {
-  const navigate = useNavigate()
   const { t } = useTranslation()
   const { distanceMeters, headingDegrees: calculatedHeadingDegrees } =
     getDistanceAndHeadingBetweenLocations(
@@ -40,9 +44,9 @@ export function AttractionDetail({
 
   return (
     <section className="attraction-detail">
-      <Link className="back-link" to={`/b/${business.id}`}>
+      <button className="back-link" onClick={onBack}>
         <ArrowLeft size={17} /> {t('common.back')}
-      </Link>
+      </button>
       <div
         className="detail-visual"
         style={{ '--detail-color': attraction.color } as CSSProperties}
@@ -89,16 +93,10 @@ export function AttractionDetail({
         </div>
       </div>
       <div className="detail-actions">
-        <button
-          className="button button-dark"
-          onClick={() => navigate(`/b/${business.id}/a/${attraction.id}/navigate`)}
-        >
+        <button className="button button-dark" onClick={onNavigate}>
           <Navigation size={17} /> {t('detail.startNavigation')}
         </button>
-        <button
-          className="outline-button"
-          onClick={() => navigate(`/b/${business.id}?attraction=${attraction.id}`)}
-        >
+        <button className="outline-button" onClick={onViewMap}>
           <MapPin size={16} /> {t('detail.viewMap')}
         </button>
       </div>

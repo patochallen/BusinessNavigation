@@ -4,7 +4,7 @@ export const resources = {
       common: {
         search: 'Buscar',
         home: 'Inicio',
-        back: 'Volver al mapa',
+        back: 'Volver',
         open: 'Abrir',
         places: '{{count}} lugares',
         walking: 'a pie',
@@ -119,7 +119,7 @@ export const resources = {
       common: {
         search: 'Search',
         home: 'Home',
-        back: 'Back to map',
+        back: 'Back',
         open: 'Open',
         places: '{{count}} places',
         walking: 'walking',

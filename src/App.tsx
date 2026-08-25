@@ -81,10 +81,10 @@ function AppContent() {
   return (
     <div className="app-shell">
       <header className="topbar">
-        <Link to={`/b/${business.id}`} className="wordmark">
+        <button className="wordmark" onClick={() => navigate(`/b/${business.id}`)}>
           <span className="brand-mark">{businessMark}</span>
           <span>{business.name}</span>
-        </Link>
+        </button>
         <Link
           to={`/b/${business.id}/settings`}
           className={isSettings ? 'icon-button icon-button-active' : 'icon-button'}
@@ -103,7 +103,7 @@ function AppContent() {
             locationPermission={permission}
             headingPermission={headingState.permission}
             position={position}
-            onBack={() => navigate(`/b/${business.id}`)}
+            onBack={() => navigate(-1)}
           />
         ) : isNavigation ? (
           <NavigationView
@@ -117,7 +117,7 @@ function AppContent() {
             enableHeading={headingState.enable}
             calibrateHeading={headingState.calibrate}
             headingStable={headingState.headingStable}
-            onBack={() => navigate(`/b/${business.id}/a/${attraction?.id ?? ''}`)}
+            onBack={() => navigate(-1)}
           />
         ) : attractionId && attraction ? (
           <AttractionDetail
@@ -125,6 +125,9 @@ function AppContent() {
             attraction={attraction}
             position={position}
             heading={headingState.heading}
+            onBack={() => navigate(-1)}
+            onNavigate={() => navigate(`/b/${business.id}/a/${attraction.id}/navigate`)}
+            onViewMap={() => navigate(`/b/${business.id}?attraction=${attraction.id}`)}
           />
         ) : (
           <BusinessHome

@@ -32,6 +32,8 @@
   font-size: 15px;
   font-weight: 700;
   letter-spacing: 0.02em;
+  border: none;
+  padding: 0;
 }
 
 .brand-mark {
@@ -210,12 +212,12 @@ footer {
 
 @media (max-width: 640px) {
   .topbar {
-    height: 66px;
-    padding: 0 22px;
+    height: 60px;
+    padding: 0 10px;
   }
 
   footer {
-    padding: 22px;
+    padding: 13px 22px;
     align-items: flex-start;
   }
 
