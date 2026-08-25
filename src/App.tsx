@@ -44,6 +44,20 @@ function AppContent() {
     .join('')
     .slice(0, 2)
     .toUpperCase()
+  const geoActive = permission === 'ready'
+  const geoCoordinatesLabel = position
+    ? `${position.coords.latitude.toFixed(5)} ${position.coords.longitude.toFixed(5)}`
+    : null
+  const geoStatusLabel =
+    permission === 'ready'
+      ? (geoCoordinatesLabel ?? t('app.geoReady'))
+      : permission === 'requesting'
+        ? t('app.geoRequesting')
+        : permission === 'denied'
+          ? t('app.geoDenied')
+          : permission === 'unavailable'
+            ? t('app.geoUnavailable')
+            : t('app.geoIdle')
 
   useEffect(() => {
     headingState.enable()
@@ -107,8 +121,17 @@ function AppContent() {
         )}
       </main>
       <footer>
-        <span>{business.name}</span>
-        <span>{t('app.mapTagline')}</span>
+        <div className="footer-business-block">
+          <span className="footer-business-name">{business.name}</span>
+          <span className="footer-geo-status" aria-live="polite">
+            <span
+              className={`footer-geo-light ${geoActive ? 'is-active' : 'is-inactive'}`}
+              aria-hidden="true"
+            />
+            {geoStatusLabel}
+          </span>
+        </div>
+        <span className="footer-tagline">{t('app.mapTagline')}</span>
       </footer>
     </div>
   )

@@ -16,6 +16,11 @@ export const resources = {
         notFoundDescription: 'Revisá el código QR e intentá nuevamente.',
         backHome: 'Volver al inicio',
         mapTagline: 'Tu mapa, tu ritmo.',
+        geoReady: 'Geolocalizacion activa',
+        geoRequesting: 'Activando geolocalizacion',
+        geoDenied: 'Geolocalizacion bloqueada',
+        geoUnavailable: 'Geolocalizacion no disponible',
+        geoIdle: 'Geolocalizacion inactiva',
       },
       explorer: {
         mapEyebrow: 'Mapa del predio',
@@ -102,6 +107,11 @@ export const resources = {
         notFoundDescription: 'Check the QR code and try again.',
         backHome: 'Back home',
         mapTagline: 'Your map, your pace.',
+        geoReady: 'Geolocation active',
+        geoRequesting: 'Activating geolocation',
+        geoDenied: 'Geolocation blocked',
+        geoUnavailable: 'Geolocation unavailable',
+        geoIdle: 'Geolocation inactive',
       },
       explorer: {
         mapEyebrow: 'Park map',

@@ -153,12 +153,54 @@ h2 {
 footer {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 20px;
   padding: 25px 10%;
   border-top: 1px solid #e1dfd6;
   color: #9da39b;
   font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.footer-business-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.footer-business-name {
+  color: #7f857d;
+}
+
+.footer-geo-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #97a098;
+  letter-spacing: 0.06em;
+}
+
+.footer-geo-light {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #c9cec4;
+}
+
+.footer-geo-light.is-active {
+  background: #2f9d57;
+  box-shadow:
+    0 0 0 1px #2f9d57,
+    0 0 10px rgba(47, 157, 87, 0.55);
+}
+
+.footer-geo-light.is-inactive {
+  background: #c2bda9;
+}
+
+.footer-tagline {
+  text-align: right;
 }
 
 @media (max-width: 640px) {
@@ -169,5 +211,10 @@ footer {
 
   footer {
     padding: 22px;
+    align-items: flex-start;
+  }
+
+  .footer-tagline {
+    text-align: left;
   }
 }
