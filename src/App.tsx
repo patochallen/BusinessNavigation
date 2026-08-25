@@ -8,7 +8,7 @@ import {
   useParams,
   useSearchParams,
 } from 'react-router-dom'
-import { Search, Settings2 } from 'lucide-react'
+import { ArrowLeft, Search, Settings2 } from 'lucide-react'
 import './App.css'
 import { demoBusinessRepository } from './domain/business-repository'
 import { useGeolocation } from './services/location'
@@ -32,6 +32,7 @@ function AppContent() {
   const business = businessId ? demoBusinessRepository.findById(businessId) : undefined
   const isNavigation = location.pathname.endsWith('/navigate')
   const isSettings = location.pathname.endsWith('/settings')
+  const isAttractionDetail = Boolean(attractionId) && !isNavigation
   const { position, permission, errorMessage } = useGeolocation()
   const attraction =
     business && attractionId
@@ -59,6 +60,12 @@ function AppContent() {
           : permission === 'unavailable'
             ? t('app.geoUnavailable')
             : t('app.geoIdle')
+  const shouldShowHeaderBack = isSettings || isNavigation || isAttractionDetail
+  const headerBackTarget = isNavigation
+    ? `/b/${business?.id}/a/${attraction?.id ?? ''}`
+    : isSettings || isAttractionDetail
+      ? `/b/${business?.id}`
+      : null
 
   useEffect(() => {
     headingState.enable()
@@ -81,10 +88,21 @@ function AppContent() {
   return (
     <div className="app-shell">
       <header className="topbar">
-        <button className="wordmark" onClick={() => navigate(`/b/${business.id}`)}>
-          <span className="brand-mark">{businessMark}</span>
-          <span>{business.name}</span>
-        </button>
+        <div className="topbar-leading">
+          {shouldShowHeaderBack && headerBackTarget ? (
+            <button
+              className="topbar-back"
+              onClick={() => navigate(headerBackTarget)}
+              aria-label={t('common.back')}
+            >
+              <ArrowLeft size={18} />
+            </button>
+          ) : null}
+          <button className="wordmark" onClick={() => navigate(`/b/${business.id}`)}>
+            <span className="brand-mark">{businessMark}</span>
+            <span>{business.name}</span>
+          </button>
+        </div>
         <Link
           to={`/b/${business.id}/settings`}
           className={isSettings ? 'icon-button icon-button-active' : 'icon-button'}
@@ -103,7 +121,6 @@ function AppContent() {
             locationPermission={permission}
             headingPermission={headingState.permission}
             position={position}
-            onBack={() => navigate(-1)}
           />
         ) : isNavigation ? (
           <NavigationView
@@ -117,7 +134,6 @@ function AppContent() {
             enableHeading={headingState.enable}
             calibrateHeading={headingState.calibrate}
             headingStable={headingState.headingStable}
-            onBack={() => navigate(-1)}
           />
         ) : attractionId && attraction ? (
           <AttractionDetail
@@ -125,7 +141,6 @@ function AppContent() {
             attraction={attraction}
             position={position}
             heading={headingState.heading}
-            onBack={() => navigate(-1)}
             onNavigate={() => navigate(`/b/${business.id}/a/${attraction.id}/navigate`)}
             onViewMap={() => navigate(`/b/${business.id}?attraction=${attraction.id}`)}
           />

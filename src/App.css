@@ -21,8 +21,26 @@
   border-bottom: 1px solid #e2dfd5;
 }
 
-.topbar .wordmark {
+.topbar-leading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-right: auto;
+}
+
+.topbar-back {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #4f625c;
+}
+
+.topbar-back:hover {
+  background: #eae7de;
 }
 
 .wordmark {
@@ -34,6 +52,8 @@
   letter-spacing: 0.02em;
   border: none;
   padding: 0;
+  background: transparent;
+  color: #283632;
 }
 
 .brand-mark {

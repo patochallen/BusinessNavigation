@@ -1,4 +1,4 @@
-import { ArrowLeft, Camera, Compass, LocateFixed, Navigation } from 'lucide-react'
+import { Camera, Compass, LocateFixed, Navigation } from 'lucide-react'
 import { useState } from 'react'
 import type { Attraction, Business, LocationPermission } from '../../domain/types'
 import {
@@ -33,7 +33,6 @@ type NavigationViewProps = {
   enableHeading: () => Promise<void>
   calibrateHeading: () => void
   headingStable: boolean
-  onBack: () => void
 }
 
 export function NavigationView({
@@ -47,7 +46,6 @@ export function NavigationView({
   enableHeading,
   calibrateHeading,
   headingStable,
-  onBack,
 }: NavigationViewProps) {
   const { t } = useTranslation()
   const [cameraVisible, setCameraVisible] = useState(false)
@@ -110,9 +108,6 @@ export function NavigationView({
 
   return (
     <section className="navigation-view">
-      <button className="back-link" onClick={onBack}>
-        <ArrowLeft size={17} /> {t('common.back')}
-      </button>
       <div className="navigation-title">
         <p className="eyebrow">
           {navigationState === 'arrived'

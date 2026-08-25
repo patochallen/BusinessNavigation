@@ -1,4 +1,4 @@
-import { ArrowLeft, Compass, Languages, LocateFixed } from 'lucide-react'
+import { Compass, Languages, LocateFixed } from 'lucide-react'
 import type { Business, LocationPermission } from '../../domain/types'
 import './SettingsView.css'
 import { useTranslation } from 'react-i18next'
@@ -9,7 +9,6 @@ type SettingsViewProps = {
   locationPermission: LocationPermission
   headingPermission: LocationPermission
   position: GeolocationPosition | null
-  onBack: () => void
 }
 
 function permissionLabel(
@@ -29,7 +28,6 @@ export function SettingsView({
   locationPermission,
   headingPermission,
   position,
-  onBack,
 }: SettingsViewProps) {
   const { t } = useTranslation()
   const locationActive = locationPermission === 'ready'
@@ -40,9 +38,6 @@ export function SettingsView({
 
   return (
     <section className="settings-view">
-      <button className="back-link" onClick={onBack}>
-        <ArrowLeft size={17} /> {t('settings.backToMap')}
-      </button>
       <div className="settings-title-block">
         <p className="eyebrow">{business.eyebrow}</p>
         <h1>{t('settings.title')}</h1>

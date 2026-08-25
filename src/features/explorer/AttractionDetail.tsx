@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowUp, Clock3, MapPin, Navigation, Ruler, ShieldCheck } from 'lucide-react'
+import { ArrowUp, Clock3, MapPin, Navigation, Ruler, ShieldCheck } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import type { Attraction, Business } from '../../domain/types'
 import { categoryLabels } from '../../domain/demo-data'
@@ -12,7 +12,6 @@ type AttractionDetailProps = {
   attraction: Attraction
   position?: GeolocationPosition | null
   heading?: number | null
-  onBack: () => void
   onNavigate: () => void
   onViewMap: () => void
 }
@@ -22,7 +21,6 @@ export function AttractionDetail({
   attraction,
   position,
   heading,
-  onBack,
   onNavigate,
   onViewMap,
 }: AttractionDetailProps) {
@@ -44,9 +42,6 @@ export function AttractionDetail({
 
   return (
     <section className="attraction-detail">
-      <button className="back-link" onClick={onBack}>
-        <ArrowLeft size={17} /> {t('common.back')}
-      </button>
       <div
         className="detail-visual"
         style={{ '--detail-color': attraction.color } as CSSProperties}
