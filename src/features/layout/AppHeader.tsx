@@ -1,5 +1,6 @@
 import { ArrowLeft, Search, Settings2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import './AppHeader.css'
 
 type AppHeaderProps = {
   businessMark: string

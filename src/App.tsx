@@ -58,7 +58,7 @@ function AppContent() {
   if (!business || (attractionId && !attraction))
     return (
       <main className="not-found">
-        <span className="brand-mark">{businessMark ?? 'BN'}</span>
+        <span className="app-brand-mark">{businessMark ?? 'BN'}</span>
         <h1>{t('app.notFoundTitle')}</h1>
         <p>{t('app.notFoundDescription')}</p>
         <Link className="button button-dark" to="/">

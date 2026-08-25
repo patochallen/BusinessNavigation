@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import type { LocationPermission } from '../../domain/types'
+import './AppFooter.css'
 
 type AppFooterProps = {
   businessName: string
@@ -25,7 +26,7 @@ export function AppFooter({ businessName, permission, position }: AppFooterProps
             : t('app.geoIdle')
 
   return (
-    <footer>
+    <footer className="app-footer">
       <div className="footer-business-block">
         <span className="footer-business-name">{businessName}</span>
         <span className="footer-geo-status" aria-live="polite">
