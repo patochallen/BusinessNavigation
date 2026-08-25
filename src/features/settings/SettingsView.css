@@ -77,6 +77,26 @@
   letter-spacing: 0.02em;
 }
 
+.settings-language-copy {
+  margin-top: 12px;
+}
+
+.settings-language-switcher {
+  margin-top: 12px;
+}
+
+.settings-language-switcher .language-switcher {
+  color: #355b56;
+}
+
+.settings-language-switcher .language-option {
+  background: #fff;
+}
+
+.settings-language-switcher .language-option.is-active {
+  background: #dfeadf;
+}
+
 @media (max-width: 800px) {
   .settings-view {
     padding: 26px 22px 34px;

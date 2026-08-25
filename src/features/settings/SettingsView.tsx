@@ -1,7 +1,8 @@
-import { ArrowLeft, Compass, LocateFixed } from 'lucide-react'
+import { ArrowLeft, Compass, Languages, LocateFixed } from 'lucide-react'
 import type { Business, LocationPermission } from '../../domain/types'
 import './SettingsView.css'
 import { useTranslation } from 'react-i18next'
+import { LanguageSwitcher } from '../../i18n/LanguageSwitcher'
 
 type SettingsViewProps = {
   business: Business
@@ -48,6 +49,19 @@ export function SettingsView({
         <p className="settings-description">{t('settings.description')}</p>
       </div>
       <div className="settings-cards">
+        <article className="settings-card">
+          <div className="settings-card-head">
+            <Languages size={16} aria-hidden="true" />
+            <h2>{t('settings.languageTitle')}</h2>
+          </div>
+          <p className="settings-meta settings-language-copy">
+            {t('settings.languageDescription')}
+          </p>
+          <div className="settings-language-switcher">
+            <LanguageSwitcher />
+          </div>
+        </article>
+
         <article className="settings-card">
           <div className="settings-card-head">
             <LocateFixed size={18} />

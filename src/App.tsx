@@ -17,7 +17,6 @@ import { BusinessHome } from './features/explorer/BusinessHome'
 import { AttractionDetail } from './features/explorer/AttractionDetail'
 import { NavigationView } from './features/navigation/NavigationView'
 import { useEffect } from 'react'
-import { LanguageSwitcher } from './i18n/LanguageSwitcher'
 import { useTranslation } from 'react-i18next'
 import { SettingsView } from './features/settings/SettingsView'
 
@@ -86,7 +85,6 @@ function AppContent() {
           <span className="brand-mark">{businessMark}</span>
           <span>{business.name}</span>
         </Link>
-        <LanguageSwitcher />
         <Link
           to={`/b/${business.id}/settings`}
           className={isSettings ? 'icon-button icon-button-active' : 'icon-button'}
