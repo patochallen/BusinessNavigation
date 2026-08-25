@@ -19,6 +19,7 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SettingsView } from './features/settings/SettingsView'
 import { AppHeader } from './features/layout/AppHeader'
+import { AppFooter } from './features/layout/AppFooter'
 
 function AppContent() {
   const { t } = useTranslation()
@@ -38,7 +39,7 @@ function AppContent() {
     business && attractionId
       ? demoBusinessRepository.findAttraction(business, attractionId)
       : business?.attractions[0]
-  const headingState = useDeviceHeading(true) // isNavigation || (attractionId !== undefined && attraction !== undefined),
+  const headingState = useDeviceHeading(true)
   const mapAttractionId = searchParams.get('attraction') ?? undefined
   const businessMark = business?.name
     .split(/\s+/)
@@ -46,20 +47,6 @@ function AppContent() {
     .join('')
     .slice(0, 2)
     .toUpperCase()
-  const geoActive = permission === 'ready'
-  const geoCoordinatesLabel = position
-    ? `${position.coords.latitude.toFixed(5)} ${position.coords.longitude.toFixed(5)}`
-    : null
-  const geoStatusLabel =
-    permission === 'ready'
-      ? (geoCoordinatesLabel ?? t('app.geoReady'))
-      : permission === 'requesting'
-        ? t('app.geoRequesting')
-        : permission === 'denied'
-          ? t('app.geoDenied')
-          : permission === 'unavailable'
-            ? t('app.geoUnavailable')
-            : t('app.geoIdle')
   const shouldShowHeaderBack = isSettings || isNavigation || isAttractionDetail
 
   useEffect(() => {
@@ -130,19 +117,7 @@ function AppContent() {
           />
         )}
       </main>
-      <footer>
-        <div className="footer-business-block">
-          <span className="footer-business-name">{business.name}</span>
-          <span className="footer-geo-status" aria-live="polite">
-            <span
-              className={`footer-geo-light ${geoActive ? 'is-active' : 'is-inactive'}`}
-              aria-hidden="true"
-            />
-            {geoStatusLabel}
-          </span>
-        </div>
-        <span className="footer-tagline">{t('app.mapTagline')}</span>
-      </footer>
+      <AppFooter businessName={business.name} permission={permission} position={position} />
     </div>
   )
 }
