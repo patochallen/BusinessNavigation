@@ -8,7 +8,7 @@ import {
   useParams,
   useSearchParams,
 } from 'react-router-dom'
-import { Search } from 'lucide-react'
+import { Search, Settings2 } from 'lucide-react'
 import './App.css'
 import { demoBusinessRepository } from './domain/business-repository'
 import { useGeolocation } from './services/location'
@@ -19,6 +19,7 @@ import { NavigationView } from './features/navigation/NavigationView'
 import { useEffect } from 'react'
 import { LanguageSwitcher } from './i18n/LanguageSwitcher'
 import { useTranslation } from 'react-i18next'
+import { SettingsView } from './features/settings/SettingsView'
 
 function AppContent() {
   const { t } = useTranslation()
@@ -31,6 +32,7 @@ function AppContent() {
   const [searchParams] = useSearchParams()
   const business = businessId ? demoBusinessRepository.findById(businessId) : undefined
   const isNavigation = location.pathname.endsWith('/navigate')
+  const isSettings = location.pathname.endsWith('/settings')
   const { position, permission, errorMessage } = useGeolocation()
   const attraction =
     business && attractionId
@@ -85,12 +87,27 @@ function AppContent() {
           <span>{business.name}</span>
         </Link>
         <LanguageSwitcher />
+        <Link
+          to={`/b/${business.id}/settings`}
+          className={isSettings ? 'icon-button icon-button-active' : 'icon-button'}
+          aria-label={t('settings.open')}
+        >
+          <Settings2 size={19} />
+        </Link>
         <button className="icon-button" aria-label={t('common.search')}>
           <Search size={19} />
         </button>
       </header>
       <main>
-        {isNavigation ? (
+        {isSettings ? (
+          <SettingsView
+            business={business}
+            locationPermission={permission}
+            headingPermission={headingState.permission}
+            position={position}
+            onBack={() => navigate(`/b/${business.id}`)}
+          />
+        ) : isNavigation ? (
           <NavigationView
             business={business}
             selected={attraction}
@@ -142,6 +159,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/b/:businessId" element={<AppContent />} />
+        <Route path="/b/:businessId/settings" element={<AppContent />} />
         <Route path="/b/:businessId/a/:attractionId" element={<AppContent />} />
         <Route path="/b/:businessId/a/:attractionId/navigate" element={<AppContent />} />
         <Route path="*" element={<AppContent />} />

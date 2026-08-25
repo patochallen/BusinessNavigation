@@ -55,10 +55,15 @@
   border-radius: 50%;
   background: transparent;
   color: #283632;
+  text-decoration: none;
 }
 
 .icon-button:hover {
   background: #eae7de;
+}
+
+.icon-button-active {
+  background: #e0e6dd;
 }
 
 .eyebrow {
