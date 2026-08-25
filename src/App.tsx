@@ -8,7 +8,6 @@ import {
   useParams,
   useSearchParams,
 } from 'react-router-dom'
-import { ArrowLeft, Search, Settings2 } from 'lucide-react'
 import './App.css'
 import { demoBusinessRepository } from './domain/business-repository'
 import { useGeolocation } from './services/location'
@@ -19,6 +18,7 @@ import { NavigationView } from './features/navigation/NavigationView'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SettingsView } from './features/settings/SettingsView'
+import { AppHeader } from './features/layout/AppHeader'
 
 function AppContent() {
   const { t } = useTranslation()
@@ -61,11 +61,6 @@ function AppContent() {
             ? t('app.geoUnavailable')
             : t('app.geoIdle')
   const shouldShowHeaderBack = isSettings || isNavigation || isAttractionDetail
-  const headerBackTarget = isNavigation
-    ? `/b/${business?.id}/a/${attraction?.id ?? ''}`
-    : isSettings || isAttractionDetail
-      ? `/b/${business?.id}`
-      : null
 
   useEffect(() => {
     headingState.enable()
@@ -87,33 +82,15 @@ function AppContent() {
 
   return (
     <div className="app-shell">
-      <header className="topbar">
-        <div className="topbar-leading">
-          {shouldShowHeaderBack && headerBackTarget ? (
-            <button
-              className="topbar-back"
-              onClick={() => navigate(headerBackTarget)}
-              aria-label={t('common.back')}
-            >
-              <ArrowLeft size={18} />
-            </button>
-          ) : null}
-          <button className="wordmark" onClick={() => navigate(`/b/${business.id}`)}>
-            <span className="brand-mark">{businessMark}</span>
-            <span>{business.name}</span>
-          </button>
-        </div>
-        <Link
-          to={`/b/${business.id}/settings`}
-          className={isSettings ? 'icon-button icon-button-active' : 'icon-button'}
-          aria-label={t('settings.open')}
-        >
-          <Settings2 size={19} />
-        </Link>
-        <button className="icon-button" aria-label={t('common.search')}>
-          <Search size={19} />
-        </button>
-      </header>
+      <AppHeader
+        businessMark={businessMark ?? 'BN'}
+        businessName={business.name}
+        isSettings={isSettings}
+        showBack={shouldShowHeaderBack}
+        onBack={() => navigate(-1)}
+        onOpenHome={() => navigate(`/b/${business.id}`, { replace: true })}
+        onOpenSettings={() => navigate(`/b/${business.id}/settings`)}
+      />
       <main>
         {isSettings ? (
           <SettingsView
