@@ -1,4 +1,4 @@
-import { ArrowLeft, Search, Settings2 } from 'lucide-react'
+import { ArrowLeft, Settings2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import './AppHeader.css'
 
@@ -7,6 +7,7 @@ type AppHeaderProps = {
   businessName: string
   isSettings: boolean
   showBack: boolean
+  showSettings: boolean
   onBack: () => void
   onOpenHome: () => void
   onOpenSettings: () => void
@@ -17,6 +18,7 @@ export function AppHeader({
   businessName,
   isSettings,
   showBack,
+  showSettings,
   onBack,
   onOpenHome,
   onOpenSettings,
@@ -36,16 +38,18 @@ export function AppHeader({
           <span>{businessName}</span>
         </button>
       </div>
-      <button
-        onClick={onOpenSettings}
-        className={isSettings ? 'icon-button icon-button-active' : 'icon-button'}
-        aria-label={t('settings.open')}
-      >
-        <Settings2 size={19} />
-      </button>
-      <button className="icon-button" aria-label={t('common.search')}>
+      {showSettings ? (
+        <button
+          onClick={onOpenSettings}
+          className={isSettings ? 'icon-button icon-button-active' : 'icon-button'}
+          aria-label={t('settings.open')}
+        >
+          <Settings2 size={19} />
+        </button>
+      ) : null}
+      {/* <button className="icon-button" aria-label={t('common.search')}>
         <Search size={19} />
-      </button>
+      </button> */}
     </header>
   )
 }
