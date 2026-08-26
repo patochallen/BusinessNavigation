@@ -22,6 +22,25 @@ export const resources = {
         geoUnavailable: 'Geolocalizacion no disponible',
         geoIdle: 'Geolocalizacion inactiva',
       },
+      locationRequired: {
+        eyebrow: 'Permiso requerido',
+        title: 'Necesitamos tu ubicacion',
+        description:
+          'Para guiarte por el mapa y calcular distancias en tiempo real, habilita el permiso de ubicacion.',
+        retry: 'Volver a solicitar permiso',
+        retrying: 'Solicitando permiso...',
+        openSettings: 'Abrir configuracion del sitio',
+        settingsHint:
+          'Si no aparece el aviso nuevamente, habilita la ubicacion manualmente en la configuracion del navegador para este sitio.',
+        webTitle: 'En navegador (web)',
+        webStep1: 'Toca el icono de candado o informacion junto a la URL.',
+        webStep2: 'Busca Permisos del sitio y cambia Ubicacion a Permitir.',
+        webStep3: 'Vuelve a esta pantalla y toca Volver a solicitar permiso.',
+        mobileTitle: 'En telefono (mobile)',
+        mobileStep1: 'Abre ajustes del navegador o del sitio actual.',
+        mobileStep2: 'En Permisos, habilita Ubicacion para este sitio.',
+        mobileStep3: 'Regresa a la app y toca Volver a solicitar permiso.',
+      },
       settings: {
         open: 'Abrir configuracion',
         title: 'Configuracion',
@@ -135,6 +154,25 @@ export const resources = {
         geoDenied: 'Geolocation blocked',
         geoUnavailable: 'Geolocation unavailable',
         geoIdle: 'Geolocation inactive',
+      },
+      locationRequired: {
+        eyebrow: 'Permission required',
+        title: 'We need your location',
+        description:
+          'To guide you through the map and calculate real-time distance, please enable location permission.',
+        retry: 'Request permission again',
+        retrying: 'Requesting permission...',
+        openSettings: 'Open site settings',
+        settingsHint:
+          'If the prompt does not appear again, manually allow location in your browser site settings for this page.',
+        webTitle: 'In browser (web)',
+        webStep1: 'Tap the lock/info icon next to the URL.',
+        webStep2: 'Open Site permissions and set Location to Allow.',
+        webStep3: 'Return to this screen and tap Request permission again.',
+        mobileTitle: 'On phone (mobile)',
+        mobileStep1: 'Open browser settings or current site settings.',
+        mobileStep2: 'In Permissions, allow Location for this site.',
+        mobileStep3: 'Return to the app and tap Request permission again.',
       },
       settings: {
         open: 'Open settings',

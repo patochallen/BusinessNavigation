@@ -56,7 +56,7 @@ export function useGeolocation() {
     if (watchId.current !== null) {
       navigator.geolocation.clearWatch(watchId.current)
     }
-    stopDemo()
+    // stopDemo()
     watchId.current = navigator.geolocation.watchPosition(
       (next) => {
         setPosition(next)
@@ -70,6 +70,37 @@ export function useGeolocation() {
     )
   }, [stopDemo])
 
+  const requestPermission = useCallback(async () => {
+    setPermission('requesting')
+    setErrorMessage(null)
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      setPermission('unavailable')
+      setErrorMessage('Geolocation is not available in this browser.')
+      return
+    }
+
+    // Ask for a fresh location first to trigger the browser prompt when possible.
+    const requestOnce = () =>
+      new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 8000,
+          maximumAge: 0,
+        })
+      })
+
+    try {
+      const next = await requestOnce()
+      setPosition(next)
+      setPermission('ready')
+      startLocationTracking()
+    } catch (error) {
+      const geoError = error as GeolocationPositionError
+      setPermission(geoError.code === geoError.PERMISSION_DENIED ? 'denied' : 'unavailable')
+      setErrorMessage(geoError.message)
+    }
+  }, [startLocationTracking])
+
   useEffect(() => {
     startLocationTracking()
     return () => {
@@ -78,7 +109,7 @@ export function useGeolocation() {
     }
   }, [startLocationTracking, stopDemo])
 
-  return { position, permission, errorMessage }
+  return { position, permission, errorMessage, requestPermission }
 }
 
 export function gpsToLocalMeters(origin: Coordinate, coordinate: Coordinate): MapPoint {

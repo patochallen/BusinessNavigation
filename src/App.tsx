@@ -16,11 +16,12 @@ import { useDeviceHeading } from './services/orientation'
 import { BusinessHome } from './features/explorer/BusinessHome'
 import { AttractionDetail } from './features/explorer/AttractionDetail'
 import { NavigationView } from './features/navigation/NavigationView'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SettingsView } from './features/settings/SettingsView'
 import { AppHeader } from './features/layout/AppHeader'
 import { AppFooter } from './features/layout/AppFooter'
+import { LocationPermissionRequiredView } from './features/location/LocationPermissionRequiredView'
 
 const DEFAULT_BUSINESS_ID = import.meta.env.VITE_DEFAULT_BUSINESS_ID
 
@@ -37,7 +38,7 @@ function AppContent() {
   const isNavigation = location.pathname.endsWith('/navigate')
   const isSettings = location.pathname.endsWith('/settings')
   const isAttractionDetail = Boolean(attractionId) && !isNavigation
-  const { position, permission, errorMessage } = useGeolocation()
+  const { position, permission, errorMessage, requestPermission } = useGeolocation()
   const attraction =
     business && attractionId
       ? demoBusinessRepository.findAttraction(business, attractionId)
@@ -52,10 +53,18 @@ function AppContent() {
     .slice(0, 2)
     .toUpperCase()
   const shouldShowHeaderBack = isSettings || isNavigation || isAttractionDetail
+  const requestedAfterDeniedRef = useRef(false)
 
   useEffect(() => {
     void enableHeading()
   }, [enableHeading])
+
+  useEffect(() => {
+    if (permission === 'ready' && requestedAfterDeniedRef.current && business) {
+      requestedAfterDeniedRef.current = false
+      navigate(`/b/${business.id}`, { replace: true })
+    }
+  }, [business, navigate, permission])
 
   if (!business || (attractionId && !attraction))
     return (
@@ -82,7 +91,16 @@ function AppContent() {
         onOpenSettings={() => navigate(`/b/${business.id}/settings`)}
       />
       <main>
-        {isSettings ? (
+        {permission === 'denied' ? (
+          <LocationPermissionRequiredView
+            requesting={false}
+            errorMessage={errorMessage}
+            onRetry={() => {
+              requestedAfterDeniedRef.current = true
+              void requestPermission()
+            }}
+          />
+        ) : isSettings ? (
           <SettingsView
             business={business}
             locationPermission={permission}
