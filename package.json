@@ -8,11 +8,13 @@
     "dev:demo": "VITE_DEMO_LOCATION=true vite --host",
     "dev:https": "VITE_HTTPS=true vite --host",
     "build": "tsc -b && vite build",
+    "build:pages": "tsc -b && vite build --mode pages",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "oxlint",
     "test": "vitest run",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "preview:pages": "vite preview --mode pages"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.8",
