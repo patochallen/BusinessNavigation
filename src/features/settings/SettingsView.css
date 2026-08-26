@@ -99,9 +99,8 @@
 
 @media (max-width: 800px) {
   .settings-view {
-    padding: 26px 22px 34px;
+    padding: 10px;
   }
-
   .settings-cards {
     grid-template-columns: 1fr;
   }

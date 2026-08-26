@@ -1,5 +1,15 @@
-import { ArrowUp, Clock3, MapPin, Navigation, Ruler, ShieldCheck } from 'lucide-react'
+import {
+  ArrowUp,
+  Clock3,
+  ExpandIcon,
+  MapPin,
+  Navigation,
+  Ruler,
+  ShieldCheck,
+  ShrinkIcon,
+} from 'lucide-react'
 import type { CSSProperties } from 'react'
+import { useState, useEffect } from 'react'
 import type { Attraction, Business } from '../../domain/types'
 import { categoryLabels } from '../../domain/demo-data'
 import './AttractionDetail.css'
@@ -32,16 +42,35 @@ export function AttractionDetail({
     )
   const deg = heading ? (calculatedHeadingDegrees - heading + 360) % 360 : calculatedHeadingDegrees
   const headingDegrees = deg
+  const [expanded, setExpanded] = useState(false)
+
+  useEffect(() => {
+    console.log('expanded changed:', expanded)
+  }, [expanded])
 
   return (
     <section className="attraction-detail">
       <div
-        className="detail-visual"
+        className={`detail-visual${expanded ? ' selected' : ''}`}
         style={{ '--detail-color': attraction.color } as CSSProperties}
       >
         <span className="detail-glyph">
-          <ArrowUp size={60} style={{ transform: `rotate(${headingDegrees}deg)` }} />
+          <ArrowUp
+            className="detail-arrow"
+            size={60}
+            style={{ transform: `rotate(${headingDegrees}deg)` }}
+          />
         </span>
+        {!expanded ? (
+          <ExpandIcon className="detail-expand" size={20} onClick={() => setExpanded(true)} />
+        ) : (
+          <ShrinkIcon
+            className="detail-expand"
+            size={20}
+            style={{ transform: 'rotate(180deg)' }}
+            onClick={() => setExpanded(false)}
+          />
+        )}
         <span className="detail-coordinate">{distanceMeters.toFixed(1)} m.</span>
         <span className="detail-orbit detail-orbit-one" />
         <span className="detail-orbit detail-orbit-two" />

@@ -1,7 +1,9 @@
 .attraction-detail {
-  max-width: 760px;
-  margin: 0 auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   padding: 45px 10% 86px;
+  position: relative;
 }
 .detail-visual {
   position: relative;
@@ -14,6 +16,38 @@
   border: 1px solid #c9cbbd;
   background: radial-gradient(circle at 50% 45%, var(--detail-color), #e7e5dc 70%);
 }
+.detail-visual.selected {
+  flex: 1;
+  align-content: center;
+  gap: 40px;
+  height: auto;
+  margin: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0;
+  .detail-glyph {
+    width: 180px;
+    height: 180px;
+    font-size: 50px;
+  }
+  .detail-arrow {
+    width: 120px;
+    height: 120px;
+  }
+  .detail-coordinate {
+    font-size: 40px;
+  }
+  .detail-expand {
+    top: 30px;
+    right: 30px;
+  }
+}
 .detail-visual::before {
   position: absolute;
   inset: 18%;
@@ -21,6 +55,12 @@
   border-radius: 50%;
   content: '';
   transform: rotate(-18deg) scaleX(1.7);
+}
+.detail-expand {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1;
 }
 .detail-glyph {
   position: relative;
@@ -104,7 +144,7 @@
 }
 @media (max-width: 640px) {
   .attraction-detail {
-    padding: 10px;
+    padding: 0 10px;
   }
   .detail-visual {
     height: 200px;
@@ -123,6 +163,7 @@
   }
   .detail-actions {
     flex-direction: column;
+    margin-top: auto;
   }
   .detail-actions .button,
   .detail-actions .outline-button {

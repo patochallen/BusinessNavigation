@@ -76,6 +76,7 @@ function AppContent() {
         businessName={business.name}
         isSettings={isSettings}
         showBack={shouldShowHeaderBack}
+        showSettings={!isSettings}
         onBack={() => navigate(-1)}
         onOpenHome={() => navigate(`/b/${business.id}`, { replace: true })}
         onOpenSettings={() => navigate(`/b/${business.id}/settings`)}
@@ -125,6 +126,12 @@ function AppContent() {
 }
 
 function App() {
+  useEffect(() => {
+    const handleContextMenu = (e: MouseEvent) => e.preventDefault()
+    document.addEventListener('contextmenu', handleContextMenu)
+    return () => document.removeEventListener('contextmenu', handleContextMenu)
+  }, [])
+
   return (
     <HashRouter>
       <Routes>
