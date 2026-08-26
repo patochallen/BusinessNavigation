@@ -49,7 +49,6 @@ export const resources = {
       explorer: {
         mapEyebrow: 'Mapa del predio',
         mapTitle: 'Tu próxima pausa',
-        exploreEyebrow: 'Explorá el valle',
         exploreTitle: 'Encontrá tu lugar',
         searchPlaceholder: 'Buscar una atracción',
         all: 'Todos',
@@ -164,7 +163,6 @@ export const resources = {
       explorer: {
         mapEyebrow: 'Park map',
         mapTitle: 'Your next pause',
-        exploreEyebrow: 'Explore the park',
         exploreTitle: 'Find your place',
         searchPlaceholder: 'Search an attraction',
         all: 'All',

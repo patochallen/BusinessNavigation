@@ -22,7 +22,7 @@ import { SettingsView } from './features/settings/SettingsView'
 import { AppHeader } from './features/layout/AppHeader'
 import { AppFooter } from './features/layout/AppFooter'
 
-const DEFAULT_BUSINESS_ID = import.meta.env.VITE_DEFAULT_BUSINESS_ID ?? 'valle-lumina'
+const DEFAULT_BUSINESS_ID = import.meta.env.VITE_DEFAULT_BUSINESS_ID ?? 'saavedra'
 
 function AppContent() {
   const { t } = useTranslation()
