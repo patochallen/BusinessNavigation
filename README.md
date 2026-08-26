@@ -14,14 +14,13 @@ This project is configured to deploy automatically to **GitHub Pages** via GitHu
 
 The site will be published at `https://<your-username>.github.io/<repo-name>/`.
 
-> **Note:** If the app uses client-side routing (React Router), add a `base` in `vite.config.ts` matching the repository name:
->
-> ```ts
-> export default defineConfig({
->   base: '/<repo-name>/',
->   // ...
-> })
-> ```
+This project already includes:
+
+- Vite `base` configured for GitHub Pages paths.
+- Hash-based routing so deep links work on GitHub Pages without server rewrites.
+
+If you deploy from a fork or a repository with a different name, set `VITE_BASE_PATH` and
+`VITE_DEFAULT_BUSINESS_ID` (see `.env.example`) before building.
 
 ### Manual / local build
 

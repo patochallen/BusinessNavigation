@@ -1,6 +1,7 @@
 import {
-  BrowserRouter,
+  HashRouter,
   Link,
+  Navigate,
   Route,
   Routes,
   useLocation,
@@ -20,6 +21,8 @@ import { useTranslation } from 'react-i18next'
 import { SettingsView } from './features/settings/SettingsView'
 import { AppHeader } from './features/layout/AppHeader'
 import { AppFooter } from './features/layout/AppFooter'
+
+const DEFAULT_BUSINESS_ID = import.meta.env.VITE_DEFAULT_BUSINESS_ID ?? 'valle-lumina'
 
 function AppContent() {
   const { t } = useTranslation()
@@ -123,15 +126,16 @@ function AppContent() {
 
 function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
+        <Route path="/" element={<Navigate to={`/b/${DEFAULT_BUSINESS_ID}`} replace />} />
         <Route path="/b/:businessId" element={<AppContent />} />
         <Route path="/b/:businessId/settings" element={<AppContent />} />
         <Route path="/b/:businessId/a/:attractionId" element={<AppContent />} />
         <Route path="/b/:businessId/a/:attractionId/navigate" element={<AppContent />} />
-        <Route path="*" element={<AppContent />} />
+        <Route path="*" element={<Navigate to={`/b/${DEFAULT_BUSINESS_ID}`} replace />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   )
 }
 export default App

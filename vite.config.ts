@@ -8,8 +8,10 @@ const keyPath = fileURLToPath(new URL('./certs/localhost-key.pem', import.meta.u
 const certificatePath = fileURLToPath(new URL('./certs/localhost.pem', import.meta.url))
 const httpsEnabled =
   process.env.VITE_HTTPS === 'true' && existsSync(keyPath) && existsSync(certificatePath)
+const basePath = process.env.VITE_BASE_PATH ?? '/BusinessNavigation/'
 
 export default defineConfig({
+  base: basePath,
   plugins: [react()],
   server: {
     host: true,
