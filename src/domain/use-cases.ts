@@ -9,7 +9,13 @@ import type {
 } from './types'
 import { localPointFromGps } from './coordinates'
 
-export { localPointFromGps } from './coordinates'
+export {
+  getBusinessBoundaryMapPoints,
+  getMapPointBounds,
+  localPointFromGps,
+  normalizeBoundary,
+  signedPolygonArea,
+} from './coordinates'
 
 export function findBusiness(businesses: Business[], businessId: string) {
   return businesses.find((business) => business.id === businessId)

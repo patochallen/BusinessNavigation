@@ -1,8 +1,16 @@
 import { Canvas } from '@react-three/fiber'
 import { Line, OrbitControls, PerspectiveCamera } from '@react-three/drei'
 import type { Business } from '../../domain/types'
-import { getAttractionMapPoint } from '../../domain/use-cases'
+import {
+  getAttractionMapPoint,
+  getBusinessBoundaryMapPoints,
+  getMapPointBounds,
+} from '../../domain/use-cases'
+import { BusinessTerrain } from './BusinessTerrain'
 import './MapScene.css'
+
+const CAMERA_FOV = 42
+const MIN_CAMERA_HEIGHT = 12
 
 type MapSceneProps = {
   business: Business
@@ -23,40 +31,38 @@ export function MapScene({
   onSelect,
   userActive,
 }: MapSceneProps) {
+  const boundaryPoints = getBusinessBoundaryMapPoints(business)
+  const visiblePoints = boundaryPoints
+  // userActive && userPosition ? [...boundaryPoints, userPosition] : boundaryPoints
+  const bounds = getMapPointBounds(visiblePoints)
+  const selectedAttraction =
+    business.attractions.find((attraction) => attraction.id === selectedId) ??
+    business.attractions[0]
+  const selectedPoint = getAttractionMapPoint(business, selectedAttraction)
+  const focusPoint = centerOnSelected ? selectedPoint : bounds.center
+  const focusRadius = Math.max(
+    ...visiblePoints.map((point) => Math.hypot(point.x - focusPoint.x, point.z - focusPoint.z)),
+  )
+  const cameraHeight = centerOnSelected
+    ? MIN_CAMERA_HEIGHT
+    : Math.max(MIN_CAMERA_HEIGHT, (focusRadius * 0.75) / Math.tan((CAMERA_FOV * Math.PI) / 360))
+  const gridSize = Math.max(15, Math.ceil(Math.max(bounds.width, bounds.depth)))
+
   return (
     <Canvas className="map-canvas" dpr={[1, 2]}>
       <PerspectiveCamera
         makeDefault
-        position={[
-          centerOnSelected
-            ? getAttractionMapPoint(
-                business,
-                business.attractions.find((attraction) => attraction.id === selectedId) ??
-                  business.attractions[0],
-              ).x
-            : 0,
-          12,
-          centerOnSelected
-            ? getAttractionMapPoint(
-                business,
-                business.attractions.find((attraction) => attraction.id === selectedId) ??
-                  business.attractions[0],
-              ).z
-            : 0,
-        ]}
+        position={[focusPoint.x, cameraHeight, focusPoint.z]}
         rotation={[-Math.PI / 2, 0, 0]}
-        fov={42}
+        fov={CAMERA_FOV}
       />
       <ambientLight intensity={1.8} />
       <directionalLight position={[3, 8, 2]} intensity={2.5} color="#fff1d0" />
-      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[15, 12]} />
-        <meshStandardMaterial color="#e7e1d4" />
-      </mesh>
+      <BusinessTerrain business={business} />
       <gridHelper
-        args={[15, 15, '#bdb7a8', '#d7d1c4']}
+        args={[gridSize, gridSize, '#bdb7a8', '#d7d1c4']}
         rotation={[0, 0, 0]}
-        position={[0, 0.02, 0]}
+        position={[bounds.center.x, 0.02, bounds.center.z]}
       />
       {business.mapFeatures?.map((feature) => {
         if (feature.type === 'path') {
@@ -138,7 +144,13 @@ export function MapScene({
           </mesh>
         </group>
       )}
-      <OrbitControls enableRotate={false} minDistance={5} maxDistance={80} zoomSpeed={0.8} />
+      <OrbitControls
+        // enableRotate={false}
+        minDistance={5}
+        maxDistance={Math.max(80, cameraHeight * 2)}
+        zoomSpeed={0.8}
+        target={[focusPoint.x, 0, focusPoint.z]}
+      />
     </Canvas>
   )
 }

@@ -57,6 +57,12 @@ export type Attraction = {
   waypointId?: string
 }
 
+export type TerrainConfig = {
+  color: string
+  sideColor?: string
+  thicknessMeters: number
+}
+
 export type Business = {
   id: string
   name: string
@@ -65,6 +71,8 @@ export type Business = {
   eyebrow: string
   statusLabel: string
   mapOrigin: Coordinate
+  boundary: Coordinate[]
+  terrain: TerrainConfig
   mapScaleMeters: number
   entryWaypointId: string
   mapLabels?: MapLabel[]
