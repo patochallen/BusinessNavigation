@@ -18,12 +18,12 @@ export type MapLabel = {
 }
 
 export type MapFeature =
-  | { type: 'path'; id: string; points: MapPoint[] }
+  | { type: 'path'; id: string; points: Coordinate[] }
   | {
       type: 'area'
       id: string
       label: string
-      points: MapPoint[]
+      points: Coordinate[]
       color: string
     }
   | {
@@ -35,7 +35,7 @@ export type MapFeature =
       color: string
     }
 
-export type Waypoint = { id: string; position: MapPoint }
+export type Waypoint = { id: string; position: Coordinate }
 export type PathSegment = {
   id: string
   from: string
@@ -49,12 +49,19 @@ export type Attraction = {
   name: string
   category: Category
   description: string
-  coordinates: Coordinate
+  origin: Coordinate
+  boundary: Coordinate[]
   imageUrl?: string
   iconUrl?: string
   color: string
   tag: string
   waypointId?: string
+}
+
+export type TerrainConfig = {
+  color: string
+  sideColor?: string
+  thicknessMeters: number
 }
 
 export type Business = {
@@ -65,7 +72,8 @@ export type Business = {
   eyebrow: string
   statusLabel: string
   mapOrigin: Coordinate
-  mapScaleMeters: number
+  boundary: Coordinate[]
+  terrain: TerrainConfig
   entryWaypointId: string
   mapLabels?: MapLabel[]
   mapFeatures?: MapFeature[]
