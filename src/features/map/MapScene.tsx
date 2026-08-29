@@ -136,7 +136,15 @@ export function MapScene({
           geometry.rotateX(Math.PI / 2)
           geometry.computeVertexNormals()
           return (
-            <mesh key={`${attraction.id}-boundary`} position={[0, 0.3, 0]} geometry={geometry}>
+            <mesh
+              key={`${attraction.id}-boundary`}
+              position={[0, 0.3, 0]}
+              geometry={geometry}
+              onClick={(event) => {
+                event.stopPropagation()
+                onSelect(attraction.id)
+              }}
+            >
               <meshStandardMaterial
                 color={attraction.color}
                 side={DoubleSide}
