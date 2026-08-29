@@ -2,3 +2,158 @@
   position: absolute !important;
   inset: 0;
 }
+
+.attraction-marker-anchor {
+  position: relative;
+}
+
+.attraction-marker {
+  --marker-color: #e87952;
+  position: relative;
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  padding: 0;
+  border: 2px solid rgb(255 255 255 / 92%);
+  border-radius: 50% 50% 50% 4px;
+  background: var(--marker-color);
+  box-shadow: 0 3px 5px rgb(41 53 48 / 35%);
+  color: #fff;
+  cursor: pointer;
+  transform: translate(-50%, -100%) rotate(-45deg);
+  transition:
+    filter 150ms ease,
+    transform 150ms ease;
+}
+
+.attraction-marker::after {
+  position: absolute;
+  z-index: -1;
+  right: 15px;
+  bottom: -6px;
+  width: 30px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgb(41 53 48 / 25%);
+  content: '';
+  filter: blur(2px);
+  transform: rotate(45deg);
+}
+
+.attraction-marker-icon {
+  display: grid;
+  place-items: center;
+  transform: rotate(45deg);
+}
+
+.attraction-marker:hover,
+.attraction-marker:focus-visible,
+.attraction-marker.is-selected {
+  filter: brightness(1.08) saturate(1.15);
+  outline: none;
+  transform: translate(-50%, -100%) rotate(-45deg) scale(1.16);
+}
+
+.attraction-marker:focus-visible {
+  box-shadow:
+    0 0 0 4px rgb(255 255 255 / 72%),
+    0 3px 7px rgb(41 53 48 / 35%);
+}
+
+.attraction-popup {
+  position: absolute;
+  bottom: 50px;
+  /* left: 50%; */
+  width: 220px;
+  padding: 13px;
+  border: 1px solid rgb(42 57 51 / 16%);
+  border-radius: 8px;
+  background: rgb(255 255 255 / 96%);
+  box-shadow: 0 8px 18px rgb(31 43 38 / 22%);
+  color: #1f302b;
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+.attraction-popup::after {
+  position: absolute;
+  bottom: -7px;
+  left: calc(50% - 7px);
+  width: 14px;
+  height: 14px;
+  border-right: 1px solid rgb(42 57 51 / 16%);
+  border-bottom: 1px solid rgb(42 57 51 / 16%);
+  background: rgb(255 255 255 / 96%);
+  content: '';
+  transform: rotate(45deg);
+}
+
+.attraction-popup strong,
+.attraction-popup p,
+.attraction-popup-tag {
+  display: block;
+}
+
+.attraction-popup strong {
+  max-width: 172px;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.attraction-popup p {
+  margin: 6px 0 12px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.attraction-popup-tag {
+  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.attraction-popup-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #50625a;
+  cursor: pointer;
+}
+
+.attraction-popup-navigate {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 5px;
+  background: #1f302b;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.attraction-popup-close:hover,
+.attraction-popup-close:focus-visible {
+  background: rgb(31 48 43 / 10%);
+  outline: none;
+}
+
+.attraction-popup-navigate:hover,
+.attraction-popup-navigate:focus-visible {
+  background: #33483e;
+  outline: 2px solid #1f302b;
+  outline-offset: 2px;
+}

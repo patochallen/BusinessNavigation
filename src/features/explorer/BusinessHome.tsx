@@ -73,7 +73,9 @@ export function BusinessHome({
             centerOnSelected={Boolean(selectedAttractionId)}
             onSelect={(attractionId) => {
               setSelectedId(attractionId)
-              navigate(`/b/${business.id}?attraction=${attractionId}`, { replace: true })
+              navigate(`/b/${business.id}/a/${attractionId}`)
+              // setSelectedId(attractionId)
+              // navigate(`/b/${business.id}?attraction=${attractionId}`, { replace: true })
             }}
             userActive={permission === 'ready'}
           />

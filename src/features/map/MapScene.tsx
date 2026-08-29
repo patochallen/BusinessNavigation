@@ -1,8 +1,8 @@
 import { Canvas } from '@react-three/fiber'
-import { CameraControls, Line, PerspectiveCamera } from '@react-three/drei'
-import { useRef } from 'react'
+import { CameraControls, Html, Line, PerspectiveCamera } from '@react-three/drei'
+import { useRef, useState } from 'react'
 import { CatmullRomCurve3, DoubleSide, ExtrudeGeometry, Shape, Vector2, Vector3 } from 'three'
-import type { Business } from '../../domain/types'
+import type { Business, Category } from '../../domain/types'
 import {
   getAttractionMapPoint,
   getAttractionBoundaryMapPoints,
@@ -11,12 +11,20 @@ import {
 } from '../../domain/use-cases'
 import { BusinessTerrain } from './BusinessTerrain'
 import './MapScene.css'
-import { RefreshCw } from 'lucide-react'
+import { Crosshair, Navigation, RefreshCw, Trees, Utensils, X, Zap } from 'lucide-react'
 
 const CAMERA_FOV = 60
 const MIN_CAMERA_HEIGHT = 2
 const CONTROLS_SPEED = 0.5
 const MAP_FEATURE_PATH_RADIUS = 1
+const ATTRACTION_MARKER_ELEVATION = 0.5
+
+const categoryIcons = {
+  food: Utensils,
+  adventure: Zap,
+  services: Crosshair,
+  nature: Trees,
+} satisfies Record<Category, typeof Utensils>
 
 type MapSceneProps = {
   business: Business
@@ -37,8 +45,8 @@ export function MapScene({
   onSelect,
   userActive,
 }: MapSceneProps) {
+  const [popupAttractionId, setPopupAttractionId] = useState<string | null>(null)
   const boundaryPoints = getBusinessBoundaryMapPoints(business)
-  // const bounds = getMapPointBounds(boundaryPoints)
 
   const selectedAttraction =
     business.attractions.find((attraction) => attraction.id === selectedId) ??
@@ -50,7 +58,7 @@ export function MapScene({
   )
   const cameraHeight = centerOnSelected
     ? MIN_CAMERA_HEIGHT
-    : Math.max(MIN_CAMERA_HEIGHT, focusRadius / Math.tan((CAMERA_FOV * Math.PI) / 360))
+    : Math.max(MIN_CAMERA_HEIGHT, (focusRadius * 1.4) / Math.tan((CAMERA_FOV * Math.PI) / 360))
   const controlsRef = useRef<CameraControls | null>(null)
 
   return (
@@ -64,11 +72,6 @@ export function MapScene({
         {/* <ambientLight intensity={1.8} /> */}
         <directionalLight position={[3, 8, 2]} intensity={2.5} color="#fff1d0" />
         <BusinessTerrain business={business} />
-        {/* <gridHelper
-          args={[gridSize, gridSize * 0.1, '#bdb7a8', '#d7d1c4']}
-          rotation={[0, 0, 0]}
-          position={[bounds.center.x, 0.02, bounds.center.z]}
-        /> */}
         {business.mapFeatures?.map((feature) => {
           const featurePoints = getMapFeatureMapPoints(business, feature)
           if (feature.type === 'path') {
@@ -136,15 +139,7 @@ export function MapScene({
           geometry.rotateX(Math.PI / 2)
           geometry.computeVertexNormals()
           return (
-            <mesh
-              key={`${attraction.id}-boundary`}
-              position={[0, 0.3, 0]}
-              geometry={geometry}
-              onClick={(event) => {
-                event.stopPropagation()
-                onSelect(attraction.id)
-              }}
-            >
+            <mesh key={`${attraction.id}-boundary`} position={[0, 0.3, 0]} geometry={geometry}>
               <meshStandardMaterial
                 color={attraction.color}
                 side={DoubleSide}
@@ -154,34 +149,59 @@ export function MapScene({
             </mesh>
           )
         })}
-        {/* {business.attractions.map((attraction) => (
-          <group
-            key={attraction.id}
-            scale={16}
-            position={[
-              getAttractionMapPoint(business, attraction).x,
-              0,
-              getAttractionMapPoint(business, attraction).z,
-            ]}
-            onClick={(event) => {
-              event.stopPropagation()
-              onSelect(attraction.id)
-            }}
-          >
-            <mesh scale={selectedId === attraction.id ? 1.35 : 1} position={[0, 0.08, 0]}>
-              <cylinderGeometry args={[0.28, 0.22, 0.16, 24]} />
-              <meshStandardMaterial
-                color={attraction.color}
-                emissive={attraction.color}
-                emissiveIntensity={selectedId === attraction.id ? 0.4 : 0.05}
-              />
-            </mesh>
-            <mesh position={[0, 0.38, 0]}>
-              <sphereGeometry args={[0.12, 12, 8]} />
-              <meshStandardMaterial color={attraction.color} />
-            </mesh>
-          </group>
-        ))} */}
+        {business.attractions.map((attraction) => {
+          const point = getAttractionMapPoint(business, attraction)
+          const Icon = categoryIcons[attraction.category]
+          return (
+            <Html
+              key={attraction.id}
+              position={[point.x, ATTRACTION_MARKER_ELEVATION, point.z]}
+              sprite
+              zIndexRange={[10, 0]}
+            >
+              <div className="attraction-marker-anchor">
+                {popupAttractionId === attraction.id && (
+                  <section className="attraction-popup" aria-label={attraction.name}>
+                    <button
+                      className="attraction-popup-close"
+                      type="button"
+                      aria-label="Cerrar información"
+                      onClick={() => setPopupAttractionId(null)}
+                    >
+                      <X size={14} aria-hidden="true" />
+                    </button>
+                    <span className="attraction-popup-tag" style={{ color: attraction.color }}>
+                      {attraction.tag}
+                    </span>
+                    <strong>{attraction.name}</strong>
+                    <p>{attraction.description}</p>
+                    <button
+                      className="attraction-popup-navigate"
+                      type="button"
+                      onClick={() => onSelect(attraction.id)}
+                    >
+                      <Navigation size={15} aria-hidden="true" />
+                      Ir
+                    </button>
+                  </section>
+                )}
+                <button
+                  className={`attraction-marker ${selectedId === attraction.id ? 'is-selected' : ''}`}
+                  style={{ '--marker-color': attraction.color } as React.CSSProperties}
+                  type="button"
+                  title={attraction.name}
+                  aria-label={attraction.name}
+                  aria-expanded={popupAttractionId === attraction.id}
+                  onClick={() => setPopupAttractionId(attraction.id)}
+                >
+                  <span className="attraction-marker-icon" aria-hidden="true">
+                    <Icon size={16} strokeWidth={2.8} />
+                  </span>
+                </button>
+              </div>
+            </Html>
+          )
+        })}
         {userActive && userPosition && (
           <group scale={32} position={[userPosition.x, 0.3 * 32, userPosition.z]}>
             <mesh>
@@ -214,7 +234,10 @@ export function MapScene({
         className="north-button"
         style={{ left: 20 }}
         title="Reset Map"
-        onClick={() => controlsRef.current?.reset(true)}
+        onClick={() => {
+          setPopupAttractionId(null)
+          controlsRef.current?.reset(true)
+        }}
       >
         <RefreshCw size={17} />
       </button>
