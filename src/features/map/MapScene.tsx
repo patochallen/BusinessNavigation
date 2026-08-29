@@ -14,7 +14,7 @@ import './MapScene.css'
 import { Crosshair, Navigation, RefreshCw, Trees, Utensils, X, Zap } from 'lucide-react'
 
 const CAMERA_FOV = 60
-const MIN_CAMERA_HEIGHT = 2
+const MIN_CAMERA_HEIGHT = 30
 const CONTROLS_SPEED = 0.5
 const MAP_FEATURE_PATH_RADIUS = 1
 const ATTRACTION_MARKER_ELEVATION = 0.5
@@ -228,6 +228,7 @@ export function MapScene({
           azimuthRotateSpeed={CONTROLS_SPEED}
           polarRotateSpeed={CONTROLS_SPEED}
           truckSpeed={CONTROLS_SPEED}
+          maxPolarAngle={Math.PI / 2}
         />
       </Canvas>
       <button
