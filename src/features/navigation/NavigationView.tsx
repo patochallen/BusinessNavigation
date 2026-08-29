@@ -3,6 +3,7 @@ import { useState } from 'react'
 import type { Attraction, Business, LocationPermission } from '../../domain/types'
 import {
   distanceToNetwork,
+  getBusinessMapWaypoints,
   isOffRoute,
   localPointFromGps,
   cameraOverlayPosition,
@@ -51,7 +52,7 @@ export function NavigationView({
   const [cameraVisible, setCameraVisible] = useState(false)
   const camera = useCameraStream()
   const distance =
-    position && selected ? getDistanceBetweenLocations(position.coords, selected.coordinates) : null //distanceInMeters(position, business, selected) : null
+    position && selected ? getDistanceBetweenLocations(position.coords, selected.origin) : null //distanceInMeters(position, business, selected) : null
   const navigationState =
     permission === 'requesting'
       ? 'locating'
@@ -62,48 +63,32 @@ export function NavigationView({
           : 'navigating'
   const routePoints = selected
     ? position
-      ? routeFromCoordinate(
-          business,
-          {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          },
-          selected,
-        )
+      ? routeFromCoordinate(business, position.coords, selected)
       : routeToAttraction(business, selected)
     : []
-  const userPoint = position
-    ? localPointFromGps(
-        business.mapOrigin,
-        {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        },
-        business.mapScaleMeters,
-      )
-    : null
+  const userPoint = position ? localPointFromGps(business.mapOrigin, position.coords) : null
   const routeDistance = selected
     ? (routeDistanceToAttraction(business, selected, userPoint ?? undefined) ??
-      routeDistanceInMeters(routePoints, business.mapScaleMeters))
+      routeDistanceInMeters(routePoints))
     : 0
   const referenceRoute = selected ? routeToAttraction(business, selected) : []
-  const progress = progressOnRoute(referenceRoute, userPoint, business.mapScaleMeters)
-  const nextWaypoint = business.waypoints?.find(
+  const progress = progressOnRoute(referenceRoute, userPoint)
+  const nextWaypoint = getBusinessMapWaypoints(business).find(
     (waypoint) =>
       waypoint.position.x === progress.nextPoint?.x &&
       waypoint.position.z === progress.nextPoint?.z,
   )
-  const instruction = nextRouteInstruction(referenceRoute, userPoint, business.mapScaleMeters)
+  const instruction = nextRouteInstruction(referenceRoute, userPoint)
   const nextDirection =
     userPoint && progress.nextPoint ? relativeBearing(userPoint, progress.nextPoint, heading) : null
   const overlayPosition = cameraOverlayPosition(nextDirection, distance)
   const networkDistance =
     userPoint && business.waypoints
-      ? distanceToNetwork(business.waypoints, userPoint, business.mapScaleMeters)
+      ? distanceToNetwork(getBusinessMapWaypoints(business), userPoint)
       : null
   const offRoute =
     userPoint && business.waypoints
-      ? isOffRoute(business.waypoints, userPoint, 30, business.mapScaleMeters)
+      ? isOffRoute(getBusinessMapWaypoints(business), userPoint, 30)
       : false
 
   return (

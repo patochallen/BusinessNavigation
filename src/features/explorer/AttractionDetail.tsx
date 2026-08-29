@@ -36,10 +36,7 @@ export function AttractionDetail({
 }: AttractionDetailProps) {
   const { t } = useTranslation()
   const { distanceMeters, headingDegrees: calculatedHeadingDegrees } =
-    getDistanceAndHeadingBetweenLocations(
-      position?.coords ?? business.mapOrigin,
-      attraction.coordinates,
-    )
+    getDistanceAndHeadingBetweenLocations(position?.coords ?? business.mapOrigin, attraction.origin)
   const deg = heading ? (calculatedHeadingDegrees - heading + 360) % 360 : calculatedHeadingDegrees
   const headingDegrees = deg
   const [expanded, setExpanded] = useState(false)

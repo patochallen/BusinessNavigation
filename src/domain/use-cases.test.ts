@@ -5,8 +5,11 @@ import {
   filterAttractions,
   findAttraction,
   findBusiness,
+  getBusinessMapWaypoints,
   localPointFromGps,
   getAttractionMapPoint,
+  getAttractionBoundaryMapPoints,
+  getMapFeatureMapPoints,
   nextRouteInstruction,
   bearingToPoint,
   nearestWaypoint,
@@ -29,6 +32,7 @@ import {
 
 const valle = businesses[0]
 const mirador = valle.attractions[0]
+const valleWaypoints = getBusinessMapWaypoints(valle)
 
 function geolocationAt(latitude: number, longitude: number) {
   return { coords: { latitude, longitude } } as GeolocationPosition
@@ -57,23 +61,22 @@ describe('attraction filtering', () => {
 
 describe('map coordinates', () => {
   it('maps the business origin to the local map origin', () => {
-    expect(localPointFromGps(valle.mapOrigin, valle.mapOrigin, valle.mapScaleMeters)).toEqual({
+    expect(localPointFromGps(valle.mapOrigin, valle.mapOrigin)).toEqual({
       x: 0,
       z: -0,
     })
   })
 
-  it('calculates distance in scaled local meters', () => {
-    expect(distanceBetweenPoints({ x: 0, z: 0 }, { x: 3, z: 4 }, 10)).toBe(50)
+  it('calculates distance in local meters', () => {
+    expect(distanceBetweenPoints({ x: 0, z: 0 }, { x: 30, z: 40 })).toBe(50)
   })
 
   it('converts GPS and measures from the same origin', () => {
     const nearby = geolocationAt(valle.mapOrigin.latitude, valle.mapOrigin.longitude + 10 / 111_320)
-    const point = localPointFromGps(
-      valle.mapOrigin,
-      { latitude: nearby.coords.latitude, longitude: nearby.coords.longitude },
-      1,
-    )
+    const point = localPointFromGps(valle.mapOrigin, {
+      latitude: nearby.coords.latitude,
+      longitude: nearby.coords.longitude,
+    })
     expect(point.x).toBeCloseTo(8.46, 1)
     expect(point.z).toBeCloseTo(0, 5)
   })
@@ -101,31 +104,61 @@ describe('map coordinates', () => {
   it('projects the GPS business boundary into local map units', () => {
     const points = getBusinessBoundaryMapPoints(valle)
     expect(points.length).toBeGreaterThanOrEqual(3)
-    expect(getMapPointBounds(points).width * valle.mapScaleMeters).toBeGreaterThan(100)
+    expect(getMapPointBounds(points).width).toBeGreaterThan(100)
+  })
+
+  it('projects map-feature coordinates into local map units', () => {
+    const feature = {
+      type: 'path' as const,
+      id: 'test-path',
+      points: [
+        valle.mapOrigin,
+        { ...valle.mapOrigin, longitude: valle.mapOrigin.longitude + 0.001 },
+      ],
+    }
+    expect(getMapFeatureMapPoints(valle, feature)).toEqual([
+      { x: 0, z: -0 },
+      localPointFromGps(valle.mapOrigin, feature.points[1]),
+    ])
+  })
+
+  it('projects attraction boundaries into local map units', () => {
+    const attraction = {
+      ...mirador,
+      boundary: [
+        valle.mapOrigin,
+        { ...valle.mapOrigin, latitude: valle.mapOrigin.latitude + 0.001 },
+      ],
+    }
+    expect(getAttractionBoundaryMapPoints(valle, attraction)).toEqual([
+      { x: 0, z: -0 },
+      localPointFromGps(valle.mapOrigin, attraction.boundary[1]),
+    ])
   })
 
   it('rejects a degenerate boundary', () => {
-    expect(() => normalizeBoundary([{ x: 0, z: 0 }, { x: 1, z: 1 }, { x: 2, z: 2 }])).toThrow()
+    expect(() =>
+      normalizeBoundary([
+        { x: 0, z: 0 },
+        { x: 1, z: 1 },
+        { x: 2, z: 2 },
+      ]),
+    ).toThrow()
   })
 })
 
 describe('predio routing', () => {
   it('selects the closest waypoint to the visitor', () => {
-    expect(nearestWaypoint(valle.waypoints ?? [], { x: -5, z: 4 })?.id).toBe('entrada')
-    expect(nearestWaypoint(valle.waypoints ?? [], { x: 2, z: -1 })?.id).toBe('fuego')
+    expect(nearestWaypoint(valleWaypoints, { x: -50, z: 40 })?.id).toBe('entrada')
+    expect(nearestWaypoint(valleWaypoints, { x: 20, z: -10 })?.id).toBe('fuego')
   })
 
   it('finds the shortest path through connected waypoints', () => {
-    const route = shortestPath(
-      valle.waypoints ?? [],
-      valle.pathSegments ?? [],
-      'entrada',
-      'mirador',
-    )
+    const route = shortestPath(valleWaypoints, valle.pathSegments ?? [], 'entrada', 'mirador')
     expect(route).toEqual([
-      { x: -5.5, z: 4.5 },
-      { x: 0, z: 0 },
-      { x: -4.2, z: -3.1 },
+      valleWaypoints.find((waypoint) => waypoint.id === 'entrada')!.position,
+      valleWaypoints.find((waypoint) => waypoint.id === 'centro')!.position,
+      valleWaypoints.find((waypoint) => waypoint.id === 'mirador')!.position,
     ])
   })
 
@@ -140,30 +173,24 @@ describe('predio routing', () => {
   })
 
   it('returns no route for an unknown destination', () => {
-    expect(
-      shortestPath(valle.waypoints ?? [], valle.pathSegments ?? [], 'entrada', 'missing'),
-    ).toEqual([])
+    expect(shortestPath(valleWaypoints, valle.pathSegments ?? [], 'entrada', 'missing')).toEqual([])
   })
 
   it('calculates route distance and detects when a visitor leaves the network', () => {
-    const waypoints = valle.waypoints ?? []
     expect(
-      routeDistanceInMeters(
-        [
-          { x: 0, z: 0 },
-          { x: 3, z: 4 },
-        ],
-        10,
-      ),
+      routeDistanceInMeters([
+        { x: 0, z: 0 },
+        { x: 30, z: 40 },
+      ]),
     ).toBe(50)
-    expect(distanceToNetwork(waypoints, { x: 2, z: 0 }, 10)).toBe(20)
-    expect(isOffRoute(waypoints, { x: 2, z: 0 }, 30, 10)).toBe(false)
-    expect(isOffRoute(waypoints, { x: 6, z: 6 }, 30, 10)).toBe(true)
+    expect(distanceToNetwork(valleWaypoints, { x: 0, z: 20 })).toBe(20)
+    expect(isOffRoute(valleWaypoints, { x: 0, z: 20 }, 30)).toBe(false)
+    expect(isOffRoute(valleWaypoints, { x: 60, z: 60 }, 30)).toBe(true)
   })
 
   it('uses segment weights for the route distance', () => {
     expect(routeDistanceToAttraction(valle, mirador)).toBe(109)
-    expect(routeDistanceToAttraction(valle, mirador, { x: -5, z: 4 })).toBe(116)
+    expect(routeDistanceToAttraction(valle, mirador, { x: -50, z: 40 })).toBe(116)
   })
 
   it('calculates a walking ETA from distance', () => {
@@ -177,27 +204,25 @@ describe('predio routing', () => {
     const progress = progressOnRoute(
       [
         { x: 0, z: 0 },
-        { x: 3, z: 0 },
-        { x: 6, z: 0 },
+        { x: 30, z: 0 },
+        { x: 60, z: 0 },
       ],
-      { x: 3, z: 0 },
-      10,
+      { x: 30, z: 0 },
     )
     expect(progress.completedMeters).toBe(30)
     expect(progress.remainingMeters).toBe(30)
     expect(progress.ratio).toBe(0.5)
-    expect(progress.nextPoint).toEqual({ x: 6, z: 0 })
+    expect(progress.nextPoint).toEqual({ x: 60, z: 0 })
   })
 
   it('describes the next turn on a route', () => {
     const instruction = nextRouteInstruction(
       [
         { x: 0, z: 0 },
-        { x: 3, z: 0 },
-        { x: 3, z: 3 },
+        { x: 30, z: 0 },
+        { x: 30, z: 30 },
       ],
       { x: 0, z: 0 },
-      10,
     )
     expect(instruction?.label).toBe('Girás a la izquierda')
     expect(instruction?.distanceToTurn).toBe(30)

@@ -13,7 +13,7 @@ export function createBusinessTerrainGeometry(business: Business) {
   shape.closePath()
 
   const geometry = new ExtrudeGeometry(shape, {
-    depth: business.terrain.thicknessMeters / business.mapScaleMeters,
+    depth: business.terrain.thicknessMeters,
     bevelEnabled: false,
     steps: 1,
   })

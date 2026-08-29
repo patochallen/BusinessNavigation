@@ -113,7 +113,7 @@ export function useGeolocation() {
 }
 
 export function gpsToLocalMeters(origin: Coordinate, coordinate: Coordinate): MapPoint {
-  return localPointFromGps(origin, coordinate, 1)
+  return localPointFromGps(origin, coordinate)
 }
 
 export function distanceInMeters(
@@ -122,13 +122,6 @@ export function distanceInMeters(
   attraction: Attraction,
 ) {
   if (!position) return null
-  const userPoint = gpsToLocalMeters(business.mapOrigin, {
-    latitude: position.coords.latitude,
-    longitude: position.coords.longitude,
-  })
-  return distanceBetweenPoints(
-    userPoint,
-    getAttractionMapPoint(business, attraction),
-    business.mapScaleMeters,
-  )
+  const userPoint = gpsToLocalMeters(business.mapOrigin, position.coords)
+  return distanceBetweenPoints(userPoint, getAttractionMapPoint(business, attraction))
 }

@@ -3,11 +3,14 @@ import type {
   Business,
   Category,
   Coordinate,
+  MapFeature,
   MapPoint,
   PathSegment,
   Waypoint,
 } from './types'
 import { localPointFromGps } from './coordinates'
+
+type ProjectedWaypoint = Omit<Waypoint, 'position'> & { position: MapPoint }
 
 export {
   getBusinessBoundaryMapPoints,
@@ -39,17 +42,33 @@ export function filterAttractions(
 }
 
 export function getAttractionMapPoint(business: Business, attraction: Attraction) {
-  return localPointFromGps(business.mapOrigin, attraction.coordinates, business.mapScaleMeters)
+  return localPointFromGps(business.mapOrigin, attraction.origin)
 }
 
-export function distanceBetweenPoints(first: MapPoint, second: MapPoint, scaleMeters = 1) {
-  const dx = (first.x - second.x) * scaleMeters
-  const dz = (first.z - second.z) * scaleMeters
+export function getAttractionBoundaryMapPoints(business: Business, attraction: Attraction) {
+  return attraction.boundary.map((coordinate) => localPointFromGps(business.mapOrigin, coordinate))
+}
+
+export function getMapFeatureMapPoints(business: Business, feature: MapFeature) {
+  if (feature.type === 'building') return []
+  return feature.points.map((coordinate) => localPointFromGps(business.mapOrigin, coordinate))
+}
+
+export function getBusinessMapWaypoints(business: Business): ProjectedWaypoint[] {
+  return (business.waypoints ?? []).map((waypoint) => ({
+    ...waypoint,
+    position: localPointFromGps(business.mapOrigin, waypoint.position),
+  }))
+}
+
+export function distanceBetweenPoints(first: MapPoint, second: MapPoint) {
+  const dx = first.x - second.x
+  const dz = first.z - second.z
   return Math.round(Math.sqrt(dx * dx + dz * dz))
 }
 
 export function shortestPath(
-  waypoints: Waypoint[],
+  waypoints: ProjectedWaypoint[],
   segments: PathSegment[],
   startId: string,
   endId: string,
@@ -91,7 +110,7 @@ export function shortestPath(
 }
 
 export function shortestPathDistance(
-  waypoints: Waypoint[],
+  waypoints: ProjectedWaypoint[],
   segments: PathSegment[],
   startId: string,
   endId: string,
@@ -126,8 +145,9 @@ export function shortestPathDistance(
 
 export function routeToAttraction(business: Business, attraction: Attraction) {
   if (!business.waypoints || !business.pathSegments || !attraction.waypointId) return []
+  const waypoints = getBusinessMapWaypoints(business)
   const waypointRoute = shortestPath(
-    business.waypoints,
+    waypoints,
     business.pathSegments,
     business.entryWaypointId,
     attraction.waypointId,
@@ -141,35 +161,31 @@ export function routeDistanceToAttraction(
   position?: MapPoint,
 ) {
   if (!business.waypoints || !business.pathSegments || !attraction.waypointId) return null
+  const waypoints = getBusinessMapWaypoints(business)
   const start = position
-    ? nearestWaypoint(business.waypoints, position)
-    : business.waypoints.find((waypoint) => waypoint.id === business.entryWaypointId)
+    ? nearestWaypoint(waypoints, position)
+    : waypoints.find((waypoint) => waypoint.id === business.entryWaypointId)
   if (!start) return null
   const networkDistance = shortestPathDistance(
-    business.waypoints,
+    waypoints,
     business.pathSegments,
     start.id,
     attraction.waypointId,
   )
   if (networkDistance === null || networkDistance === undefined) return null
-  const approachDistance = position
-    ? distanceBetweenPoints(position, start.position, business.mapScaleMeters)
-    : 0
-  const destinationWaypoint = business.waypoints.find(
-    (waypoint) => waypoint.id === attraction.waypointId,
-  )
+  const approachDistance = position ? distanceBetweenPoints(position, start.position) : 0
+  const destinationWaypoint = waypoints.find((waypoint) => waypoint.id === attraction.waypointId)
   const destinationDistance = destinationWaypoint
     ? distanceBetweenPoints(
         destinationWaypoint.position,
         getAttractionMapPoint(business, attraction),
-        business.mapScaleMeters,
       )
     : 0
   return networkDistance + approachDistance + destinationDistance
 }
 
-export function nearestWaypoint(waypoints: Waypoint[], position: MapPoint) {
-  return waypoints.reduce<Waypoint | undefined>((nearest, waypoint) => {
+export function nearestWaypoint(waypoints: ProjectedWaypoint[], position: MapPoint) {
+  return waypoints.reduce<ProjectedWaypoint | undefined>((nearest, waypoint) => {
     if (!nearest) return waypoint
     return distanceBetweenPoints(position, waypoint.position) <
       distanceBetweenPoints(position, nearest.position)
@@ -184,23 +200,21 @@ export function routeFromCoordinate(
   attraction: Attraction,
 ) {
   if (!business.waypoints || !business.pathSegments || !attraction.waypointId) return []
-  const userPoint = localPointFromGps(business.mapOrigin, coordinate, business.mapScaleMeters)
-  const start = nearestWaypoint(business.waypoints, userPoint)
+  const userPoint = localPointFromGps(business.mapOrigin, coordinate)
+  const waypoints = getBusinessMapWaypoints(business)
+  const start = nearestWaypoint(waypoints, userPoint)
   if (!start) return []
   const waypointRoute = [
     userPoint,
-    ...shortestPath(business.waypoints, business.pathSegments, start.id, attraction.waypointId),
+    ...shortestPath(waypoints, business.pathSegments, start.id, attraction.waypointId),
   ]
   return [...waypointRoute, getAttractionMapPoint(business, attraction)]
 }
 
-export function routeDistanceInMeters(route: MapPoint[], scaleMeters = 1) {
+export function routeDistanceInMeters(route: MapPoint[]) {
   return route
     .slice(1)
-    .reduce(
-      (total, point, index) => total + distanceBetweenPoints(route[index], point, scaleMeters),
-      0,
-    )
+    .reduce((total, point, index) => total + distanceBetweenPoints(route[index], point), 0)
 }
 
 const WALKING_METERS_PER_MINUTE = 80
@@ -225,22 +239,21 @@ export function projectPointOnSegment(point: MapPoint, start: MapPoint, end: Map
   return { point: { x: start.x + dx * ratio, z: start.z + dz * ratio }, ratio }
 }
 
-export function distanceToNetwork(waypoints: Waypoint[], position: MapPoint, scaleMeters = 1) {
+export function distanceToNetwork(waypoints: ProjectedWaypoint[], position: MapPoint) {
   const nearest = nearestWaypoint(waypoints, position)
-  return nearest ? distanceBetweenPoints(position, nearest.position, scaleMeters) : null
+  return nearest ? distanceBetweenPoints(position, nearest.position) : null
 }
 
 export function isOffRoute(
-  waypoints: Waypoint[],
+  waypoints: ProjectedWaypoint[],
   position: MapPoint,
   thresholdMeters: number,
-  scaleMeters = 1,
 ) {
-  const distance = distanceToNetwork(waypoints, position, scaleMeters)
+  const distance = distanceToNetwork(waypoints, position)
   return distance !== null && distance > thresholdMeters
 }
 
-export function progressOnRoute(route: MapPoint[], position: MapPoint | null, scaleMeters = 1) {
+export function progressOnRoute(route: MapPoint[], position: MapPoint | null) {
   if (route.length < 2)
     return {
       completedMeters: 0,
@@ -248,7 +261,7 @@ export function progressOnRoute(route: MapPoint[], position: MapPoint | null, sc
       ratio: 0,
       nextPoint: undefined,
     }
-  const totalMeters = routeDistanceInMeters(route, scaleMeters)
+  const totalMeters = routeDistanceInMeters(route)
   if (!position)
     return {
       completedMeters: 0,
@@ -273,12 +286,8 @@ export function progressOnRoute(route: MapPoint[], position: MapPoint | null, sc
   const segmentMeters = distanceBetweenPoints(
     route[nearestSegment.index],
     route[nearestSegment.index + 1],
-    scaleMeters,
   )
-  const completedBeforeSegment = routeDistanceInMeters(
-    route.slice(0, nearestSegment.index + 1),
-    scaleMeters,
-  )
+  const completedBeforeSegment = routeDistanceInMeters(route.slice(0, nearestSegment.index + 1))
   const completedMeters = completedBeforeSegment + Math.round(segmentMeters * nearestSegment.ratio)
   return {
     completedMeters,
@@ -288,11 +297,7 @@ export function progressOnRoute(route: MapPoint[], position: MapPoint | null, sc
   }
 }
 
-export function nextRouteInstruction(
-  route: MapPoint[],
-  position: MapPoint | null,
-  scaleMeters = 1,
-) {
+export function nextRouteInstruction(route: MapPoint[], position: MapPoint | null) {
   if (route.length < 2) return null
   const nearestIndex = position
     ? route.reduce(
@@ -305,8 +310,8 @@ export function nextRouteInstruction(
     : 0
   const turnIndex = Math.min(nearestIndex + 1, route.length - 1)
   const distanceToTurn = position
-    ? distanceBetweenPoints(position, route[turnIndex], scaleMeters)
-    : distanceBetweenPoints(route[0], route[turnIndex], scaleMeters)
+    ? distanceBetweenPoints(position, route[turnIndex])
+    : distanceBetweenPoints(route[0], route[turnIndex])
   if (turnIndex === route.length - 1) {
     return { label: 'Seguí hasta el destino', distanceToTurn }
   }

@@ -1,16 +1,22 @@
 import { Canvas } from '@react-three/fiber'
-import { Line, OrbitControls, PerspectiveCamera } from '@react-three/drei'
+import { CameraControls, Line, PerspectiveCamera } from '@react-three/drei'
+import { useRef } from 'react'
+import { CatmullRomCurve3, DoubleSide, ExtrudeGeometry, Shape, Vector2, Vector3 } from 'three'
 import type { Business } from '../../domain/types'
 import {
   getAttractionMapPoint,
+  getAttractionBoundaryMapPoints,
   getBusinessBoundaryMapPoints,
-  getMapPointBounds,
+  getMapFeatureMapPoints,
 } from '../../domain/use-cases'
 import { BusinessTerrain } from './BusinessTerrain'
 import './MapScene.css'
+import { RefreshCw } from 'lucide-react'
 
-const CAMERA_FOV = 42
-const MIN_CAMERA_HEIGHT = 12
+const CAMERA_FOV = 60
+const MIN_CAMERA_HEIGHT = 2
+const CONTROLS_SPEED = 0.5
+const MAP_FEATURE_PATH_RADIUS = 1
 
 type MapSceneProps = {
   business: Business
@@ -32,125 +38,178 @@ export function MapScene({
   userActive,
 }: MapSceneProps) {
   const boundaryPoints = getBusinessBoundaryMapPoints(business)
-  const visiblePoints = boundaryPoints
-  // userActive && userPosition ? [...boundaryPoints, userPosition] : boundaryPoints
-  const bounds = getMapPointBounds(visiblePoints)
+  // const bounds = getMapPointBounds(boundaryPoints)
+
   const selectedAttraction =
     business.attractions.find((attraction) => attraction.id === selectedId) ??
     business.attractions[0]
   const selectedPoint = getAttractionMapPoint(business, selectedAttraction)
-  const focusPoint = centerOnSelected ? selectedPoint : bounds.center
+  const focusPoint = centerOnSelected ? selectedPoint : { x: 0, z: 0 }
   const focusRadius = Math.max(
-    ...visiblePoints.map((point) => Math.hypot(point.x - focusPoint.x, point.z - focusPoint.z)),
+    ...boundaryPoints.map((point) => Math.hypot(point.x - focusPoint.x, point.z - focusPoint.z)),
   )
   const cameraHeight = centerOnSelected
     ? MIN_CAMERA_HEIGHT
-    : Math.max(MIN_CAMERA_HEIGHT, (focusRadius * 0.75) / Math.tan((CAMERA_FOV * Math.PI) / 360))
-  const gridSize = Math.max(15, Math.ceil(Math.max(bounds.width, bounds.depth)))
+    : Math.max(MIN_CAMERA_HEIGHT, focusRadius / Math.tan((CAMERA_FOV * Math.PI) / 360))
+  const controlsRef = useRef<CameraControls | null>(null)
 
   return (
-    <Canvas className="map-canvas" dpr={[1, 2]}>
-      <PerspectiveCamera
-        makeDefault
-        position={[focusPoint.x, cameraHeight, focusPoint.z]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        fov={CAMERA_FOV}
-      />
-      <ambientLight intensity={1.8} />
-      <directionalLight position={[3, 8, 2]} intensity={2.5} color="#fff1d0" />
-      <BusinessTerrain business={business} />
-      <gridHelper
-        args={[gridSize, gridSize, '#bdb7a8', '#d7d1c4']}
-        rotation={[0, 0, 0]}
-        position={[bounds.center.x, 0.02, bounds.center.z]}
-      />
-      {business.mapFeatures?.map((feature) => {
-        if (feature.type === 'path') {
+    <>
+      <Canvas className="map-canvas" dpr={[1, 2]}>
+        <PerspectiveCamera
+          makeDefault
+          position={[focusPoint.x, cameraHeight, focusPoint.z]}
+          fov={CAMERA_FOV}
+        />
+        {/* <ambientLight intensity={1.8} /> */}
+        <directionalLight position={[3, 8, 2]} intensity={2.5} color="#fff1d0" />
+        <BusinessTerrain business={business} />
+        {/* <gridHelper
+          args={[gridSize, gridSize * 0.1, '#bdb7a8', '#d7d1c4']}
+          rotation={[0, 0, 0]}
+          position={[bounds.center.x, 0.02, bounds.center.z]}
+        /> */}
+        {business.mapFeatures?.map((feature) => {
+          const featurePoints = getMapFeatureMapPoints(business, feature)
+          if (feature.type === 'path') {
+            const curve = new CatmullRomCurve3(
+              featurePoints.map((point) => new Vector3(point.x, 0.5, point.z)),
+            )
+            return (
+              <mesh key={feature.id} scale={[1, 0.2, 1]}>
+                <tubeGeometry
+                  args={[
+                    curve,
+                    Math.max(8, featurePoints.length * 8),
+                    MAP_FEATURE_PATH_RADIUS,
+                    8,
+                    false,
+                  ]}
+                />
+                <meshStandardMaterial color="#f3f0e7" />
+              </mesh>
+            )
+          }
+          if (feature.type === 'building') {
+            return (
+              <mesh
+                key={feature.id}
+                position={[feature.position.x, 0.18, feature.position.z]}
+                scale={3}
+              >
+                <boxGeometry args={[feature.size.x, 0.32, feature.size.z]} />
+                <meshStandardMaterial color={feature.color} />
+              </mesh>
+            )
+          }
+          const minX = Math.min(...featurePoints.map((point) => point.x))
+          const maxX = Math.max(...featurePoints.map((point) => point.x))
+          const minZ = Math.min(...featurePoints.map((point) => point.z))
+          const maxZ = Math.max(...featurePoints.map((point) => point.z))
           return (
-            <Line
+            <mesh
               key={feature.id}
-              points={feature.points.map((point) => [point.x, 0.12, point.z])}
-              color="#f3f0e7"
-              lineWidth={4}
-            />
-          )
-        }
-        if (feature.type === 'building') {
-          return (
-            <mesh key={feature.id} position={[feature.position.x, 0.18, feature.position.z]}>
-              <boxGeometry args={[feature.size.x, 0.32, feature.size.z]} />
-              <meshStandardMaterial color={feature.color} />
+              position={[(minX + maxX) / 2, 0.04, (minZ + maxZ) / 2]}
+              rotation={[-Math.PI / 2, 0, 0]}
+            >
+              <planeGeometry args={[maxX - minX, maxZ - minZ]} />
+              <meshBasicMaterial color={feature.color} transparent opacity={0.55} />
             </mesh>
           )
-        }
-        const minX = Math.min(...feature.points.map((point) => point.x))
-        const maxX = Math.max(...feature.points.map((point) => point.x))
-        const minZ = Math.min(...feature.points.map((point) => point.z))
-        const maxZ = Math.max(...feature.points.map((point) => point.z))
-        return (
-          <mesh
-            key={feature.id}
-            position={[(minX + maxX) / 2, 0.04, (minZ + maxZ) / 2]}
-            rotation={[-Math.PI / 2, 0, 0]}
+        })}
+        {routePoints.length > 1 && (
+          <Line
+            points={routePoints.map((point) => [point.x, 0.2, point.z])}
+            color="#e8b84a"
+            lineWidth={5}
+          />
+        )}
+        {business.attractions.map((attraction) => {
+          const boundary = getAttractionBoundaryMapPoints(business, attraction)
+          if (boundary.length < 3) return null
+          const shape = new Shape(boundary.map((point) => new Vector2(point.x, point.z)))
+          const geometry = new ExtrudeGeometry(shape, {
+            depth: 0.2,
+            bevelEnabled: false,
+            steps: 1,
+          })
+          geometry.rotateX(Math.PI / 2)
+          geometry.computeVertexNormals()
+          return (
+            <mesh key={`${attraction.id}-boundary`} position={[0, 0.3, 0]} geometry={geometry}>
+              <meshStandardMaterial
+                color={attraction.color}
+                side={DoubleSide}
+                transparent
+                opacity={0.5}
+              />
+            </mesh>
+          )
+        })}
+        {/* {business.attractions.map((attraction) => (
+          <group
+            key={attraction.id}
+            scale={16}
+            position={[
+              getAttractionMapPoint(business, attraction).x,
+              0,
+              getAttractionMapPoint(business, attraction).z,
+            ]}
+            onClick={(event) => {
+              event.stopPropagation()
+              onSelect(attraction.id)
+            }}
           >
-            <planeGeometry args={[maxX - minX, maxZ - minZ]} />
-            <meshBasicMaterial color={feature.color} transparent opacity={0.55} />
-          </mesh>
-        )
-      })}
-      {routePoints.length > 1 && (
-        <Line
-          points={routePoints.map((point) => [point.x, 0.2, point.z])}
-          color="#e8b84a"
-          lineWidth={5}
+            <mesh scale={selectedId === attraction.id ? 1.35 : 1} position={[0, 0.08, 0]}>
+              <cylinderGeometry args={[0.28, 0.22, 0.16, 24]} />
+              <meshStandardMaterial
+                color={attraction.color}
+                emissive={attraction.color}
+                emissiveIntensity={selectedId === attraction.id ? 0.4 : 0.05}
+              />
+            </mesh>
+            <mesh position={[0, 0.38, 0]}>
+              <sphereGeometry args={[0.12, 12, 8]} />
+              <meshStandardMaterial color={attraction.color} />
+            </mesh>
+          </group>
+        ))} */}
+        {userActive && userPosition && (
+          <group scale={32} position={[userPosition.x, 0.3 * 32, userPosition.z]}>
+            <mesh>
+              <coneGeometry args={[0.2, 0.45, 16]} />
+              <meshStandardMaterial
+                color="#477e78"
+                emissive="#477e78"
+                emissiveIntensity={0.25}
+                transparent
+                opacity={0.4}
+              />
+            </mesh>
+            <mesh position={[0, -0.2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+              <ringGeometry args={[0.24, 0.32, 24]} />
+              <meshBasicMaterial color="#477e78" transparent opacity={0.4} />
+            </mesh>
+          </group>
+        )}
+        <CameraControls
+          ref={controlsRef}
+          minDistance={MIN_CAMERA_HEIGHT}
+          maxDistance={cameraHeight * 1.5}
+          dollySpeed={CONTROLS_SPEED}
+          azimuthRotateSpeed={CONTROLS_SPEED}
+          polarRotateSpeed={CONTROLS_SPEED}
+          truckSpeed={CONTROLS_SPEED}
         />
-      )}
-      {business.attractions.map((attraction) => (
-        <group
-          key={attraction.id}
-          position={[
-            getAttractionMapPoint(business, attraction).x,
-            0.22,
-            getAttractionMapPoint(business, attraction).z,
-          ]}
-          onClick={(event) => {
-            event.stopPropagation()
-            onSelect(attraction.id)
-          }}
-        >
-          <mesh scale={selectedId === attraction.id ? 1.35 : 1}>
-            <cylinderGeometry args={[0.28, 0.22, 0.16, 24]} />
-            <meshStandardMaterial
-              color={attraction.color}
-              emissive={attraction.color}
-              emissiveIntensity={selectedId === attraction.id ? 0.4 : 0.05}
-            />
-          </mesh>
-          <mesh position={[0, 0.22, 0]}>
-            <sphereGeometry args={[0.12, 12, 8]} />
-            <meshStandardMaterial color={attraction.color} />
-          </mesh>
-        </group>
-      ))}
-      {userActive && userPosition && (
-        <group position={[userPosition.x, 0.3, userPosition.z]}>
-          <mesh>
-            <coneGeometry args={[0.2, 0.45, 16]} />
-            <meshStandardMaterial color="#477e78" emissive="#477e78" emissiveIntensity={0.25} />
-          </mesh>
-          <mesh position={[0, -0.2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[0.24, 0.32, 24]} />
-            <meshBasicMaterial color="#477e78" transparent opacity={0.7} />
-          </mesh>
-        </group>
-      )}
-      <OrbitControls
-        // enableRotate={false}
-        minDistance={5}
-        maxDistance={Math.max(80, cameraHeight * 2)}
-        zoomSpeed={0.8}
-        target={[focusPoint.x, 0, focusPoint.z]}
-      />
-    </Canvas>
+      </Canvas>
+      <button
+        className="north-button"
+        style={{ left: 20 }}
+        title="Reset Map"
+        onClick={() => controlsRef.current?.reset(true)}
+      >
+        <RefreshCw size={17} />
+      </button>
+    </>
   )
 }

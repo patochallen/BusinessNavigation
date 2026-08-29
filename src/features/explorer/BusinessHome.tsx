@@ -37,19 +37,12 @@ export function BusinessHome({
 }: BusinessHomeProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const [selectedId, setSelectedId] = useState(selectedAttractionId ?? 'punto-encuentro')
+  const [selectedId, setSelectedId] = useState(selectedAttractionId)
   const [category, setCategory] = useState<'all' | Category>('all')
   const [query, setQuery] = useState('')
   const activeSelectedId = selectedAttractionId ?? selectedId
-  const selected =
-    business.attractions.find((item) => item.id === activeSelectedId) ?? business.attractions[0]
-  const userPosition = position
-    ? localPointFromGps(
-        business.mapOrigin,
-        { latitude: position.coords.latitude, longitude: position.coords.longitude },
-        business.mapScaleMeters,
-      )
-    : undefined
+  const selected = business.attractions.find((item) => item.id === activeSelectedId)
+  const userPosition = position ? localPointFromGps(business.mapOrigin, position.coords) : undefined
   const filtered = useMemo(
     () => filterAttractions(business.attractions, category, query),
     [business.attractions, category, query],
@@ -104,7 +97,10 @@ export function BusinessHome({
             className="north-button"
             aria-label={t('explorer.resetMap')}
             title={t('explorer.resetMap')}
-            onClick={() => navigate(`/b/${business.id}`, { replace: true })}
+            onClick={() => {
+              setSelectedId(undefined)
+              navigate(`/b/${business.id}`, { replace: true })
+            }}
           >
             <Compass size={17} />
           </button>
@@ -147,7 +143,7 @@ export function BusinessHome({
           {filtered.map((item) => {
             const { distanceMeters, headingDegrees } = getDistanceAndHeadingBetweenLocations(
               position?.coords ?? business.mapOrigin,
-              item.coordinates,
+              item.origin,
             )
             const Icon = icons[item.category]
             return (

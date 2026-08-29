@@ -39,10 +39,10 @@
 }
 .map-frame {
   position: relative;
-  height: 485px;
+  height: 685px;
   overflow: hidden;
   border: 1px solid #d1cec2;
-  background: #ded9cd;
+  background: #000;
   box-shadow: 0 12px 32px rgba(59, 60, 45, 0.08);
 }
 .map-label {
@@ -151,7 +151,7 @@
     padding: 15px;
   }
   .map-frame {
-    height: 320px;
+    height: 520px;
     margin: 0 -6px;
   }
   .attraction-list {
