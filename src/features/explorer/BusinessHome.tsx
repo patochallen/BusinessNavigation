@@ -14,6 +14,7 @@ import './BusinessHome.css'
 import { getDistanceAndHeadingBetweenLocations } from '../../utils/location'
 import { AttractionItemList } from './AttractionItemList'
 import { useTranslation } from 'react-i18next'
+import { IconButton } from '../layout/IconButton'
 
 type BusinessHomeProps = {
   business: Business
@@ -95,17 +96,14 @@ export function BusinessHome({
             <span className="legend-dot" />{' '}
             {t('explorer.pointsOfInterest', { count: business.attractions.length })}
           </div>
-          <button
-            className="north-button"
-            aria-label={t('explorer.resetMap')}
-            title={t('explorer.resetMap')}
+          <IconButton
+            icon={<Compass />}
+            position="topRight"
             onClick={() => {
               setSelectedId(undefined)
               navigate(`/b/${business.id}`, { replace: true })
             }}
-          >
-            <Compass size={17} />
-          </button>
+          />
         </div>
       </section>
       <section className="explore-section">

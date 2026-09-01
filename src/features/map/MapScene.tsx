@@ -11,7 +11,17 @@ import {
 } from '../../domain/use-cases'
 import { BusinessTerrain } from './BusinessTerrain'
 import './MapScene.css'
-import { Crosshair, Navigation, RefreshCw, Trees, Utensils, X, Zap } from 'lucide-react'
+import {
+  Crosshair,
+  Navigation,
+  RefreshCw,
+  RefreshCwOff,
+  Trees,
+  Utensils,
+  X,
+  Zap,
+} from 'lucide-react'
+import { IconButton } from '../layout/IconButton'
 
 const CAMERA_FOV = 60
 const MIN_CAMERA_HEIGHT = 30
@@ -223,7 +233,7 @@ export function MapScene({
         <CameraControls
           ref={controlsRef}
           minDistance={MIN_CAMERA_HEIGHT}
-          maxDistance={cameraHeight * 1.5}
+          maxDistance={cameraHeight * 5}
           dollySpeed={CONTROLS_SPEED}
           azimuthRotateSpeed={CONTROLS_SPEED}
           polarRotateSpeed={CONTROLS_SPEED}
@@ -231,17 +241,14 @@ export function MapScene({
           maxPolarAngle={Math.PI / 2}
         />
       </Canvas>
-      <button
-        className="north-button"
-        style={{ left: 20 }}
-        title="Reset Map"
+      <IconButton
+        icon={<RefreshCwOff />}
+        position="topLeft"
         onClick={() => {
           setPopupAttractionId(null)
           controlsRef.current?.reset(true)
         }}
-      >
-        <RefreshCw size={17} />
-      </button>
+      />
     </>
   )
 }

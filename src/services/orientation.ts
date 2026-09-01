@@ -10,7 +10,8 @@ type PermissionCapableOrientation = typeof DeviceOrientationEvent & {
 export function useDeviceHeading(enabled = true) {
   const [heading, setHeading] = useState<number | null>(null)
   const [permission, setPermission] = useState<LocationPermission>('idle')
-  const [calibrationOffset, setCalibrationOffset] = useState(0)
+  const calibrationOffset = 0
+  // const [calibrationOffset, setCalibrationOffset] = useState(0)
   const [headingStable, setHeadingStable] = useState(false)
   const rawHeadingRef = useRef<number | null>(null)
   const samplesRef = useRef<number[]>([])
@@ -36,6 +37,7 @@ export function useDeviceHeading(enabled = true) {
   useEffect(() => {
     if (!enabled || !supported || permission !== 'ready') return
     const onOrientation = (event: CompassEvent) => {
+      // console.log('Device orientation event:', event)
       const rawHeading =
         event.webkitCompassHeading ?? (event.alpha === null ? null : 360 - event.alpha)
       if (rawHeading !== null) {
@@ -48,13 +50,13 @@ export function useDeviceHeading(enabled = true) {
         setHeading(calibrated)
       }
     }
-    window.addEventListener('deviceorientation', onOrientation)
-    return () => window.removeEventListener('deviceorientation', onOrientation)
+    window.addEventListener('deviceorientationabsolute', onOrientation)
+    return () => window.removeEventListener('deviceorientationabsolute', onOrientation)
   }, [calibrationOffset, enabled, permission, supported])
 
   const calibrate = () => {
     if (rawHeadingRef.current === null) return
-    setCalibrationOffset(rawHeadingRef.current)
+    // setCalibrationOffset(rawHeadingRef.current)
     setHeading(0)
     samplesRef.current = []
     setHeadingStable(false)

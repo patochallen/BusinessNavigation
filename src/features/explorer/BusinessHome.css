@@ -70,19 +70,6 @@
   border-radius: 50%;
   background: #e4b544;
 }
-.north-button {
-  display: grid;
-  place-items: center;
-  border: 0;
-  color: #283632;
-  position: absolute;
-  right: 17px;
-  top: 17px;
-  width: 31px;
-  height: 31px;
-  border-radius: 50%;
-  background: rgba(246, 244, 238, 0.78);
-}
 .explore-section {
   padding-top: 24px;
   padding-bottom: 24px;

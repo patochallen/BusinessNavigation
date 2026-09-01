@@ -15,13 +15,19 @@ import { useGeolocation } from './services/location'
 import { useDeviceHeading } from './services/orientation'
 import { BusinessHome } from './features/explorer/BusinessHome'
 import { AttractionDetail } from './features/explorer/AttractionDetail'
-import { NavigationView } from './features/navigation/NavigationView'
+import { NewNavigationView } from './features/navigation/NewNavigationView'
 import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SettingsView } from './features/settings/SettingsView'
 import { AppHeader } from './features/layout/AppHeader'
 import { AppFooter } from './features/layout/AppFooter'
 import { LocationPermissionRequiredView } from './features/location/LocationPermissionRequiredView'
+import { localPointFromGps } from './domain/coordinates'
+import {
+  getDistanceAndHeadingBetweenLocations,
+  getDistanceBetweenLocations,
+} from './utils/location'
+import { SensorScreen } from './features/sensors/SensorScreen'
 
 const DEFAULT_BUSINESS_ID = import.meta.env.VITE_DEFAULT_BUSINESS_ID
 
@@ -78,6 +84,26 @@ function AppContent() {
       </main>
     )
 
+  if (isNavigation && attraction && position) {
+    // const distanceAndHeading = getDistanceAndHeadingBetweenLocations(
+    //   position.coords,
+    //   attraction.origin,
+    // )
+    // console.log('Navigating to attraction:', distanceAndHeading)
+    // const userPosition = localPointFromGps(business.mapOrigin, position.coords)
+    return (
+      <NewNavigationView
+        business={business}
+        selected={attraction}
+        userPosition={position.coords}
+        heading={360 - (headingState.heading ?? 0) + 11}
+        onBack={() => navigate(-1)}
+      />
+    )
+  }
+
+  // return <SensorScreen />
+
   return (
     <div className="app-shell">
       <AppHeader
@@ -106,19 +132,6 @@ function AppContent() {
             locationPermission={permission}
             headingPermission={headingState.permission}
             position={position}
-          />
-        ) : isNavigation ? (
-          <NavigationView
-            business={business}
-            selected={attraction}
-            position={position}
-            permission={permission}
-            errorMessage={errorMessage}
-            heading={headingState.heading}
-            headingPermission={headingState.permission}
-            enableHeading={enableHeading}
-            calibrateHeading={headingState.calibrate}
-            headingStable={headingState.headingStable}
           />
         ) : attractionId && attraction ? (
           <AttractionDetail
