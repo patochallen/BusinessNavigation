@@ -1,6 +1,7 @@
 import { Camera, Compass, LocateFixed, Navigation } from 'lucide-react'
 import { useState } from 'react'
 import type { Attraction, Business, LocationPermission } from '../../domain/types'
+import { center } from '../../utils/utils'
 import {
   distanceToNetwork,
   getBusinessMapWaypoints,
@@ -52,7 +53,9 @@ export function NavigationView({
   const [cameraVisible, setCameraVisible] = useState(false)
   const camera = useCameraStream()
   const distance =
-    position && selected ? getDistanceBetweenLocations(position.coords, selected.origin) : null //distanceInMeters(position, business, selected) : null
+    position && selected
+      ? getDistanceBetweenLocations(position.coords, selected.origin ?? center(selected.boundary))
+      : null //distanceInMeters(position, business, selected) : null
   const navigationState =
     permission === 'requesting'
       ? 'locating'

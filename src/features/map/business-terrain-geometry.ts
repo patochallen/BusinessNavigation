@@ -1,4 +1,4 @@
-import { ExtrudeGeometry, Shape, ShapeUtils, Vector2 } from 'three'
+import { Shape, ShapeUtils, Vector2, ShapeGeometry } from 'three'
 import type { Business } from '../../domain/types'
 import { getBusinessBoundaryMapPoints } from '../../domain/use-cases'
 
@@ -12,11 +12,12 @@ export function createBusinessTerrainGeometry(business: Business) {
   contour.slice(1).forEach((point) => shape.lineTo(point.x, point.y))
   shape.closePath()
 
-  const geometry = new ExtrudeGeometry(shape, {
-    depth: business.terrain.thicknessMeters,
-    bevelEnabled: false,
-    steps: 1,
-  })
+  const geometry = new ShapeGeometry(shape)
+  // new ExtrudeGeometry(shape, {
+  //   depth: business.terrain.thicknessMeters,
+  //   bevelEnabled: true,
+  //   steps: 1,
+  // })
   geometry.rotateX(Math.PI / 2)
   geometry.computeVertexNormals()
   return geometry

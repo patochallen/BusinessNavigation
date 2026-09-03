@@ -1,3 +1,6 @@
+import { degToRad } from 'three/src/math/MathUtils.js'
+import { getDistanceAndHeadingBetweenLocations } from '../utils/location'
+import { center } from '../utils/utils'
 import type {
   Attraction,
   Business,
@@ -8,17 +11,19 @@ import type {
   PathSegment,
   Waypoint,
 } from './types'
-import { localPointFromGps } from './coordinates'
+// import { localPointFromGps } from './coordinates'
+// import { center } from './coordinates'
 
 type ProjectedWaypoint = Omit<Waypoint, 'position'> & { position: MapPoint }
 
-export {
-  getBusinessBoundaryMapPoints,
-  getMapPointBounds,
-  localPointFromGps,
-  normalizeBoundary,
-  signedPolygonArea,
-} from './coordinates'
+// export {
+//   getBusinessBoundaryMapPoints,
+//   getMapPointBounds,
+//   localPointFromGps,
+//   normalizeBoundary,
+//   signedPolygonArea,
+// } from './coordinates'
+const POINT_EPSILON = 1e-8
 
 export function findBusiness(businesses: Business[], businessId: string) {
   return businesses.find((business) => business.id === businessId)
@@ -41,8 +46,56 @@ export function filterAttractions(
   })
 }
 
+export function localPointFromGps(mapOrigin: Coordinate, coordinate: Coordinate): MapPoint {
+  // Implement the conversion from GPS coordinates to local map coordinates here
+  // This is a placeholder implementation and should be replaced with the actual logic
+  const { distanceMeters, headingDegrees } = getDistanceAndHeadingBetweenLocations(
+    mapOrigin,
+    coordinate,
+  )
+  return {
+    x: distanceMeters * Math.sin(degToRad(headingDegrees)),
+    z: -distanceMeters * Math.cos(degToRad(headingDegrees)),
+  }
+}
+
+function sameMapPoint(first: MapPoint, second: MapPoint) {
+  return (
+    Math.abs(first.x - second.x) < POINT_EPSILON && Math.abs(first.z - second.z) < POINT_EPSILON
+  )
+}
+
+export function normalizeBoundary(points: MapPoint[]) {
+  const normalized = points.filter(
+    (point, index) => index === 0 || !sameMapPoint(point, points[index - 1]),
+  )
+  if (normalized.length > 1 && sameMapPoint(normalized[0], normalized[normalized.length - 1])) {
+    normalized.pop()
+  }
+  if (normalized.length < 3 || Math.abs(signedPolygonArea(normalized)) < POINT_EPSILON) {
+    throw new Error('Business boundary must contain at least three non-collinear points.')
+  }
+  return normalized
+}
+
+export function signedPolygonArea(points: MapPoint[]) {
+  return (
+    points.reduce((area, point, index) => {
+      const next = points[(index + 1) % points.length]
+      return area + point.x * next.z - next.x * point.z
+    }, 0) / 2
+  )
+}
+
+export function getBusinessBoundaryMapPoints(business: Business): MapPoint[] {
+  return normalizeBoundary(
+    // toPoints(business.boundary),
+    business.boundary.map((coordinate) => localPointFromGps(business.mapOrigin, coordinate)),
+  )
+}
+
 export function getAttractionMapPoint(business: Business, attraction: Attraction) {
-  return localPointFromGps(business.mapOrigin, attraction.origin)
+  return localPointFromGps(business.mapOrigin, attraction.origin ?? center(attraction.boundary))
 }
 
 export function getAttractionBoundaryMapPoints(business: Business, attraction: Attraction) {

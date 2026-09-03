@@ -7,6 +7,8 @@ type PermissionCapableOrientation = typeof DeviceOrientationEvent & {
   requestPermission?: () => Promise<'granted' | 'denied'>
 }
 
+const isMobile = false //typeof window !== 'undefined' && /Mobi|Android/i.test(navigator.userAgent)
+
 export function useDeviceHeading(enabled = true) {
   const [heading, setHeading] = useState<number | null>(null)
   const [permission, setPermission] = useState<LocationPermission>('idle')
@@ -36,6 +38,7 @@ export function useDeviceHeading(enabled = true) {
 
   useEffect(() => {
     if (!enabled || !supported || permission !== 'ready') return
+    console.log('Device orientation enabled isMobile:', isMobile, navigator.userAgent)
     const onOrientation = (event: CompassEvent) => {
       // console.log('Device orientation event:', event)
       const rawHeading =
@@ -43,15 +46,19 @@ export function useDeviceHeading(enabled = true) {
       if (rawHeading !== null) {
         const normalized = (rawHeading + 360) % 360
         rawHeadingRef.current = normalized
-        const calibrated = (normalized - calibrationOffset + 360) % 360
+        const calibrated = (normalized - calibrationOffset + 360 - (isMobile ? 11 : 0)) % 360
         samplesRef.current = [...samplesRef.current.slice(-7), calibrated]
         const spread = circularAngleSpread(samplesRef.current)
         setHeadingStable(samplesRef.current.length >= 3 && spread < 12)
         setHeading(calibrated)
       }
     }
-    window.addEventListener('deviceorientationabsolute', onOrientation)
-    return () => window.removeEventListener('deviceorientationabsolute', onOrientation)
+    if (isMobile) window.addEventListener('deviceorientationabsolute', onOrientation)
+    else window.addEventListener('deviceorientation', onOrientation)
+    return () => {
+      if (isMobile) window.removeEventListener('deviceorientationabsolute', onOrientation)
+      else window.removeEventListener('deviceorientation', onOrientation)
+    }
   }, [calibrationOffset, enabled, permission, supported])
 
   const calibrate = () => {

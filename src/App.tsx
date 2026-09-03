@@ -22,12 +22,12 @@ import { SettingsView } from './features/settings/SettingsView'
 import { AppHeader } from './features/layout/AppHeader'
 import { AppFooter } from './features/layout/AppFooter'
 import { LocationPermissionRequiredView } from './features/location/LocationPermissionRequiredView'
-import { localPointFromGps } from './domain/coordinates'
-import {
-  getDistanceAndHeadingBetweenLocations,
-  getDistanceBetweenLocations,
-} from './utils/location'
-import { SensorScreen } from './features/sensors/SensorScreen'
+// import { localPointFromGps } from './domain/coordinates'
+// import {
+//   getDistanceAndHeadingBetweenLocations,
+//   getDistanceBetweenLocations,
+// } from './utils/location'
+// import { SensorScreen } from './features/sensors/SensorScreen'
 
 const DEFAULT_BUSINESS_ID = import.meta.env.VITE_DEFAULT_BUSINESS_ID
 
@@ -96,7 +96,7 @@ function AppContent() {
         business={business}
         selected={attraction}
         userPosition={position.coords}
-        heading={360 - (headingState.heading ?? 0) + 11}
+        heading={360 - (headingState.heading ?? 0)}
         onBack={() => navigate(-1)}
       />
     )

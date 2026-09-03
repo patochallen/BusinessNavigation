@@ -1,5 +1,5 @@
 import './NewNavigationView.css'
-import type { Attraction, Business, MapPoint } from '../../domain/types'
+import type { Attraction, Business } from '../../domain/types'
 import { IconButton } from '../layout/IconButton'
 import { X } from 'lucide-react'
 import { NavigationMap } from '../map/NavigationMap'

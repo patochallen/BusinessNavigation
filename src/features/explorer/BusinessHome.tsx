@@ -11,10 +11,13 @@ import {
 } from '../../domain/use-cases'
 import { MapScene } from '../map/MapScene'
 import './BusinessHome.css'
-import { getDistanceAndHeadingBetweenLocations } from '../../utils/location'
+// import { getDistanceAndHeadingBetweenLocations } from '../../utils/location'
 import { AttractionItemList } from './AttractionItemList'
 import { useTranslation } from 'react-i18next'
 import { IconButton } from '../layout/IconButton'
+import { center } from '../../utils/utils'
+import { getDistanceAndHeadingBetweenLocations } from '../../utils/location'
+// import { center } from '../../domain/coordinates'
 
 type BusinessHomeProps = {
   business: Business
@@ -143,7 +146,7 @@ export function BusinessHome({
           {filtered.map((item) => {
             const { distanceMeters, headingDegrees } = getDistanceAndHeadingBetweenLocations(
               position?.coords ?? business.mapOrigin,
-              item.origin,
+              item.origin ?? center(item.boundary),
             )
             const Icon = icons[item.category]
             return (

@@ -1,8 +1,8 @@
 import { Canvas } from '@react-three/fiber'
 import { DeviceOrientationControls, Html, Line, PerspectiveCamera } from '@react-three/drei'
-import { createElement, useState } from 'react'
+import { useState } from 'react'
 import { CatmullRomCurve3, DoubleSide, ExtrudeGeometry, Shape, Vector2, Vector3 } from 'three'
-import type { Business, Category, Attraction } from '../../domain/types'
+import type { Business, Attraction } from '../../domain/types'
 import {
   getAttractionBoundaryMapPoints,
   getMapFeatureMapPoints,
@@ -12,6 +12,7 @@ import { BusinessTerrain } from './BusinessTerrain'
 import './MapScene.css'
 import { ArrowBigUpDash, Crosshair, RefreshCw, Trees, Utensils, Zap } from 'lucide-react'
 import { IconButton } from '../layout/IconButton'
+import { center } from '../../utils/utils'
 import { getDistanceAndHeadingBetweenLocations } from '../../utils/location'
 
 const CAMERA_FOV = 60
@@ -43,10 +44,13 @@ export function NavigationMap({
 }: NavigationMapProps) {
   const [cameraHeight, setCameraHeight] = useState(MIN_CAMERA_HEIGHT)
   const position = localPointFromGps(business.mapOrigin, userPosition)
-  const attractionPosition = localPointFromGps(business.mapOrigin, selectedAttraction.origin)
+  const attractionPosition = localPointFromGps(
+    business.mapOrigin,
+    selectedAttraction.origin ?? center(selectedAttraction.boundary),
+  )
   const distanceAndHeading = getDistanceAndHeadingBetweenLocations(
     userPosition,
-    selectedAttraction.origin,
+    selectedAttraction.origin ?? center(selectedAttraction.boundary),
   )
   const angleToAttraction = 360 - distanceAndHeading.headingDegrees
   console.log('heading:', heading, 'angle:', angleToAttraction.toFixed(2))
@@ -159,6 +163,7 @@ export function NavigationMap({
           <meshStandardMaterial color="red" />
         </mesh>
         <DeviceOrientationControls />
+        {/* <OrbitControls /> */}
       </Canvas>
       <div
         className="centered-circle"

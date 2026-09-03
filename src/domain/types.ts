@@ -49,11 +49,13 @@ export type Attraction = {
   name: string
   category: Category
   description: string
-  origin: Coordinate
+  origin?: Coordinate
+  elevationOrder?: number
   boundary: Coordinate[]
   imageUrl?: string
   iconUrl?: string
   color: string
+  opacity?: number
   tag: string
   waypointId?: string
 }
@@ -61,6 +63,7 @@ export type Attraction = {
 export type TerrainConfig = {
   color: string
   sideColor?: string
+  opacity?: number
   thicknessMeters: number
 }
 

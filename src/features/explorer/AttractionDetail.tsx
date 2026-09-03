@@ -16,6 +16,7 @@ import './AttractionDetail.css'
 import { routeDistanceToAttraction, walkingEtaFromDistance } from '../../domain/use-cases'
 import { getDistanceAndHeadingBetweenLocations } from '../../utils/location'
 import { useTranslation } from 'react-i18next'
+import { center } from '../../utils/utils'
 
 type AttractionDetailProps = {
   business: Business
@@ -36,7 +37,10 @@ export function AttractionDetail({
 }: AttractionDetailProps) {
   const { t } = useTranslation()
   const { distanceMeters, headingDegrees: calculatedHeadingDegrees } =
-    getDistanceAndHeadingBetweenLocations(position?.coords ?? business.mapOrigin, attraction.origin)
+    getDistanceAndHeadingBetweenLocations(
+      position?.coords ?? business.mapOrigin,
+      attraction.origin ?? center(attraction.boundary),
+    )
   const deg = heading ? (calculatedHeadingDegrees - heading + 360) % 360 : calculatedHeadingDegrees
   const headingDegrees = deg
   const [expanded, setExpanded] = useState(false)
