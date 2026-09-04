@@ -1,7 +1,12 @@
 import { Vector2, Vector3 } from 'three'
 import * as THREE from 'three'
 import type { Coordinate } from '../domain/types'
-
+export const isAndroid =
+  typeof navigator !== 'undefined' ? /Android/i.test(navigator.userAgent) : false
+export const isMobile =
+  typeof navigator !== 'undefined'
+    ? /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
+    : false
 export const toRadians = (degrees: number): number => (degrees * Math.PI) / 180
 export const toDegrees = (radians: number): number => (radians * 180) / Math.PI
 export const clamp = (value: number, min: number, max: number): number =>

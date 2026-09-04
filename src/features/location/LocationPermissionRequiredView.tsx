@@ -1,6 +1,7 @@
 import { LocateFixed, Monitor, ShieldAlert, Smartphone } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import './LocationPermissionRequiredView.css'
+import { isMobile } from '../../utils/utils'
 
 type LocationPermissionRequiredViewProps = {
   requesting: boolean
@@ -14,10 +15,6 @@ export function LocationPermissionRequiredView({
   onRetry,
 }: LocationPermissionRequiredViewProps) {
   const { t } = useTranslation()
-  const isMobile =
-    typeof navigator !== 'undefined'
-      ? /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
-      : false
 
   const openHelp = () => {
     if (typeof window === 'undefined') return

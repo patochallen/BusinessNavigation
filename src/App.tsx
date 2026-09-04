@@ -22,6 +22,7 @@ import { SettingsView } from './features/settings/SettingsView'
 import { AppHeader } from './features/layout/AppHeader'
 import { AppFooter } from './features/layout/AppFooter'
 import { LocationPermissionRequiredView } from './features/location/LocationPermissionRequiredView'
+import { isAndroid } from './utils/utils'
 // import { localPointFromGps } from './domain/coordinates'
 // import {
 //   getDistanceAndHeadingBetweenLocations,
@@ -117,7 +118,7 @@ function AppContent() {
         onOpenSettings={() => navigate(`/b/${business.id}/settings`)}
       />
       <main>
-        {permission === 'denied' ? (
+        {permission === 'denied' && isAndroid ? (
           <LocationPermissionRequiredView
             requesting={false}
             errorMessage={errorMessage}
