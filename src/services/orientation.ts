@@ -7,7 +7,7 @@ type PermissionCapableOrientation = typeof DeviceOrientationEvent & {
   requestPermission?: () => Promise<'granted' | 'denied'>
 }
 
-const isMobile = false //typeof window !== 'undefined' && /Mobi|Android/i.test(navigator.userAgent)
+const isMobile = typeof window !== 'undefined' && /Mobi|Android/i.test(navigator.userAgent)
 
 export function useDeviceHeading(enabled = true) {
   const [heading, setHeading] = useState<number | null>(null)

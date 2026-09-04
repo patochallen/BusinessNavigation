@@ -74,15 +74,7 @@ export function MapScene({
   )
   const camera = useMemo(() => {
     console.log('creating camera with position:', cameraPos)
-    return (
-      <PerspectiveCamera
-        key={cameraPos.toArray().toString()}
-        makeDefault
-        position={cameraPos}
-        fov={CAMERA_FOV}
-        near={0.5}
-      />
-    )
+    return <PerspectiveCamera makeDefault position={cameraPos} fov={CAMERA_FOV} near={0.5} />
     // const cam = new THREE.PerspectiveCamera(CAMERA_FOV, 1, 0.5, 1000)
     // cam.position.copy(cameraPos)
     // return c
