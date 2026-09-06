@@ -62,6 +62,8 @@ function AppContent() {
   const shouldShowHeaderBack = isSettings || isNavigation || isAttractionDetail
   const requestedAfterDeniedRef = useRef(false)
 
+  // console.log('isMobile:', 'ondeviceorientationabsolute' in window)
+
   useEffect(() => {
     void enableHeading()
   }, [enableHeading])
@@ -146,8 +148,9 @@ function AppContent() {
         ) : (
           <BusinessHome
             business={business}
-            permission={permission}
+            // permission={permission}
             position={position}
+            heading={headingState.heading}
             selectedAttractionId={mapAttractionId}
           />
         )}
@@ -178,3 +181,9 @@ function App() {
   )
 }
 export default App
+
+//Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36
+//Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Mobile Safari/537.36
+//Mozilla/5.0 (Linux; Android 7.0; SM-G950U Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Mobile Safari/537.36
+//Mozilla/5.0 (Linux; Android 9; SM-G950U1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Mobile Safari/537.36
+//Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Mobile Safari/537.36

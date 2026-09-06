@@ -117,6 +117,7 @@ export function NavigationView({
             business={business}
             routePoints={routePoints}
             userPosition={routePoints[0]}
+            heading={heading ?? 0}
             selectedId={selected?.id}
             onSelect={() => undefined}
             userActive={permission === 'ready'}

@@ -13,7 +13,7 @@ import { useState, useEffect } from 'react'
 import type { Attraction, Business } from '../../domain/types'
 import { categoryLabels } from '../../domain/demo-data'
 import './AttractionDetail.css'
-import { routeDistanceToAttraction, walkingEtaFromDistance } from '../../domain/use-cases'
+import { walkingEtaFromDistance } from '../../domain/use-cases'
 import { getDistanceAndHeadingBetweenLocations } from '../../utils/location'
 import { useTranslation } from 'react-i18next'
 import { center } from '../../utils/utils'
@@ -41,8 +41,9 @@ export function AttractionDetail({
       position?.coords ?? business.mapOrigin,
       attraction.origin ?? center(attraction.boundary),
     )
-  const deg = heading ? (calculatedHeadingDegrees - heading + 360) % 360 : calculatedHeadingDegrees
-  const headingDegrees = deg
+  const headingDegrees = heading
+    ? (calculatedHeadingDegrees - heading + 360) % 360
+    : calculatedHeadingDegrees
   const [expanded, setExpanded] = useState(false)
 
   useEffect(() => {
@@ -91,10 +92,7 @@ export function AttractionDetail({
         <div>
           <Clock3 size={17} />
           <span>
-            <strong>
-              {walkingEtaFromDistance(routeDistanceToAttraction(business, attraction)) ?? '—'}
-            </strong>{' '}
-            {t('common.walking')}
+            <strong>{walkingEtaFromDistance(distanceMeters) ?? '—'}</strong> {t('common.walking')}
           </span>
         </div>
         <div>

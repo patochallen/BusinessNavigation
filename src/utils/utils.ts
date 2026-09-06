@@ -1,14 +1,16 @@
 import { Vector2, Vector3 } from 'three'
 import * as THREE from 'three'
+import { degToRad, radToDeg } from 'three/src/math/MathUtils.js'
 import type { Coordinate } from '../domain/types'
+
 export const isAndroid =
   typeof navigator !== 'undefined' ? /Android/i.test(navigator.userAgent) : false
+export const isIOS =
+  typeof navigator !== 'undefined' ? /iPhone|iPad|iPod/i.test(navigator.userAgent) : false
 export const isMobile =
   typeof navigator !== 'undefined'
     ? /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
     : false
-export const toRadians = (degrees: number): number => (degrees * Math.PI) / 180
-export const toDegrees = (radians: number): number => (radians * 180) / Math.PI
 export const clamp = (value: number, min: number, max: number): number =>
   Math.min(max, Math.max(min, value))
 export const toCoordinate = (location?: GeolocationCoordinates | null): Coordinate => ({
@@ -30,8 +32,8 @@ export function center(CoordinateList: Coordinate[]): Coordinate {
 }
 
 export function toVector3(Coordinate: Coordinate): Vector3 {
-  const lat = toRadians(Coordinate.latitude)
-  const lng = toRadians(Coordinate.longitude)
+  const lat = degToRad(Coordinate.latitude)
+  const lng = degToRad(Coordinate.longitude)
   const radius = Earth.RADIUS
   const x = radius * Math.cos(lat) * Math.cos(lng)
   const y = radius * Math.cos(lat) * Math.sin(lng)
@@ -44,8 +46,8 @@ export function toPoints(CoordinateList: Coordinate[]): Vector2[] {
   return CoordinateList.map((point) => {
     const ang = SphericalUtil.computeHeading(location, point)
     const distance = SphericalUtil.computeDistanceBetween(location, point)
-    const left = Math.sin(toRadians(ang)) * distance
-    const bottom = Math.cos(toRadians(ang)) * distance
+    const left = Math.sin(degToRad(ang)) * distance
+    const bottom = Math.cos(degToRad(ang)) * distance
     return new Vector2(left, bottom)
   })
 }
@@ -140,10 +142,10 @@ export class SphericalUtil {
    * Result in degrees clockwise from North, clamped to [-180, 180].
    */
   static computeHeading(from: Coordinate, to: Coordinate): number {
-    const fromLat = toRadians(from.latitude)
-    const fromLng = toRadians(from.longitude)
-    const toLat = toRadians(to.latitude)
-    const toLng = toRadians(to.longitude)
+    const fromLat = degToRad(from.latitude)
+    const fromLng = degToRad(from.longitude)
+    const toLat = degToRad(to.latitude)
+    const toLng = degToRad(to.longitude)
     const dLng = toLng - fromLng
 
     const heading = Math.atan2(
@@ -151,7 +153,7 @@ export class SphericalUtil {
       Math.cos(fromLat) * Math.sin(toLat) - Math.sin(fromLat) * Math.cos(toLat) * Math.cos(dLng),
     )
 
-    return clamp(toDegrees(heading), -180, 180)
+    return clamp(radToDeg(heading), -180, 180)
   }
 
   /**
@@ -159,9 +161,9 @@ export class SphericalUtil {
    */
   static computeOffset(from: Coordinate, distance: number, heading: number): Coordinate {
     const dis = distance / Earth.RADIUS
-    const headingRad = toRadians(heading)
-    const fromLat = toRadians(from.latitude)
-    const fromLng = toRadians(from.longitude)
+    const headingRad = degToRad(heading)
+    const fromLat = degToRad(from.latitude)
+    const fromLng = degToRad(from.longitude)
     const cosDistance = Math.cos(dis)
     const sinDistance = Math.sin(dis)
     const sinFromLat = Math.sin(fromLat)
@@ -173,8 +175,8 @@ export class SphericalUtil {
     )
 
     return {
-      latitude: toDegrees(Math.asin(sinLat)),
-      longitude: toDegrees(fromLng + dLng),
+      latitude: radToDeg(Math.asin(sinLat)),
+      longitude: radToDeg(fromLng + dLng),
     }
   }
 
@@ -186,10 +188,10 @@ export class SphericalUtil {
   /** Returns the angle between two points, in radians. */
   static computeAngleBetween(from: Coordinate, to: Coordinate): number {
     return SphericalUtil.distanceRadians(
-      toRadians(from.latitude),
-      toRadians(from.longitude),
-      toRadians(to.latitude),
-      toRadians(to.longitude),
+      degToRad(from.latitude),
+      degToRad(from.longitude),
+      degToRad(to.latitude),
+      degToRad(to.longitude),
     )
   }
 

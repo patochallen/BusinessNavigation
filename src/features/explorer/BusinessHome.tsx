@@ -3,26 +3,20 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Business, Category } from '../../domain/types'
 import { categoryLabels } from '../../domain/demo-data'
-import {
-  filterAttractions,
-  localPointFromGps,
-  routeDistanceToAttraction,
-  walkingEtaFromDistance,
-} from '../../domain/use-cases'
-import { MapScene } from '../map/MapScene'
+import { filterAttractions, walkingEtaFromDistance } from '../../domain/use-cases'
 import './BusinessHome.css'
 // import { getDistanceAndHeadingBetweenLocations } from '../../utils/location'
 import { AttractionItemList } from './AttractionItemList'
 import { useTranslation } from 'react-i18next'
-import { IconButton } from '../layout/IconButton'
 import { center } from '../../utils/utils'
 import { getDistanceAndHeadingBetweenLocations } from '../../utils/location'
+import { MapScene2 } from '../map/MapScene2'
 // import { center } from '../../domain/coordinates'
 
 type BusinessHomeProps = {
   business: Business
-  permission: string
   position: GeolocationPosition | null
+  heading?: number | null
   selectedAttractionId?: string
 }
 
@@ -35,18 +29,18 @@ const icons: Record<Category, typeof Compass> = {
 
 export function BusinessHome({
   business,
-  permission,
   position,
+  heading,
   selectedAttractionId,
 }: BusinessHomeProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const [selectedId, setSelectedId] = useState(selectedAttractionId)
+  // const [selectedId, setSelectedId] = useState(selectedAttractionId)
   const [category, setCategory] = useState<'all' | Category>('all')
   const [query, setQuery] = useState('')
-  const activeSelectedId = selectedAttractionId ?? selectedId
-  const selected = business.attractions.find((item) => item.id === activeSelectedId)
-  const userPosition = position ? localPointFromGps(business.mapOrigin, position.coords) : undefined
+  // const activeSelectedId = selectedAttractionId ?? selectedId
+  // const selected = business.attractions.find((item) => item.id === activeSelectedId)
+  // const userPosition = position ? localPointFromGps(business.mapOrigin, position.coords) : undefined
   const filtered = useMemo(
     () => filterAttractions(business.attractions, category, query),
     [business.attractions, category, query],
@@ -69,20 +63,23 @@ export function BusinessHome({
       </section>
       <section className="map-section">
         <div className="map-frame">
-          <MapScene
-            key={selectedAttractionId ?? 'overview'}
-            business={business}
-            userPosition={userPosition}
-            selectedId={selected?.id}
-            centerOnSelected={Boolean(selectedAttractionId)}
-            onSelect={(attractionId) => {
-              setSelectedId(attractionId)
-              navigate(`/b/${business.id}/a/${attractionId}`)
-              // setSelectedId(attractionId)
-              // navigate(`/b/${business.id}?attraction=${attractionId}`, { replace: true })
-            }}
-            userActive={permission === 'ready'}
-          />
+          {position && (
+            <MapScene2
+              key={selectedAttractionId ?? 'overview'}
+              business={business}
+              userPosition={position.coords}
+              heading={heading ?? 0}
+              // selectedId={selected?.id}
+              // centerOnSelected={Boolean(selectedAttractionId)}
+              onSelect={(attractionId) => {
+                // setSelectedId(attractionId)
+                navigate(`/b/${business.id}/a/${attractionId}`)
+                // setSelectedId(attractionId)
+                // navigate(`/b/${business.id}?attraction=${attractionId}`, { replace: true })
+              }}
+              // userActive={permission === 'ready'}
+            />
+          )}
           {business.mapLabels?.map((mapLabel) => (
             <div
               className="map-label"
@@ -99,14 +96,14 @@ export function BusinessHome({
             <span className="legend-dot" />{' '}
             {t('explorer.pointsOfInterest', { count: business.attractions.length })}
           </div>
-          <IconButton
+          {/* <IconButton
             icon={<Compass />}
             position="topRight"
             onClick={() => {
               setSelectedId(undefined)
               navigate(`/b/${business.id}`, { replace: true })
             }}
-          />
+          /> */}
         </div>
       </section>
       <section className="explore-section">
@@ -148,6 +145,7 @@ export function BusinessHome({
               position?.coords ?? business.mapOrigin,
               item.origin ?? center(item.boundary),
             )
+            // console.log(item.name, 'heading:', heading, 'headingDegrees:', headingDegrees)
             const Icon = icons[item.category]
             return (
               <AttractionItemList
@@ -157,14 +155,12 @@ export function BusinessHome({
                 name={item.name}
                 description={item.description}
                 category={t(`categories.${item.category}`)}
-                walkingEta={
-                  walkingEtaFromDistance(routeDistanceToAttraction(business, item)) ?? '—'
-                }
+                walkingEta={walkingEtaFromDistance(distanceMeters) ?? '—'}
                 distanceMeters={`${Math.round(distanceMeters)} m.`}
                 headingDegrees={headingDegrees}
                 icon={Icon}
                 onClick={() => {
-                  setSelectedId(item.id)
+                  // setSelectedId(item.id)
                   navigate(`/b/${business.id}/a/${item.id}`)
                 }}
               />

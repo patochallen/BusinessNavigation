@@ -1,20 +1,11 @@
 import { Canvas } from '@react-three/fiber'
 import { CameraControls, Html, Line, PerspectiveCamera } from '@react-three/drei'
 import { useMemo, useRef, useState } from 'react'
-import {
-  CatmullRomCurve3,
-  DoubleSide,
-  // PerspectiveCamera,
-  Shape,
-  ShapeGeometry,
-  Vector2,
-  Vector3,
-} from 'three'
+import { CatmullRomCurve3, DoubleSide, Shape, ShapeGeometry, Vector2, Vector3 } from 'three'
 import type { Business, Category, MapPoint } from '../../domain/types'
 import {
   getAttractionMapPoint,
   getAttractionBoundaryMapPoints,
-  // getBusinessBoundaryMapPoints,
   getMapFeatureMapPoints,
   getBusinessBoundaryMapPoints,
 } from '../../domain/use-cases'
@@ -22,6 +13,8 @@ import { BusinessTerrain } from './BusinessTerrain'
 import './MapScene.css'
 import { Crosshair, Navigation, RefreshCwOff, Trees, Utensils, X, Zap } from 'lucide-react'
 import { IconButton } from '../layout/IconButton'
+import { CompassView } from './CompassView'
+import { radToDeg } from 'three/src/math/MathUtils.js'
 
 const CAMERA_FOV = 60
 const MIN_CAMERA_HEIGHT = 3
@@ -39,7 +32,8 @@ const categoryIcons = {
 type MapSceneProps = {
   business: Business
   routePoints?: { x: number; z: number }[]
-  userPosition?: MapPoint
+  userPosition: MapPoint
+  heading: number
   selectedId?: string
   centerOnSelected?: boolean
   onSelect: (id: string) => void
@@ -50,6 +44,7 @@ export function MapScene({
   business,
   routePoints = [],
   userPosition,
+  heading,
   selectedId,
   centerOnSelected = false,
   onSelect,
@@ -57,6 +52,7 @@ export function MapScene({
 }: MapSceneProps) {
   const [popupAttractionId, setPopupAttractionId] = useState<string | null>(null)
   const boundaryPoints = getBusinessBoundaryMapPoints(business)
+  const position = userPosition
 
   const selectedAttraction = business.attractions.find((attraction) => attraction.id === selectedId)
   const selectedPoint = selectedAttraction && getAttractionMapPoint(business, selectedAttraction)
@@ -66,40 +62,35 @@ export function MapScene({
   )
   const cameraHeight = centerOnSelected
     ? MIN_CAMERA_HEIGHT
-    : Math.max(MIN_CAMERA_HEIGHT, (focusRadius * 1.4) / Math.tan((CAMERA_FOV * Math.PI) / 360))
+    : Math.max(MIN_CAMERA_HEIGHT, (focusRadius * 1) / Math.tan((CAMERA_FOV * Math.PI) / 360))
   const controlsRef = useRef<CameraControls | null>(null)
   const cameraPos = useMemo(
-    () => new Vector3(userPosition?.x ?? 0, cameraHeight, userPosition?.z ?? 0),
-    [userPosition, cameraHeight],
+    () => new Vector3(position.x, cameraHeight, position.z),
+    [position, cameraHeight],
   )
-  const camera = useMemo(() => {
-    console.log('creating camera with position:', cameraPos)
-    return <PerspectiveCamera makeDefault position={cameraPos} fov={CAMERA_FOV} near={0.5} />
-    // const cam = new THREE.PerspectiveCamera(CAMERA_FOV, 1, 0.5, 1000)
-    // cam.position.copy(cameraPos)
-    // return c
-  }, [cameraPos])
+  // const camera = useMemo(() => {
+  //   console.log('creating camera with position:', cameraPos)
+  //   return <PerspectiveCamera makeDefault position={cameraPos} fov={CAMERA_FOV} near={0.5} />
+  //   // const cam = new THREE.PerspectiveCamera(CAMERA_FOV, 1, 0.5, 1000)
+  //   // cam.position.copy(cameraPos)
+  //   // return c
+  // }, [cameraPos])
   // console.log('cameraPos:', cameraPos)
 
   return (
     <>
       <Canvas className="map-canvas" dpr={[1, 2]}>
-        {camera}
+        {/* {camera} */}
         {/* <perspectiveCamera
           position={[cameraPos.x, cameraPos.y, cameraPos.z]}
           fov={CAMERA_FOV}
           near={0.5}
         /> */}
-        {/* <PerspectiveCamera
-          makeDefault
-          position={[cameraPos.x, cameraPos.y, cameraPos.z]}
-          fov={CAMERA_FOV}
-          near={0.5}
-        /> */}
+        <PerspectiveCamera makeDefault position={cameraPos} fov={CAMERA_FOV} near={0.5} />
         <ambientLight intensity={1.8} />
         <directionalLight position={[3, 8, 2]} intensity={2.5} color="#fff1d0" />
         <BusinessTerrain business={business} />
-        <mesh position={[userPosition?.x ?? 0, 0, userPosition?.z ?? 0]}>
+        <mesh position={[position.x, 0, position.z]}>
           <sphereGeometry args={[1, 32, 32]} />
           <meshStandardMaterial color="#e0e0e0" />
         </mesh>
@@ -240,8 +231,8 @@ export function MapScene({
             </Html>
           )
         })}
-        {userActive && userPosition && (
-          <group position={[userPosition.x, 0.3, userPosition.z]}>
+        {userActive && position && (
+          <group position={[position.x, 0.3, position.z]}>
             <mesh>
               <coneGeometry args={[0.2, 0.45, 16]} />
               <meshStandardMaterial
@@ -277,6 +268,43 @@ export function MapScene({
         onClick={() => {
           setPopupAttractionId(null)
           controlsRef.current?.reset(true)
+        }}
+      />
+      <IconButton
+        icon={<RefreshCwOff />}
+        position="topRight"
+        onClick={() => {
+          controlsRef.current?.setTarget(...[position.x, 0, position.z], true)
+        }}
+      />
+      <CompassView heading={heading} />
+      <IconButton
+        icon={<RefreshCwOff />}
+        position="bottomLeft"
+        onClick={() => {
+          console.log(
+            'Button clicked',
+            controlsRef.current?.camera?.rotation
+              .toArray()
+              .filter((v) => typeof v === 'number')
+              .map((v) => radToDeg(v).toFixed(2)),
+          )
+          // const heading = SphericalUtil.computeHeading(userPosition, Earth.NORTH)
+          // const newPos = SphericalUtil.computeOffset(userPosition, 10, heading)
+          // const newPoint = localPointFromGps(business.mapOrigin, newPos)
+          // const vec = controlsRef.current?.getTarget(new Vector3()) ?? new Vector3()
+          // // const { distanceMeters, headingDegrees } = getDistanceAndHeadingBetweenLocations(
+          // //   userPosition,
+          // //   Earth.NORTH,
+          // // )
+          // console.log('bottomLeft icon button clicked: ', newPoint, 'computed heading:', -heading)
+          // if (vec.x === 0 && vec.z === 0) {
+          //   controlsRef.current?.setTarget(newPoint.x, 0, newPoint.z)
+          // } else {
+          //   controlsRef.current?.setTarget(0, 0, 0)
+          // }
+          // setPopupAttractionId(null)
+          // controlsRef.current?.reset(true)
         }}
       />
     </>

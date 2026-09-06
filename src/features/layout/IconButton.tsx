@@ -3,15 +3,16 @@ import { cloneElement } from 'react'
 
 type IconPosition = 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight'
 
-type IconButtonProps = {
+type IconButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   icon: React.ReactElement<LucideProps>
   position?: IconPosition
   onClick?: () => void
 }
 
-export const IconButton = ({ icon, position, onClick }: IconButtonProps) => {
+export const IconButton = ({ icon, position, onClick, ...props }: IconButtonProps) => {
   return (
     <button
+      {...props}
       style={{
         position: 'absolute',
         width: '31px',
@@ -28,6 +29,7 @@ export const IconButton = ({ icon, position, onClick }: IconButtonProps) => {
         display: 'grid',
         alignItems: 'center',
         justifyItems: 'center',
+        zIndex: 20,
       }}
       onClick={onClick}
     >

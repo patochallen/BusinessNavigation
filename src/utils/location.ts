@@ -1,31 +1,20 @@
-// import { Vector3 } from "three"
-
+import { degToRad, radToDeg } from 'three/src/math/MathUtils.js'
 import type { Coordinate } from '../domain/types'
-
-// export type LocationPoint = {
-//   latitude: number
-//   longitude: number
-//   altitude?: number | null
-// }
+import { Earth } from './utils'
 
 export type DistanceAndHeading = {
   distanceMeters: number
   headingDegrees: number
 }
 
-const EARTH_RADIUS_METERS = 6371000
-
-const toRadians = (degrees: number): number => (degrees * Math.PI) / 180
-const toDegrees = (radians: number): number => (radians * 180) / Math.PI
-
 export const getDistanceAndHeadingBetweenLocations = (
   from: Coordinate,
   to: Coordinate,
 ): DistanceAndHeading => {
-  const fromLat = toRadians(from.latitude)
-  const fromLng = toRadians(from.longitude)
-  const toLat = toRadians(to.latitude)
-  const toLng = toRadians(to.longitude)
+  const fromLat = degToRad(from.latitude)
+  const fromLng = degToRad(from.longitude)
+  const toLat = degToRad(to.latitude)
+  const toLng = degToRad(to.longitude)
 
   const deltaLat = toLat - fromLat
   const deltaLng = toLng - fromLng
@@ -33,12 +22,12 @@ export const getDistanceAndHeadingBetweenLocations = (
   const haversineA =
     Math.sin(deltaLat / 2) ** 2 + Math.cos(fromLat) * Math.cos(toLat) * Math.sin(deltaLng / 2) ** 2
   const haversineC = 2 * Math.atan2(Math.sqrt(haversineA), Math.sqrt(1 - haversineA))
-  const distanceMeters = EARTH_RADIUS_METERS * haversineC
+  const distanceMeters = Earth.RADIUS * haversineC
 
   const y = Math.sin(deltaLng) * Math.cos(toLat)
   const x =
     Math.cos(fromLat) * Math.sin(toLat) - Math.sin(fromLat) * Math.cos(toLat) * Math.cos(deltaLng)
-  const headingDegrees = (toDegrees(Math.atan2(y, x)) + 360) % 360
+  const headingDegrees = (radToDeg(Math.atan2(y, x)) + 360) % 360
 
   return {
     distanceMeters,
@@ -56,24 +45,24 @@ export const moveLocation = (
   distanceMeters: number,
   headingDegrees: number,
 ): Coordinate => {
-  const lat = toRadians(location.latitude)
-  const lng = toRadians(location.longitude)
-  const heading = toRadians(headingDegrees)
+  const lat = degToRad(location.latitude)
+  const lng = degToRad(location.longitude)
+  const heading = degToRad(headingDegrees)
 
   const newLat = Math.asin(
-    Math.sin(lat) * Math.cos(distanceMeters / EARTH_RADIUS_METERS) +
-      Math.cos(lat) * Math.sin(distanceMeters / EARTH_RADIUS_METERS) * Math.cos(heading),
+    Math.sin(lat) * Math.cos(distanceMeters / Earth.RADIUS) +
+      Math.cos(lat) * Math.sin(distanceMeters / Earth.RADIUS) * Math.cos(heading),
   )
   const newLng =
     lng +
     Math.atan2(
-      Math.sin(heading) * Math.sin(distanceMeters / EARTH_RADIUS_METERS) * Math.cos(lat),
-      Math.cos(distanceMeters / EARTH_RADIUS_METERS) - Math.sin(lat) * Math.sin(newLat),
+      Math.sin(heading) * Math.sin(distanceMeters / Earth.RADIUS) * Math.cos(lat),
+      Math.cos(distanceMeters / Earth.RADIUS) - Math.sin(lat) * Math.sin(newLat),
     )
 
   return {
-    latitude: toDegrees(newLat),
-    longitude: toDegrees(newLng),
+    latitude: radToDeg(newLat),
+    longitude: radToDeg(newLng),
     altitude: location.altitude,
   }
 }
@@ -83,24 +72,24 @@ export const moveLatLng = (
   distanceMeters: number,
   headingDegrees: number,
 ): Coordinate => {
-  const lat = toRadians(location.latitude)
-  const lng = toRadians(location.longitude)
-  const heading = toRadians(headingDegrees)
+  const lat = degToRad(location.latitude)
+  const lng = degToRad(location.longitude)
+  const heading = degToRad(headingDegrees)
 
   const newLat = Math.asin(
-    Math.sin(lat) * Math.cos(distanceMeters / EARTH_RADIUS_METERS) +
-      Math.cos(lat) * Math.sin(distanceMeters / EARTH_RADIUS_METERS) * Math.cos(heading),
+    Math.sin(lat) * Math.cos(distanceMeters / Earth.RADIUS) +
+      Math.cos(lat) * Math.sin(distanceMeters / Earth.RADIUS) * Math.cos(heading),
   )
   const newLng =
     lng +
     Math.atan2(
-      Math.sin(heading) * Math.sin(distanceMeters / EARTH_RADIUS_METERS) * Math.cos(lat),
-      Math.cos(distanceMeters / EARTH_RADIUS_METERS) - Math.sin(lat) * Math.sin(newLat),
+      Math.sin(heading) * Math.sin(distanceMeters / Earth.RADIUS) * Math.cos(lat),
+      Math.cos(distanceMeters / Earth.RADIUS) - Math.sin(lat) * Math.sin(newLat),
     )
 
   return {
-    latitude: toDegrees(newLat),
-    longitude: toDegrees(newLng),
+    latitude: radToDeg(newLat),
+    longitude: radToDeg(newLng),
   }
 }
 
@@ -134,8 +123,8 @@ export const getRelativeHeadingDegrees = (deviceHeading: number, targetHeading: 
 
 // export const getOffsetRelativeToLocation = (from: DeviceLocation, to: DeviceLocation): Vector3 => {
 //   const { distanceMeters, headingDegrees } = getDistanceAndHeadingBetweenLocations(from, to)
-//   const eastMeters = distanceMeters * Math.sin(toRadians(headingDegrees))
-//   const northMeters = -distanceMeters * Math.cos(toRadians(headingDegrees))
+//   const eastMeters = distanceMeters * Math.sin(degToRad(headingDegrees))
+//   const northMeters = -distanceMeters * Math.cos(degToRad(headingDegrees))
 //   return new Vector3(eastMeters, 0, northMeters)
 // }
 
@@ -155,17 +144,17 @@ export const getRelativeHeadingDegrees = (deviceHeading: number, targetHeading: 
 
 // const EARTH_RADIUS_METERS = 6371000
 
-// const toRadians = (degrees: number): number => (degrees * Math.PI) / 180
-// const toDegrees = (radians: number): number => (radians * 180) / Math.PI
+// const degToRad = (degrees: number): number => (degrees * Math.PI) / 180
+// const degToRad = (radians: number): number => (radians * 180) / Math.PI
 
 // export const getDistanceAndHeadingBetweenLocations = (
 //   from: Coordinate,
 //   to: Coordinate,
 // ): DistanceAndHeading => {
-//   const fromLat = toRadians(from.latitude)
-//   const fromLng = toRadians(from.longitude)
-//   const toLat = toRadians(to.latitude)
-//   const toLng = toRadians(to.longitude)
+//   const fromLat = degToRad(from.latitude)
+//   const fromLng = degToRad(from.longitude)
+//   const toLat = degToRad(to.latitude)
+//   const toLng = degToRad(to.longitude)
 
 //   const deltaLat = toLat - fromLat
 //   const deltaLng = toLng - fromLng
@@ -178,7 +167,7 @@ export const getRelativeHeadingDegrees = (deviceHeading: number, targetHeading: 
 //   const y = Math.sin(deltaLng) * Math.cos(toLat)
 //   const x =
 //     Math.cos(fromLat) * Math.sin(toLat) - Math.sin(fromLat) * Math.cos(toLat) * Math.cos(deltaLng)
-//   const headingDegrees = (toDegrees(Math.atan2(y, x)) + 360) % 360
+//   const headingDegrees = (degToRad(Math.atan2(y, x)) + 360) % 360
 
 //   return {
 //     distanceMeters,
@@ -196,9 +185,9 @@ export const getRelativeHeadingDegrees = (deviceHeading: number, targetHeading: 
 //   distanceMeters: number,
 //   headingDegrees: number,
 // ): Coordinate => {
-//   const lat = toRadians(location.latitude)
-//   const lng = toRadians(location.longitude)
-//   const heading = toRadians(headingDegrees)
+//   const lat = degToRad(location.latitude)
+//   const lng = degToRad(location.longitude)
+//   const heading = degToRad(headingDegrees)
 
 //   const newLat = Math.asin(
 //     Math.sin(lat) * Math.cos(distanceMeters / EARTH_RADIUS_METERS) +
@@ -212,8 +201,8 @@ export const getRelativeHeadingDegrees = (deviceHeading: number, targetHeading: 
 //     )
 
 //   return {
-//     latitude: toDegrees(newLat),
-//     longitude: toDegrees(newLng),
+//     latitude: degToRad(newLat),
+//     longitude: degToRad(newLng),
 //     altitude: location.altitude,
 //   }
 // }
@@ -223,9 +212,9 @@ export const getRelativeHeadingDegrees = (deviceHeading: number, targetHeading: 
 //   distanceMeters: number,
 //   headingDegrees: number,
 // ): Coordinate => {
-//   const lat = toRadians(location.latitude)
-//   const lng = toRadians(location.longitude)
-//   const heading = toRadians(headingDegrees)
+//   const lat = degToRad(location.latitude)
+//   const lng = degToRad(location.longitude)
+//   const heading = degToRad(headingDegrees)
 
 //   const newLat = Math.asin(
 //     Math.sin(lat) * Math.cos(distanceMeters / EARTH_RADIUS_METERS) +
@@ -239,8 +228,8 @@ export const getRelativeHeadingDegrees = (deviceHeading: number, targetHeading: 
 //     )
 
 //   return {
-//     latitude: toDegrees(newLat),
-//     longitude: toDegrees(newLng),
+//     latitude: degToRad(newLat),
+//     longitude: degToRad(newLng),
 //   }
 // }
 
@@ -274,7 +263,7 @@ export const getRelativeHeadingDegrees = (deviceHeading: number, targetHeading: 
 
 // export const getOffsetRelativeToLocation = (from: Coordinate, to: Coordinate): Vector3 => {
 //   const { distanceMeters, headingDegrees } = getDistanceAndHeadingBetweenLocations(from, to)
-//   const eastMeters = distanceMeters * Math.sin(toRadians(headingDegrees))
-//   const northMeters = -distanceMeters * Math.cos(toRadians(headingDegrees))
+//   const eastMeters = distanceMeters * Math.sin(degToRad(headingDegrees))
+//   const northMeters = -distanceMeters * Math.cos(degToRad(headingDegrees))
 //   return new Vector3(eastMeters, 0, northMeters)
 // }
