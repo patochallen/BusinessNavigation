@@ -9,7 +9,6 @@ import {
   localPointFromGps,
   getAttractionMapPoint,
   getAttractionBoundaryMapPoints,
-  getMapFeatureMapPoints,
   nextRouteInstruction,
   bearingToPoint,
   nearestWaypoint,
