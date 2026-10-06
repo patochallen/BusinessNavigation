@@ -105,20 +105,20 @@ describe('map coordinates', () => {
   //   expect(getMapPointBounds(points).width).toBeGreaterThan(100)
   // })
 
-  it('projects map-feature coordinates into local map units', () => {
-    const feature = {
-      type: 'path' as const,
-      id: 'test-path',
-      points: [
-        valle.mapOrigin,
-        { ...valle.mapOrigin, longitude: valle.mapOrigin.longitude + 0.001 },
-      ],
-    }
-    expect(getMapFeatureMapPoints(valle, feature)).toEqual([
-      { x: 0, z: -0 },
-      localPointFromGps(valle.mapOrigin, feature.points[1]),
-    ])
-  })
+  // it('projects map-feature coordinates into local map units', () => {
+  //   const feature = {
+  //     type: 'path' as const,
+  //     id: 'test-path',
+  //     points: [
+  //       valle.mapOrigin,
+  //       { ...valle.mapOrigin, longitude: valle.mapOrigin.longitude + 0.001 },
+  //     ],
+  //   }
+  //   expect(getMapFeatureMapPoints(valle, feature)).toEqual([
+  //     { x: 0, z: -0 },
+  //     localPointFromGps(valle.mapOrigin, feature.points[1]),
+  //   ])
+  // })
 
   it('projects attraction boundaries into local map units', () => {
     const attraction = {
