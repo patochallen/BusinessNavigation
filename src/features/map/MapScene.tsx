@@ -115,18 +115,18 @@ export function MapScene({
               </mesh>
             )
           }
-          if (feature.type === 'building') {
-            return (
-              <mesh
-                key={feature.id}
-                position={[feature.position.x, 0.18, feature.position.z]}
-                scale={3}
-              >
-                <boxGeometry args={[feature.size.x, 0.32, feature.size.z]} />
-                <meshStandardMaterial color={feature.color} />
-              </mesh>
-            )
-          }
+          // if (feature.type === 'building') {
+          //   return (
+          //     <mesh
+          //       key={feature.id}
+          //       position={[feature.position.x, 0.18, feature.position.z]}
+          //       scale={3}
+          //     >
+          //       <boxGeometry args={[feature.size.x, 0.32, feature.size.z]} />
+          //       <meshStandardMaterial color={feature.color} />
+          //     </mesh>
+          //   )
+          // }
           const minX = Math.min(...featurePoints.map((point) => point.x))
           const maxX = Math.max(...featurePoints.map((point) => point.x))
           const minZ = Math.min(...featurePoints.map((point) => point.z))
