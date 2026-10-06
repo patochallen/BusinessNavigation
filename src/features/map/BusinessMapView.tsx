@@ -1,7 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import type { Business, Category, Coordinate, MapPoint, Attraction } from '../../domain/types'
 import {
-  Box3,
   BoxGeometry,
   BufferGeometry,
   CatmullRomCurve3,
@@ -23,8 +22,6 @@ import { Crosshair, Trees, Utensils, Zap } from 'lucide-react'
 import { Html } from '@react-three/drei'
 import { useLoader } from '@react-three/fiber'
 import { GLTFLoader, OBJLoader } from 'three/examples/jsm/Addons.js'
-import { degToRad } from 'three/src/math/MathUtils.js'
-import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 
 const categoryIcons = {
   food: Utensils,
@@ -166,10 +163,7 @@ function createMesh(
   opacity: number = 1,
   side: Side = DoubleSide,
 ): Mesh {
-  const mesh = new Mesh(
-    geometry,
-    new MeshStandardMaterial({ color, transparent: true, opacity: 0.3, side }),
-  )
+  const mesh = new Mesh(geometry, new MeshStandardMaterial({ color, transparent, opacity, side }))
   mesh.receiveShadow = receiveShadow
   return mesh
 }

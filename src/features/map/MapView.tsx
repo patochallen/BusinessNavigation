@@ -28,7 +28,7 @@ type MapViewProps = {
   selectedAttraction?: Attraction | null
 }
 
-export function MapView({ business, userPosition, heading, onSelect }: MapViewProps) {
+export function MapView({ business, userPosition, heading }: MapViewProps) {
   const mapBoundary = toBoundary(business.boundary)
   // const distanceToBusiness = SphericalUtil.computeDistanceBetween(business.mapOrigin, userPosition)
   // const headingToBusiness = SphericalUtil.computeHeading(business.mapOrigin, userPosition)

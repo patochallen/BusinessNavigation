@@ -15,16 +15,14 @@ import { useGeolocation } from './services/location'
 import { useDeviceHeading } from './services/orientation'
 import { BusinessHome } from './features/explorer/BusinessHome'
 import { AttractionDetail } from './features/explorer/AttractionDetail'
-import { NewNavigationView } from './features/navigation/NewNavigationView'
 import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SettingsView } from './features/settings/SettingsView'
 import { AppHeader } from './features/layout/AppHeader'
 import { AppFooter } from './features/layout/AppFooter'
 import { LocationPermissionRequiredView } from './features/location/LocationPermissionRequiredView'
-import { isAndroid, SphericalUtil } from './utils/utils'
+import { isAndroid } from './utils/utils'
 import { MapView } from './features/map/MapView'
-import { MathUtils } from 'three'
 // import { localPointFromGps } from './domain/coordinates'
 // import {
 //   getDistanceAndHeadingBetweenLocations,
@@ -72,10 +70,10 @@ function AppContent() {
 
   // useEffect(() => {
   //   console.log('enableHeading called')
-  window.SphericalUtil = SphericalUtil
-  window.business = business
-  window.position = position?.coords
-  window.MathUtils = MathUtils
+  // window.SphericalUtil = SphericalUtil
+  // window.business = business
+  // window.position = position?.coords
+  // window.MathUtils = MathUtils
   // }, [window])
 
   useEffect(() => {
