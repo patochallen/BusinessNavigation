@@ -22,7 +22,9 @@ import { SettingsView } from './features/settings/SettingsView'
 import { AppHeader } from './features/layout/AppHeader'
 import { AppFooter } from './features/layout/AppFooter'
 import { LocationPermissionRequiredView } from './features/location/LocationPermissionRequiredView'
-import { isAndroid } from './utils/utils'
+import { isAndroid, SphericalUtil } from './utils/utils'
+import { MapView } from './features/map/MapView'
+import { MathUtils } from 'three'
 // import { localPointFromGps } from './domain/coordinates'
 // import {
 //   getDistanceAndHeadingBetweenLocations,
@@ -68,6 +70,14 @@ function AppContent() {
     void enableHeading()
   }, [enableHeading])
 
+  // useEffect(() => {
+  //   console.log('enableHeading called')
+  window.SphericalUtil = SphericalUtil
+  window.business = business
+  window.position = position?.coords
+  window.MathUtils = MathUtils
+  // }, [window])
+
   useEffect(() => {
     if (permission === 'ready' && requestedAfterDeniedRef.current && business) {
       requestedAfterDeniedRef.current = false
@@ -87,6 +97,16 @@ function AppContent() {
       </main>
     )
 
+  // if (position?.coords)
+  //   return (
+  //     <MapView
+  //       business={business}
+  //       userPosition={position.coords}
+  //       heading={360 - (headingState.heading ?? 0)}
+  //       onSelect={() => {}}
+  //     />
+  //   )
+
   if (isNavigation && attraction && position) {
     // const distanceAndHeading = getDistanceAndHeadingBetweenLocations(
     //   position.coords,
@@ -95,12 +115,12 @@ function AppContent() {
     // console.log('Navigating to attraction:', distanceAndHeading)
     // const userPosition = localPointFromGps(business.mapOrigin, position.coords)
     return (
-      <NewNavigationView
+      <MapView
         business={business}
-        selected={attraction}
         userPosition={position.coords}
         heading={360 - (headingState.heading ?? 0)}
-        onBack={() => navigate(-1)}
+        onSelect={() => {}}
+        // selectedAttraction={attraction}
       />
     )
   }

@@ -1,3 +1,5 @@
+import type { Vector3 } from 'three'
+
 export type Category = 'food' | 'adventure' | 'services' | 'nature'
 
 export type Coordinate = {
@@ -18,7 +20,12 @@ export type MapLabel = {
 }
 
 export type MapFeature =
-  | { type: 'path'; id: string; points: Coordinate[] }
+  | {
+      type: 'path'
+      id: string
+      points: Coordinate[]
+      color: string
+    }
   | {
       type: 'area'
       id: string
@@ -30,7 +37,7 @@ export type MapFeature =
       type: 'building'
       id: string
       label: string
-      position: MapPoint
+      position: Coordinate
       size: MapPoint
       color: string
     }
@@ -57,6 +64,10 @@ export type Attraction = {
   color: string
   opacity?: number
   tag: string
+  modelUrl?: string
+  rotation?: Vector3
+  offset?: Vector3
+  scale?: Vector3
   waypointId?: string
 }
 

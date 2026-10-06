@@ -9,7 +9,7 @@ import {
   ShrinkIcon,
 } from 'lucide-react'
 import type { CSSProperties } from 'react'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import type { Attraction, Business } from '../../domain/types'
 import { categoryLabels } from '../../domain/demo-data'
 import './AttractionDetail.css'
@@ -45,10 +45,6 @@ export function AttractionDetail({
     ? (calculatedHeadingDegrees - heading + 360) % 360
     : calculatedHeadingDegrees
   const [expanded, setExpanded] = useState(false)
-
-  useEffect(() => {
-    console.log('expanded changed:', expanded)
-  }, [expanded])
 
   return (
     <section className="attraction-detail">

@@ -5,14 +5,18 @@ import type { Coordinate } from '../domain/types'
 
 export const isAndroid =
   typeof navigator !== 'undefined' ? /Android/i.test(navigator.userAgent) : false
+
 export const isIOS =
   typeof navigator !== 'undefined' ? /iPhone|iPad|iPod/i.test(navigator.userAgent) : false
+
 export const isMobile =
   typeof navigator !== 'undefined'
     ? /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
     : false
+
 export const clamp = (value: number, min: number, max: number): number =>
   Math.min(max, Math.max(min, value))
+
 export const toCoordinate = (location?: GeolocationCoordinates | null): Coordinate => ({
   latitude: location?.latitude ?? 0,
   longitude: location?.longitude ?? 0,
@@ -41,13 +45,30 @@ export function toVector3(Coordinate: Coordinate): Vector3 {
   return new Vector3(x, z, -y) // Invert Y for correct orientation
 }
 
-export function toPoints(CoordinateList: Coordinate[]): Vector2[] {
-  const location = center(CoordinateList)
+export function toBoundary(coordinates: Coordinate[]) {
+  const featurePoints = toPoints(coordinates)
+  const minX = Math.min(...featurePoints.map((point) => point.x))
+  const maxX = Math.max(...featurePoints.map((point) => point.x))
+  const minY = Math.min(...featurePoints.map((point) => point.y))
+  const maxY = Math.max(...featurePoints.map((point) => point.y))
+  return new Vector2(maxX - minX, maxY - minY)
+}
+
+export function toPoint(origin: Coordinate, coordinate: Coordinate): Vector2 {
+  const ang = SphericalUtil.computeHeading(origin, coordinate)
+  const distance = SphericalUtil.computeDistanceBetween(origin, coordinate)
+  const left = Math.sin(degToRad(ang)) * distance
+  const bottom = -Math.cos(degToRad(ang)) * distance
+  return new Vector2(left, bottom)
+}
+
+export function toPoints(CoordinateList: Coordinate[], origin?: Coordinate): Vector2[] {
+  const location = origin ?? center(CoordinateList)
   return CoordinateList.map((point) => {
     const ang = SphericalUtil.computeHeading(location, point)
     const distance = SphericalUtil.computeDistanceBetween(location, point)
     const left = Math.sin(degToRad(ang)) * distance
-    const bottom = Math.cos(degToRad(ang)) * distance
+    const bottom = -Math.cos(degToRad(ang)) * distance
     return new Vector2(left, bottom)
   })
 }
