@@ -92,7 +92,7 @@ export function MapView2({ business, userPosition, heading, onSelect }: MapView2
   }, [selectedPosition, controls])
 
   useEffect(() => {
-    scene.setSelectedAttraction(selectedAttraction)
+    // scene.setSelectedAttraction(selectedAttraction)
     const pos = selectedAttraction?.getPosition()?.add(scene.getPosition()) || null
     setSelectedPosition(pos)
   }, [selectedAttraction])

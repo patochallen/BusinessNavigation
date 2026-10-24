@@ -4,9 +4,9 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import type { Coordinate } from '../../domain/types'
 import type { AttractionModel } from '../../domain/scene-model'
 import './MapView.css'
-import { CameraHelper, Mesh, PerspectiveCamera, Vector2, Vector3, Vector4 } from 'three'
+import { CameraHelper, PerspectiveCamera, Vector2, Vector3, Vector4 } from 'three'
 import { useMemo } from 'react'
-import { CameraControls, DeviceOrientationControls, Line, OrbitControls } from '@react-three/drei'
+import { DeviceOrientationControls, Line, OrbitControls } from '@react-three/drei'
 import { angle2D, toPoint } from '../../utils/utils'
 import { SceneModel } from '../../domain/scene-model'
 import { SceneModelView } from './SceneModelView'
@@ -345,7 +345,11 @@ export function NavigationMapView({
         <CompassView heading={heading} />
         <IconButton icon={<X />} position="topRight" onClick={onClose} />
       </>
-      <ArrowOverlay distance={distanceToAttraction} heading={angleDifferenceToAttraction} />
+      <ArrowOverlay
+        distance={distanceToAttraction}
+        heading={angleDifferenceToAttraction}
+        fov={hFov}
+      />
     </div>
   )
 }
