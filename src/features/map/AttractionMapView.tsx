@@ -31,7 +31,7 @@ export const AttractionMapView = ({ userPosition, scene, attraction }: Attractio
     () => ({
       fov: { value: 60, min: 30, max: 120, step: 1, label: 'FOV' },
       offset: { value: 0, min: -180, max: 180, step: 1, label: 'Offset' },
-      opacity: { value: 0.2, min: 0, max: 1, step: 0.05, label: 'Opacity' },
+      opacity: { value: 0.1, min: 0, max: 1, step: 0.05, label: 'Opacity' },
       fakeLocation: { value: false, label: 'Fake Location' },
       orbitActive: { value: false, label: 'Orbit Active' },
       absolute: { value: true, label: 'Absolute Orientation' },
@@ -39,7 +39,7 @@ export const AttractionMapView = ({ userPosition, scene, attraction }: Attractio
         setControls({
           fov: 60,
           offset: 0,
-          opacity: 0.2,
+          opacity: 0.1,
           fakeLocation: false,
           orbitActive: false,
           absolute: true,
@@ -72,7 +72,7 @@ export const AttractionMapView = ({ userPosition, scene, attraction }: Attractio
     const length = Math.hypot(deltaX, deltaZ)
     if (length === 0) return null
 
-    const halfWidth = 0.5
+    const halfWidth = 2
     const perpendicularX = (-deltaZ / length) * halfWidth
     const perpendicularZ = (deltaX / length) * halfWidth
     const shape = new Shape()
@@ -110,8 +110,7 @@ export const AttractionMapView = ({ userPosition, scene, attraction }: Attractio
     <div className="attraction-map-view">
       <Leva hidden={!showControls} />
       <Canvas camera={camera}>
-        <gridHelper args={[6, 30]} />
-        <CardinalMarkers position={new Vector3(position.x, 0, position.y)} />
+        <CardinalMarkers position={new Vector3(position.x, 1, position.y)} distance={80} />
         <directionalLight position={[1, 3, 1]} intensity={5} color="#fff" />
         <directionalLight position={[-1, 3, -1]} intensity={5} color="#fff" />
         <EffectComposer>
