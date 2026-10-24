@@ -1,4 +1,4 @@
-import { PerspectiveCamera, Vector2, Mesh, Vector3, Quaternion } from 'three'
+import { PerspectiveCamera, Vector2, Mesh, Vector3, Quaternion, Shape } from 'three'
 import type { SceneObject } from '../../domain/scene-model'
 import './AttractionMapView.css'
 import type { Coordinate } from '../../domain/types'
@@ -27,16 +27,26 @@ type AttractionMapViewProps = {
 
 export const AttractionMapView = ({ userPosition, scene, attraction }: AttractionMapViewProps) => {
   const [showControls, setShowControls] = useState(false)
-  const [{ fov, offset, fakeLocation, orbitActive, absolute }, setControls] = useControls(() => ({
-    fov: { value: 60, min: 30, max: 120, step: 1, label: 'FOV' },
-    offset: { value: 0, min: -180, max: 180, step: 1, label: 'Offset' },
-    fakeLocation: { value: false, label: 'Fake Location' },
-    orbitActive: { value: false, label: 'Orbit Active' },
-    absolute: { value: true, label: 'Absolute Orientation' },
-    reset: button(() =>
-      setControls({ fov: 60, offset: 0, fakeLocation: false, orbitActive: false, absolute: true }),
-    ),
-  }))
+  const [{ fov, offset, opacity, fakeLocation, orbitActive, absolute }, setControls] = useControls(
+    () => ({
+      fov: { value: 60, min: 30, max: 120, step: 1, label: 'FOV' },
+      offset: { value: 0, min: -180, max: 180, step: 1, label: 'Offset' },
+      opacity: { value: 0.2, min: 0, max: 1, step: 0.05, label: 'Opacity' },
+      fakeLocation: { value: false, label: 'Fake Location' },
+      orbitActive: { value: false, label: 'Orbit Active' },
+      absolute: { value: true, label: 'Absolute Orientation' },
+      reset: button(() =>
+        setControls({
+          fov: 60,
+          offset: 0,
+          opacity: 0.2,
+          fakeLocation: false,
+          orbitActive: false,
+          absolute: true,
+        }),
+      ),
+    }),
+  )
   const { heading, quaternion, enable } = useDeviceOrientation(absolute)
   const position = useMemo(() => {
     return toPoint(pos, fakeLocation ? ParkLocation : userPosition ? userPosition : ParkLocation)
@@ -56,10 +66,31 @@ export const AttractionMapView = ({ userPosition, scene, attraction }: Attractio
     if (Math.abs(ang) > 180) ang = (ang - 360) % 360
     return ang
   }, [heading, angle, offset])
+  const pathShape = useMemo(() => {
+    const deltaX = attractionPosition.x - position.x
+    const deltaZ = attractionPosition.y - position.y
+    const length = Math.hypot(deltaX, deltaZ)
+    if (length === 0) return null
+
+    const halfWidth = 0.5
+    const perpendicularX = (-deltaZ / length) * halfWidth
+    const perpendicularZ = (deltaX / length) * halfWidth
+    const shape = new Shape()
+    shape.moveTo(perpendicularX, -perpendicularZ)
+    shape.lineTo(-perpendicularX, perpendicularZ)
+    shape.lineTo(deltaX - perpendicularX, -deltaZ + perpendicularZ)
+    shape.lineTo(deltaX + perpendicularX, -deltaZ - perpendicularZ)
+    shape.closePath()
+    return shape
+  }, [position, attractionPosition])
 
   useEffect(() => {
     enable()
   }, [])
+
+  useEffect(() => {
+    scene.setSceneOpacity(opacity)
+  }, [opacity])
 
   useEffect(() => {
     camera.position.set(position.x, 1.6, position.y)
@@ -89,16 +120,12 @@ export const AttractionMapView = ({ userPosition, scene, attraction }: Attractio
           <Vignette eskil={false} offset={0.1} darkness={0.5} />
         </EffectComposer>
         <SceneModelView scene={scene} />
-        <mesh position={new Vector3(position.x, 0, position.y)}>
-          <sphereGeometry args={[0.2, 32, 32]} />
-          <meshStandardMaterial color="#ff0000" />
-        </mesh>
         <primitive object={attraction} />
         <group position={attraction.position}>
           <Line
             points={[
               [0, 0, 0],
-              [0, distance / 4, 0],
+              [0, distance / 8, 0],
             ]}
             color="#66def3"
             lineWidth={2}
@@ -106,7 +133,7 @@ export const AttractionMapView = ({ userPosition, scene, attraction }: Attractio
             renderOrder={10}
           />
           <Html
-            position={[0, distance / 4, 0]}
+            position-y={distance / 8}
             center
             zIndexRange={[10, 0]}
             style={{ pointerEvents: 'none' }}
@@ -114,6 +141,17 @@ export const AttractionMapView = ({ userPosition, scene, attraction }: Attractio
             <span className="navigation-attraction-label">{attraction.name}</span>
           </Html>
         </group>
+        {pathShape && (
+          <mesh position={[position.x, 0.2, position.y]} rotation-x={-Math.PI / 2}>
+            <shapeGeometry args={[pathShape]} />
+            <meshStandardMaterial
+              color="black"
+              transparent
+              opacity={0.8}
+              // depthWrite={false}
+            />
+          </mesh>
+        )}
         <OrbitControls enabled={orbitActive} camera={camera} maxPolarAngle={Math.PI / 2} />
       </Canvas>
       <div

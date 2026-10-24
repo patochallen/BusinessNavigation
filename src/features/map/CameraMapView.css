@@ -17,5 +17,5 @@
 .leva-c-kWgxhW-bCBHqk-fill-false {
   top: 60px !important;
   left: 50%;
-  translate: -50%;
+  transform: translateX(-50%);
 }
