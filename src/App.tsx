@@ -7,22 +7,20 @@ import {
   useLocation,
   useNavigate,
   useParams,
-  useSearchParams,
 } from 'react-router-dom'
 import './App.css'
 import { demoBusinessRepository } from './domain/business-repository'
 import { useGeolocation } from './services/location'
-import { useDeviceHeading } from './services/orientation'
-import { BusinessHome } from './features/explorer/BusinessHome'
+import type { AttractionModel } from './domain/scene-model'
 import { AttractionDetail } from './features/explorer/AttractionDetail'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SettingsView } from './features/settings/SettingsView'
-import { AppHeader } from './features/layout/AppHeader'
-import { AppFooter } from './features/layout/AppFooter'
 import { LocationPermissionRequiredView } from './features/location/LocationPermissionRequiredView'
 import { isAndroid } from './utils/utils'
-import { MapView } from './features/map/MapView'
+import { MapView2 } from './features/map/MapView2'
+import { NavigationMapView } from './features/map/NavigationMapView'
+import { useHeading } from './services/heading'
 // import { localPointFromGps } from './domain/coordinates'
 // import {
 //   getDistanceAndHeadingBetweenLocations,
@@ -31,6 +29,7 @@ import { MapView } from './features/map/MapView'
 // import { SensorScreen } from './features/sensors/SensorScreen'
 
 const DEFAULT_BUSINESS_ID = import.meta.env.VITE_DEFAULT_BUSINESS_ID
+const ParkLocation = { latitude: -34.550539413457, longitude: -58.48003697685765 }
 
 function AppContent() {
   const { t } = useTranslation()
@@ -40,33 +39,37 @@ function AppContent() {
   }>()
   const location = useLocation()
   const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
+  // const [searchParams] = useSearchParams()
   const business = businessId ? demoBusinessRepository.findById(businessId) : undefined
-  const isNavigation = location.pathname.endsWith('/navigate')
+  // const isNavigation = location.pathname.endsWith('/navigate')
   const isSettings = location.pathname.endsWith('/settings')
-  const isAttractionDetail = Boolean(attractionId) && !isNavigation
+  // const isAttractionDetail = Boolean(attractionId) && !isNavigation
   const { position, permission, errorMessage, requestPermission } = useGeolocation()
   const attraction =
     business && attractionId
       ? demoBusinessRepository.findAttraction(business, attractionId)
       : business?.attractions[0]
-  const headingState = useDeviceHeading(true)
-  const enableHeading = headingState.enable
-  const mapAttractionId = searchParams.get('attraction') ?? undefined
+  // const headingState = useDeviceHeading(true)
+
+  const headingState = useHeading()
+  // const enableHeading = headingState.enable
+  // const mapAttractionId = searchParams.get('attraction') ?? undefined
+  const [selectedAttraction, setSelectedAttraction] = useState<AttractionModel | null>(null)
   const businessMark = business?.name
     .split(/\s+/)
     .map((word) => word[0])
     .join('')
     .slice(0, 2)
     .toUpperCase()
-  const shouldShowHeaderBack = isSettings || isNavigation || isAttractionDetail
+  // const shouldShowHeaderBack = isSettings || isNavigation || isAttractionDetail
   const requestedAfterDeniedRef = useRef(false)
 
   // console.log('isMobile:', 'ondeviceorientationabsolute' in window)
 
   useEffect(() => {
-    void enableHeading()
-  }, [enableHeading])
+    // headingState.enable()
+    headingState.start()
+  }, [headingState.start])
 
   // useEffect(() => {
   //   console.log('enableHeading called')
@@ -75,6 +78,11 @@ function AppContent() {
   // window.position = position?.coords
   // window.MathUtils = MathUtils
   // }, [window])
+
+  // useEffect(() => {
+  //   if (!position?.coords) return
+  //   console.log('Position changed:', position.coords)
+  // }, [position?.coords])
 
   useEffect(() => {
     if (permission === 'ready' && requestedAfterDeniedRef.current && business) {
@@ -104,30 +112,34 @@ function AppContent() {
   //       onSelect={() => {}}
   //     />
   //   )
+  useEffect(() => {
+    console.log('HeadingState:', headingState)
+  }, [headingState])
 
-  if (isNavigation && attraction && position) {
+  // if (headingState.heading !== null) {
+  // return <OrientationTest /> //heading={headingState.heading} />
+  // }
+
+  if (selectedAttraction && ParkLocation && position?.coords) {
     // const distanceAndHeading = getDistanceAndHeadingBetweenLocations(
     //   position.coords,
     //   attraction.origin,
     // )
-    // console.log('Navigating to attraction:', distanceAndHeading)
     // const userPosition = localPointFromGps(business.mapOrigin, position.coords)
     return (
-      <MapView
-        business={business}
-        userPosition={position.coords}
-        heading={360 - (headingState.heading ?? 0)}
-        onSelect={() => {}}
-        // selectedAttraction={attraction}
+      <NavigationMapView
+        userPosition={ParkLocation}
+        // userPosition={position.coords}
+        heading={headingState.heading !== null ? headingState.heading : undefined}
+        selectedAttraction={selectedAttraction}
+        onClose={() => setSelectedAttraction(null)}
       />
     )
   }
 
-  // return <SensorScreen />
-
   return (
     <div className="app-shell">
-      <AppHeader
+      {/* <AppHeader
         businessMark={businessMark ?? 'BN'}
         businessName={business.name}
         isSettings={isSettings}
@@ -136,7 +148,7 @@ function AppContent() {
         onBack={() => navigate(-1)}
         onOpenHome={() => navigate(`/b/${business.id}`, { replace: true })}
         onOpenSettings={() => navigate(`/b/${business.id}/settings`)}
-      />
+      /> */}
       <main>
         {permission === 'denied' && isAndroid ? (
           <LocationPermissionRequiredView
@@ -151,7 +163,7 @@ function AppContent() {
           <SettingsView
             business={business}
             locationPermission={permission}
-            headingPermission={headingState.permission}
+            headingPermission={'ready'}
             position={position}
           />
         ) : attractionId && attraction ? (
@@ -163,17 +175,27 @@ function AppContent() {
             onNavigate={() => navigate(`/b/${business.id}/a/${attraction.id}/navigate`)}
             onViewMap={() => navigate(`/b/${business.id}?attraction=${attraction.id}`)}
           />
-        ) : (
-          <BusinessHome
+        ) : position ? (
+          <MapView2
             business={business}
-            // permission={permission}
-            position={position}
-            heading={headingState.heading}
-            selectedAttractionId={mapAttractionId}
+            userPosition={ParkLocation}
+            // userPosition={position.coords}
+            heading={360 - (headingState.heading ?? 0)}
+            onSelect={(attraction) => {
+              setSelectedAttraction(attraction)
+              console.log('Selected attraction:', attraction)
+            }}
           />
-        )}
+        ) : // <BusinessHome
+        //   business={business}
+        //   // permission={permission}
+        //   position={position}
+        //   heading={headingState.heading}
+        //   selectedAttractionId={mapAttractionId}
+        // />
+        null}
       </main>
-      <AppFooter businessName={business.name} permission={permission} position={position} />
+      {/* <AppFooter businessName={business.name} permission={permission} position={position} /> */}
     </div>
   )
 }

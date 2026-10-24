@@ -9,14 +9,21 @@ import { Vector3 } from 'three'
 import { PositionMesh } from '@react-three/drei'
 
 export class AttractionModel {
+  readonly id: string
+  private attraction: Object3D
   private name: string
+  private description: string | null = null
   private position: Vector3 = new Vector3()
   private floor: Mesh
   private building: Mesh
+  private isVisible: boolean = false
 
   constructor(attraction: Object3D) {
+    this.id = crypto.randomUUID()
+    this.attraction = attraction
     this.name = attraction.name || ''
-    this.position.copy(attraction.position)
+    this.description = attraction.userData?.description
+    this.position.copy(attraction.position.clone())
     this.floor =
       (attraction.children.filter((child) => child.name.includes('Floor'))?.[0] as Mesh) ||
       new PositionMesh()
@@ -27,6 +34,9 @@ export class AttractionModel {
   getName() {
     return this.name
   }
+  getDescription() {
+    return this.description
+  }
   getFloor() {
     return this.floor.clone()
   }
@@ -35,6 +45,43 @@ export class AttractionModel {
   }
   getBuilding() {
     return this.building?.clone()
+  }
+  getObject3D() {
+    return this.attraction.clone()
+  }
+  toggleVisible() {
+    this.setVisible(!this.isVisible)
+  }
+  setVisible(visible: boolean) {
+    if (visible === this.isVisible) return
+    this.isVisible = visible
+    // const scale = this.isVisible ? 3 : 1 / 3
+    // console.log('Setting attraction visibility to:', visible)
+    this.attraction?.traverse((child) => {
+      if ((child as Mesh).isMesh) {
+        const mesh = child as Mesh
+        if ((mesh.material as MeshStandardMaterial).isMeshStandardMaterial) {
+          const material = mesh.material as MeshStandardMaterial
+          material.wireframe = visible
+          material.needsUpdate = true
+        }
+      }
+    })
+    // this.floor?.scale.set(
+    //   this.floor?.scale?.x * scale,
+    //   this.floor?.scale?.y * scale,
+    //   this.floor?.scale?.z * scale,
+    // )
+    // this.building?.scale.set(
+    //   this.building?.scale?.x * scale,
+    //   this.building?.scale?.y * scale,
+    //   this.building?.scale?.z * scale,
+    // )
+    // this.attraction?.scale.set(
+    //   this.attraction?.scale?.x * scale,
+    //   this.attraction?.scale?.y * scale,
+    //   this.attraction?.scale?.z * scale,
+    // )
   }
 }
 
@@ -46,6 +93,7 @@ export class SceneObject {
   private paths: Mesh | null = null
   private sceneWireframe: boolean = false
   private sceneOpacity: number = 1
+  // private selectedAttraction: AttractionModel | null = null
 
   constructor(scene: Group) {
     this.position.copy(new Vector3(-3, 0, -16))
@@ -154,18 +202,52 @@ export class SceneObject {
       }
     })
   }
+
+  // setSelectedAttraction(attraction: AttractionModel | null) {
+  //   this.selectedAttraction = attraction
+  //   console.log('Selected attraction set to:', attraction)
+  // }
 }
 
 export class SceneModel {
-  private sceneObject: SceneObject | null = null
+  private sceneObject: SceneObject
 
   constructor(scene: Group) {
-    this.sceneObject = new SceneObject(scene)
+    const clonedScene = scene.clone(true)
+    const geometries = new Map<Mesh['geometry'], Mesh['geometry']>()
+    const materials = new Map<Material, Material>()
+
+    clonedScene.traverse((child) => {
+      const mesh = child as Mesh
+      if (!mesh.isMesh) return
+
+      let geometry = geometries.get(mesh.geometry)
+      if (!geometry) {
+        geometry = mesh.geometry.clone()
+        geometries.set(mesh.geometry, geometry)
+      }
+      mesh.geometry = geometry
+
+      const cloneMaterial = (material: Material) => {
+        let clonedMaterial = materials.get(material)
+        if (!clonedMaterial) {
+          clonedMaterial = material.clone()
+          materials.set(material, clonedMaterial)
+        }
+        return clonedMaterial
+      }
+
+      mesh.material = Array.isArray(mesh.material)
+        ? mesh.material.map(cloneMaterial)
+        : cloneMaterial(mesh.material)
+    })
+
+    this.sceneObject = new SceneObject(clonedScene)
     this.log()
   }
 
   log() {
-    console.log(this)
+    // console.log(this)
   }
 
   getScene() {

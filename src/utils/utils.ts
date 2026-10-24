@@ -35,6 +35,37 @@ export function center(CoordinateList: Coordinate[]): Coordinate {
   }
 }
 
+export function remap(
+  value: number,
+  inMin: number,
+  inMax: number,
+  outMin: number,
+  outMax: number,
+  clamp: boolean = true,
+): number {
+  const result = outMin + (outMax - outMin) * ((value - inMin) / (inMax - inMin))
+  if (!clamp) return result
+  const min = Math.min(outMin, outMax)
+  const max = Math.max(outMin, outMax)
+  return Math.max(min, Math.min(max, result))
+}
+
+export function angle2D(v1: Vector2, v2: Vector2): number {
+  let angle = Math.atan2(v2.y - v1.y, v2.x - v1.x)
+  if (angle < 0) {
+    angle += Math.PI * 2
+  }
+  angle = radToDeg(angle)
+  // console.log(
+  //   'angle2D:',
+  //   angle.toFixed(2),
+  //   ((angle + 90) % 360).toFixed(2),
+  //   // (360 - (angle % 360)).toFixed(2),
+  //   // ((360 - (angle % 360)) % 360).toFixed(2),
+  // )
+  return angle % 360
+}
+
 export function toVector3(Coordinate: Coordinate): Vector3 {
   const lat = degToRad(Coordinate.latitude)
   const lng = degToRad(Coordinate.longitude)

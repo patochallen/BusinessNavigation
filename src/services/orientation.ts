@@ -6,10 +6,11 @@ type PermissionCapableOrientation = typeof DeviceOrientationEvent & {
   requestPermission?: () => Promise<'granted' | 'denied'>
 }
 
-const useMagneticNorth = false
+export const useMagneticNorth = false
 
 export function useDeviceHeading(enabled = true) {
-  const [heading, setHeading] = useState<number | null>(null)
+  const [normalized, setHeading] = useState<number | null>(null)
+  const [orientation, setOrientation] = useState<DeviceOrientationEvent | null>(null)
   const [permission, setPermission] = useState<LocationPermission>('idle')
   const calibrationOffset = 0
   // const [calibrationOffset, setCalibrationOffset] = useState(0)
@@ -44,23 +45,52 @@ export function useDeviceHeading(enabled = true) {
         hasOrientation.current = true
       }
       if (hasOrientation.current && !event.absolute) return
-      const rawHeading = event.alpha === null ? null : 360 - event.alpha
-      if (rawHeading !== null) {
-        const normalized = (rawHeading + 360) % 360
-        rawHeadingRef.current = normalized
-        const calibrated =
-          (normalized - calibrationOffset + 360 - (useMagneticNorth ? 0 : 11)) % 360
-        samplesRef.current = [...samplesRef.current.slice(-7), calibrated]
-        const spread = circularAngleSpread(samplesRef.current)
-        setHeadingStable(samplesRef.current.length >= 3 && spread < 12)
-        setHeading(calibrated)
+      if (!event.absolute) {
+        setOrientation(event)
       }
+      // const euler = new Euler(
+      //   degToRad(event.beta!),
+      //   degToRad(event.alpha!),
+      //   -degToRad(event.gamma!),
+      //   'YXZ',
+      // )
+      // const orientation = new Quaternion().setFromEuler(euler)
+      // orientation.multiply(new Quaternion(-Math.SQRT1_2, 0, 0, Math.SQRT1_2))
+      // orientation.multiply(
+      //   new Quaternion().setFromAxisAngle(
+      //     new Vector3(0, 0, 1),
+      //     -degToRad(screen.orientation?.angle ?? 0),
+      //   ),
+      // )
+
+      // const forward = new Vector3(0, 0, -1).applyQuaternion(orientation)
+      // const normalized = (radToDeg(Math.atan2(forward.x, -forward.z)) + 360) % 360
+      // rawHeadingRef.current = normalized
+      // const calibrated = (normalized - calibrationOffset + 360 - (useMagneticNorth ? 0 : 11)) % 360
+      // samplesRef.current = [...samplesRef.current.slice(-7), calibrated]
+      // const spread = circularAngleSpread(samplesRef.current)
+      // setHeadingStable(samplesRef.current.length >= 3 && spread < 12)
+      // setHeading(calibrated)
+      const rawHeading =
+        event.alpha === null ? null : 360 - event.alpha - (useMagneticNorth ? 0 : 10.44)
+      if (rawHeading === null) {
+        setHeading(null)
+        setHeadingStable(false)
+        return
+      }
+      const normalized = (rawHeading + 360) % 360
+      rawHeadingRef.current = normalized
+      const calibrated = (normalized - calibrationOffset + 360) % 360
+      samplesRef.current = [...samplesRef.current.slice(-7), calibrated]
+      const spread = circularAngleSpread(samplesRef.current)
+      setHeadingStable(samplesRef.current.length >= 3 && spread < 12)
+      setHeading(calibrated)
     }
     window.addEventListener('deviceorientationabsolute', onOrientation)
-    window.addEventListener('deviceorientation', onOrientation)
+    // window.addEventListener('deviceorientation', onOrientation)
     return () => {
       window.removeEventListener('deviceorientationabsolute', onOrientation)
-      window.removeEventListener('deviceorientation', onOrientation)
+      // window.removeEventListener('deviceorientation', onOrientation)
     }
   }, [calibrationOffset, enabled, permission, supported])
 
@@ -73,7 +103,8 @@ export function useDeviceHeading(enabled = true) {
   }
 
   return {
-    heading,
+    heading: normalized,
+    orientation,
     permission: enabled && !supported ? 'unavailable' : permission,
     enable,
     calibrate,
