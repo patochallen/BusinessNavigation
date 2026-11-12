@@ -1,0 +1,111 @@
+.controls-view-button {
+  position: absolute;
+  display: flex;
+  top: 10px;
+  right: 10px;
+  z-index: 11;
+  background-color: 'white';
+  border: none;
+  padding: 4px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.controls-view {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+}
+.controls-view-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 15px;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: auto;
+}
+.control-item {
+  display: flex;
+  width: 200px;
+  padding: 4px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 50px;
+  align-items: center;
+  cursor: pointer;
+}
+.control-item-expanded {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  color: #fff;
+}
+.control-item-label {
+  margin-left: 8px;
+  color: black;
+  font-size: 14px;
+}
+.control-item-value {
+  margin-left: 8px;
+  font-weight: bold;
+  font-size: 12px;
+}
+.control-item-info {
+  display: flex;
+  flex-direction: column;
+  margin-left: 8px;
+  flex: 1;
+}
+.control-item-delete-icon {
+  margin-right: 8px;
+  color: rgb(225, 9, 9);
+  cursor: pointer;
+}
+.control-item-expanded-title {
+  display: flex;
+  align-items: center;
+  padding-left: 20px;
+  gap: 10px;
+  background-color: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 50px;
+}
+.control-item-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  border: none;
+  padding: 4px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.control-item-button-expanded {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgb(3, 181, 3);
+  color: white;
+  z-index: 12;
+  animation: expand 0.3s ease-in-out;
+}
+
+@keyframes expand {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

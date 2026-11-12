@@ -1,0 +1,25 @@
+.camera-map-view {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+.camera-map-view2 {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+.attraction-item {
+  padding: 8px;
+  border: 1px solid #ccc;
+  margin: 4px;
+  border-radius: 4px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.leva-c-kWgxhW-bCBHqk-fill-false {
+  top: 60px !important;
+  left: 50%;
+  transform: translateX(-50%);
+}

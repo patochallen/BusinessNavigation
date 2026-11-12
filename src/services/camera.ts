@@ -8,11 +8,11 @@ export function useCameraStream() {
   const streamRef = useRef<MediaStream | null>(null)
 
   useEffect(() => {
-    console.log('XXXXXX Camera stream updated:', stream)
+    // console.log('XXXXXX Camera stream updated:', stream)
   }, [stream])
 
   const stop = () => {
-    console.log('XXXXXX Stopping camera stream')
+    // console.log('XXXXXX Stopping camera stream')
     streamRef.current?.getTracks().forEach((track) => track.stop())
     streamRef.current = null
     setStream(null)
@@ -20,7 +20,7 @@ export function useCameraStream() {
   }
 
   const start = async () => {
-    console.log('XXXXXX Starting camera stream')
+    // console.log('XXXXXX Starting camera stream')
     if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
       setPermission('unavailable')
       setErrorMessage('La cámara requiere HTTPS o localhost.')
@@ -33,7 +33,7 @@ export function useCameraStream() {
         video: { facingMode: { ideal: 'environment' } },
         audio: false,
       })
-      console.log('XXXXXX Camera stream obtained:', nextStream)
+      // console.log('XXXXXX Camera stream obtained:', nextStream)
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((track) => track.stop())
       }
@@ -49,9 +49,9 @@ export function useCameraStream() {
   }
 
   useEffect(() => {
-    console.log('XXXXXX Camera stream effect mounted')
+    // console.log('XXXXXX Camera stream effect mounted')
     return () => {
-      console.log('XXXXXX Cleaning up camera stream on unmount')
+      // console.log('XXXXXX Cleaning up camera stream on unmount')
       streamRef.current?.getTracks().forEach((track) => track.stop())
       streamRef.current = null
     }

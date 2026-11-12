@@ -4,15 +4,18 @@ import { Vector3 } from 'three'
 
 export const SceneModelView = ({
   scene,
+  position,
   onAttractionClick,
 }: {
   scene: SceneObject
+  position?: Vector3
   onAttractionClick?: (attraction: AttractionModel) => void
   onPositionSelected?: (position: Vector3) => void
 }) => {
   const [attractionDown, setAttractionDown] = useState<AttractionModel | null>(null)
   return (
-    <group position={scene.getPosition()}>
+    // <group position={scene.getPosition().add(position ?? new Vector3())}>
+    <group position={position ?? new Vector3()}>
       {scene.getAttractions()?.map((attraction, index) => {
         const floor = attraction.getFloor()
         const building = attraction.getBuilding()
@@ -32,7 +35,7 @@ export const SceneModelView = ({
           >
             <primitive object={floor} />
             {building && <primitive object={building} />}
-            <mesh position={position}>
+            <mesh>
               <sphereGeometry args={[1, 32, 32]} />
               <meshStandardMaterial color="#000000" />
             </mesh>

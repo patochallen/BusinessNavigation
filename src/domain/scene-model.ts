@@ -86,6 +86,7 @@ export class AttractionModel {
 }
 
 export class SceneObject {
+  readonly id: string = crypto.randomUUID()
   private readonly MIN_OPACITY = 0.1
   private position: Vector3 = new Vector3()
   private attractions: AttractionModel[] = []
@@ -93,16 +94,18 @@ export class SceneObject {
   private paths: Mesh | null = null
   private sceneWireframe: boolean = false
   private sceneOpacity: number = 1
+  private scene: Group | null = null
   // private selectedAttraction: AttractionModel | null = null
 
   constructor(scene: Group) {
-    this.position.copy(new Vector3(-3, 0, -16))
+    // this.position.copy(scene.children[0].position)
     this.attractions = (scene.getObjectByName('Attractions') as Object3D)?.children?.map(
       (child) => new AttractionModel(child),
     )
     this.floor = scene.getObjectByName('Floor2') as Mesh | null
     this.paths = scene.getObjectByName('Paths') as Mesh | null
     this.floor!.children.length = 0
+    this.scene = scene
   }
 
   getAttractions() {
@@ -116,6 +119,10 @@ export class SceneObject {
   }
   getPaths() {
     return this.paths?.clone()
+  }
+
+  getScene() {
+    return this.scene?.clone()
   }
 
   setSceneWireframe(wireframe: boolean) {
