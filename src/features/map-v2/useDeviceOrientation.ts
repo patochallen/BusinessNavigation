@@ -1,6 +1,6 @@
 import { useEffect, useSyncExternalStore } from 'react'
-import { Euler, Quaternion, Vector3 } from 'three'
-import { degToRad, radToDeg } from 'three/src/math/MathUtils.js'
+import { Euler, Quaternion } from 'three'
+import { degToRad } from 'three/src/math/MathUtils.js'
 
 export type OrientationPermissionState =
   | 'idle' // permission required (iOS 13+) but not requested yet

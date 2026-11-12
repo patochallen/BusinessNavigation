@@ -9,7 +9,6 @@ import { SceneModelView } from '../map/SceneModelView'
 import { useDeviceOrientation } from '../../services/device-orientation'
 import { IconButton } from '../layout/IconButton'
 import { PointerIcon, PointerOffIcon } from 'lucide-react'
-import { radToDeg } from 'three/src/math/MathUtils.js'
 import { useDeviceMotion } from '../../services/device-motion'
 
 export const FirstPersonView = ({ scene, position }: { scene: SceneObject; position: Vector3 }) => {

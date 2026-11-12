@@ -7,7 +7,6 @@ import { useLoader } from '@react-three/fiber'
 import { GLTFLoader } from 'three/examples/jsm/Addons.js'
 import { SceneModel } from '../../domain/scene-model'
 import { Mesh, MeshStandardMaterial, Color } from 'three'
-import { DEFAULT_BUSINESS_ID } from '../../main'
 import { useGeolocation } from '../../services/location'
 
 export const CameraMapViewContent = () => {

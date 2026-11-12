@@ -329,7 +329,7 @@ export const ManualAttractionScreen = ({
     [attraction],
   )
   const pos = useMemo(() => attraction.position.clone().add(position), [attraction, position])
-  const [rotation, setRotation] = useState(new Euler())
+  const rotation = new Euler()
   const [controls, setControls] = useState<OrbitControlsImpl | null>(null)
 
   useEffect(() => {

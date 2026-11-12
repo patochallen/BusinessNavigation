@@ -23,7 +23,7 @@ import { SceneModelView } from '../map/SceneModelView'
 import { toV3 } from '../../utils/utils'
 import { SnapshotList } from './snapshots/SnapshotList'
 import { MapSync } from './MapSync'
-import { ControlsView } from './ControlsView'
+
 import { FirstPersonView } from './FirstPersonView'
 
 export const SettingsIdle = ({

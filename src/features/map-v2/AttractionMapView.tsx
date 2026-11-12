@@ -1,4 +1,4 @@
-import { PerspectiveCamera, Vector2, Mesh, Vector3, Quaternion } from 'three'
+import { PerspectiveCamera, Vector2, Mesh, Vector3 } from 'three'
 import type { SceneObject } from '../../domain/scene-model'
 import './AttractionMapView.css'
 import type { Coordinate } from '../../domain/types'
@@ -11,7 +11,6 @@ import { CompassView } from '../map/CompassView'
 import { IconButton } from '../layout/IconButton'
 import { Settings2 } from 'lucide-react'
 import { button, Leva, useControls } from 'leva'
-import { degToRad } from 'three/src/math/MathUtils.js'
 import { PathShape } from './PathShape'
 import { AttractionMarker } from './AttractionMarker'
 import { MapComposer } from './MapComposer'
@@ -43,7 +42,7 @@ export const AttractionMapView = ({ userPosition, scene, attraction }: Attractio
       }),
     ),
   }))
-  const { heading, quaternion, permission, start } = useDeviceOrientation()
+  const { heading, permission, start } = useDeviceOrientation()
   const position = useMemo(() => {
     return toPoint(pos, fakeLocation ? ParkLocation : userPosition ? userPosition : ParkLocation)
   }, [userPosition, fakeLocation])

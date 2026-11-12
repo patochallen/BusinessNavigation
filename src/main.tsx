@@ -1,25 +1,13 @@
-import { StrictMode, useEffect, useMemo, useRef, useState } from 'react'
+import { StrictMode, useEffect, useMemo } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import i18n from './i18n/i18n'
-import { StartScreen } from './features/map-v2/PermissionsScreen'
-import { AppV2 } from './features/map-v3/AppV2'
-import { HomeV3 } from './features/map-v3/AppV3'
-import { useDeviceOrientation } from './services/device-orientation'
-import { degToRad, radToDeg } from 'three/src/math/MathUtils.js'
-import { Euler, PerspectiveCamera, Quaternion, Vector3 } from 'three'
-import { remap } from './utils/utils'
-import { Canvas, useLoader } from '@react-three/fiber'
+import { degToRad } from 'three/src/math/MathUtils.js'
+import { Vector3 } from 'three'
+import { useLoader } from '@react-three/fiber'
 import { GLTFLoader } from 'three/examples/jsm/Addons.js'
-import {
-  CameraControls,
-  DeviceOrientationControls,
-  OrbitControls,
-  type CameraControlsImpl,
-} from '@react-three/drei'
 import { SceneModel } from './domain/scene-model'
-import { SceneModelView } from './features/map/SceneModelView'
-import { SettingsApp, SettingsScreen } from './features/settings/SettingsScreen'
+import { SettingsApp } from './features/settings/SettingsScreen'
 import { useGeolocation } from './services/location'
 import { getDistanceAndHeadingBetweenLocations } from './utils/location'
 
@@ -209,154 +197,153 @@ const ParkLocation = { latitude: -34.550539413457, longitude: -58.48003697685765
 export const DEFAULT_BUSINESS_ID = import.meta.env.VITE_DEFAULT_BUSINESS_ID
 
 // Time constant of the gravity low-pass filter: higher = smoother but more lag.
-const GRAVITY_SMOOTHING_MS = 300
 
-const TestComponent = () => {
-  const phone = useMemo(() => {
-    const model = useLoader(GLTFLoader, `${import.meta.env.BASE_URL}phone.glb`)
-    return model.scene.clone() //.translateY(0.3)
-  }, [])
-  const scene = useMemo(() => {
-    const model = useLoader(GLTFLoader, `${import.meta.env.BASE_URL}scene3.glb`)
-    const sceneModel = new SceneModel(model.scene.clone())
-    const sc = sceneModel.getScene()
-    sc.setSceneOpacity(0.72)
-    return sc
-  }, [])
-  const camera = useMemo(() => {
-    const c = new PerspectiveCamera(60, 1, 0.1, 1000).translateY(1).translateZ(1)
-    c.lookAt(0, 0, 0)
-    return c
-  }, [])
-  const { deviceOrientation, quaternion, euler } = useDeviceOrientation()
-  const { alpha, beta, gamma } = deviceOrientation ?? { alpha: null, beta: null, gamma: null }
-  const [gravity, setGravity] = useState<Vector3 | null>(null)
-  const smoothedGravityRef = useRef<Vector3 | null>(null)
-  const lastMotionTimeRef = useRef<number | null>(null)
-  const rotation = useMemo(() => {
-    if (!gravity) return new Vector3()
-    const { x, y, z } = gravity
+// const TestComponent = () => {
+//   const phone = useMemo(() => {
+//     const model = useLoader(GLTFLoader, `${import.meta.env.BASE_URL}phone.glb`)
+//     return model.scene.clone() //.translateY(0.3)
+//   }, [])
+//   const scene = useMemo(() => {
+//     const model = useLoader(GLTFLoader, `${import.meta.env.BASE_URL}scene3.glb`)
+//     const sceneModel = new SceneModel(model.scene.clone())
+//     const sc = sceneModel.getScene()
+//     sc.setSceneOpacity(0.72)
+//     return sc
+//   }, [])
+//   const camera = useMemo(() => {
+//     const c = new PerspectiveCamera(60, 1, 0.1, 1000).translateY(1).translateZ(1)
+//     c.lookAt(0, 0, 0)
+//     return c
+//   }, [])
+//   const { deviceOrientation, quaternion, euler } = useDeviceOrientation()
+//   const { alpha, beta, gamma } = deviceOrientation ?? { alpha: null, beta: null, gamma: null }
+//   const [gravity, setGravity] = useState<Vector3 | null>(null)
+//   const smoothedGravityRef = useRef<Vector3 | null>(null)
+//   const lastMotionTimeRef = useRef<number | null>(null)
+//   const rotation = useMemo(() => {
+//     if (!gravity) return new Vector3()
+//     const { x, y, z } = gravity
 
-    // At rest, accelerationIncludingGravity is the "up" vector in device coordinates.
-    // For the W3C Z-X'-Y'' rotation it equals (-sin γ·cos β, sin β, cos γ·cos β).
-    // Alpha (rotation around the vertical axis) can't be derived from gravity alone.
-    const alpha = 0
-    let gamma = radToDeg(Math.atan2(-x, z))
-    // Keep gamma within the spec range [-90, 90]; the extra half turn goes into beta.
-    if (gamma > 90) gamma -= 180
-    else if (gamma < -90) gamma += 180
-    const beta = radToDeg(Math.atan2(y, (z < 0 ? -1 : 1) * Math.hypot(x, z)))
-    return new Vector3(alpha, beta, gamma)
-  }, [gravity])
-  const quat = useMemo(() => {
-    const euler = new Euler(
-      degToRad(rotation.y),
-      degToRad(rotation.x),
-      -degToRad(rotation.z),
-      'YXZ',
-    )
+//     // At rest, accelerationIncludingGravity is the "up" vector in device coordinates.
+//     // For the W3C Z-X'-Y'' rotation it equals (-sin γ·cos β, sin β, cos γ·cos β).
+//     // Alpha (rotation around the vertical axis) can't be derived from gravity alone.
+//     const alpha = 0
+//     let gamma = radToDeg(Math.atan2(-x, z))
+//     // Keep gamma within the spec range [-90, 90]; the extra half turn goes into beta.
+//     if (gamma > 90) gamma -= 180
+//     else if (gamma < -90) gamma += 180
+//     const beta = radToDeg(Math.atan2(y, (z < 0 ? -1 : 1) * Math.hypot(x, z)))
+//     return new Vector3(alpha, beta, gamma)
+//   }, [gravity])
+//   const quat = useMemo(() => {
+//     const euler = new Euler(
+//       degToRad(rotation.y),
+//       degToRad(rotation.x),
+//       -degToRad(rotation.z),
+//       'YXZ',
+//     )
 
-    const quaternion = new Quaternion().setFromEuler(euler)
-    quaternion.multiply(new Quaternion(-Math.SQRT1_2, 0, 0, Math.SQRT1_2))
-    // quaternion.multiply(new Quaternion().setFromAxisAngle(new Vector3(0, 0, 1), 0))
-    return quaternion
-  }, [rotation])
-  const [controls, setControls] = useState<CameraControlsImpl | null>(null)
+//     const quaternion = new Quaternion().setFromEuler(euler)
+//     quaternion.multiply(new Quaternion(-Math.SQRT1_2, 0, 0, Math.SQRT1_2))
+//     // quaternion.multiply(new Quaternion().setFromAxisAngle(new Vector3(0, 0, 1), 0))
+//     return quaternion
+//   }, [rotation])
+//   const [controls, setControls] = useState<CameraControlsImpl | null>(null)
 
-  useEffect(() => {
-    if (controls) {
-      // controls.zoomTo(1)
-      controls.rotatePolarTo(-Math.PI / 2)
-      controls.saveState()
-      // console.log('Controls current:', controls)
-    }
-  }, [controls])
+//   useEffect(() => {
+//     if (controls) {
+//       // controls.zoomTo(1)
+//       controls.rotatePolarTo(-Math.PI / 2)
+//       controls.saveState()
+//       // console.log('Controls current:', controls)
+//     }
+//   }, [controls])
 
-  useEffect(() => {
-    const handleDeviceMotion = (e: DeviceMotionEvent) => {
-      console.log('Device motion event:', e)
-      const { x, y, z } = e.accelerationIncludingGravity ?? {}
-      if (x == null || y == null || z == null) return
+//   useEffect(() => {
+//     const handleDeviceMotion = (e: DeviceMotionEvent) => {
+//       console.log('Device motion event:', e)
+//       const { x, y, z } = e.accelerationIncludingGravity ?? {}
+//       if (x == null || y == null || z == null) return
 
-      // Exponential low-pass filter on the gravity vector (not on the angles, to avoid ±180° wrap jumps).
-      // Time-based so the smoothing is the same regardless of the sensor's event rate.
-      const now = performance.now()
-      const dt = lastMotionTimeRef.current == null ? 0 : now - lastMotionTimeRef.current
-      lastMotionTimeRef.current = now
+//       // Exponential low-pass filter on the gravity vector (not on the angles, to avoid ±180° wrap jumps).
+//       // Time-based so the smoothing is the same regardless of the sensor's event rate.
+//       const now = performance.now()
+//       const dt = lastMotionTimeRef.current == null ? 0 : now - lastMotionTimeRef.current
+//       lastMotionTimeRef.current = now
 
-      const raw = new Vector3(x, y, z)
-      const prev = smoothedGravityRef.current
-      const next = prev ? prev.clone().lerp(raw, 1 - Math.exp(-dt / GRAVITY_SMOOTHING_MS)) : raw
-      smoothedGravityRef.current = next
-      setGravity(next)
-    }
-    window.addEventListener('devicemotion', handleDeviceMotion)
-    return () => window.removeEventListener('devicemotion', handleDeviceMotion)
-  }, [])
+//       const raw = new Vector3(x, y, z)
+//       const prev = smoothedGravityRef.current
+//       const next = prev ? prev.clone().lerp(raw, 1 - Math.exp(-dt / GRAVITY_SMOOTHING_MS)) : raw
+//       smoothedGravityRef.current = next
+//       setGravity(next)
+//     }
+//     window.addEventListener('devicemotion', handleDeviceMotion)
+//     return () => window.removeEventListener('devicemotion', handleDeviceMotion)
+//   }, [])
 
-  // useEffect(() => {
-  //   if (quaternion) {
-  //     camera.rotation.setFromQuaternion(quaternion)
-  //   }
-  // }, [quaternion])
+//   // useEffect(() => {
+//   //   if (quaternion) {
+//   //     camera.rotation.setFromQuaternion(quaternion)
+//   //   }
+//   // }, [quaternion])
 
-  // useEffect(() => {
-  //   if (quat) {
-  //     camera.rotation.setFromQuaternion(quat)
-  //   }
-  // }, [quat])
+//   // useEffect(() => {
+//   //   if (quat) {
+//   //     camera.rotation.setFromQuaternion(quat)
+//   //   }
+//   // }, [quat])
 
-  return (
-    <div>
-      <div>
-        Device Orientation: alpha: {alpha?.toFixed(2)}, beta: {beta?.toFixed(2)}, gamma:{' '}
-        {gamma?.toFixed(2)}
-      </div>
-      <div>
-        Quaternion:{' '}
-        {quaternion
-          ?.toArray()
-          ?.map((v) => radToDeg(v).toFixed())
-          .join(', ')}
-      </div>
-      <div>
-        Euler:{' '}
-        {euler
-          ?.toArray()
-          ?.map((v) => (typeof v === 'number' ? radToDeg(v).toFixed() : v))
-          .join(', ')}
-      </div>
-      <div>
-        Rotation: x: {rotation.x.toFixed(2)}, y: {rotation.y.toFixed(2)}, z: {rotation.z.toFixed(2)}
-      </div>
-      <div style={{ backgroundColor: 'grey', width: '100vw', height: '100vh' }}>
-        <Canvas camera={camera}>
-          <directionalLight position={[1, 3, 1]} intensity={5} color="#fff" />
-          <directionalLight position={[-1, 3, -1]} intensity={5} color="#fff" />
-          {/* <mesh>
-            <boxGeometry args={[1, 1, 1]} />
-            <meshStandardMaterial color="orange" />
-          </mesh> */}
-          <SceneModelView scene={scene} />
-          {/* <primitive object={phone} /> */}
-          <DeviceOrientationControls
-            deviceOrientation={
-              alpha !== null && beta !== null && gamma !== null && deviceOrientation
-                ? deviceOrientation
-                : {
-                    alpha: rotation.x,
-                    beta: rotation.y,
-                    gamma: rotation.z,
-                  }
-            }
-          />
-          {/* <CameraControls /> */}
-          {/* <OrbitControls /> */}
-        </Canvas>
-      </div>
-    </div>
-  )
-}
+//   return (
+//     <div>
+//       <div>
+//         Device Orientation: alpha: {alpha?.toFixed(2)}, beta: {beta?.toFixed(2)}, gamma:{' '}
+//         {gamma?.toFixed(2)}
+//       </div>
+//       <div>
+//         Quaternion:{' '}
+//         {quaternion
+//           ?.toArray()
+//           ?.map((v) => radToDeg(v).toFixed())
+//           .join(', ')}
+//       </div>
+//       <div>
+//         Euler:{' '}
+//         {euler
+//           ?.toArray()
+//           ?.map((v) => (typeof v === 'number' ? radToDeg(v).toFixed() : v))
+//           .join(', ')}
+//       </div>
+//       <div>
+//         Rotation: x: {rotation.x.toFixed(2)}, y: {rotation.y.toFixed(2)}, z: {rotation.z.toFixed(2)}
+//       </div>
+//       <div style={{ backgroundColor: 'grey', width: '100vw', height: '100vh' }}>
+//         <Canvas camera={camera}>
+//           <directionalLight position={[1, 3, 1]} intensity={5} color="#fff" />
+//           <directionalLight position={[-1, 3, -1]} intensity={5} color="#fff" />
+//           {/* <mesh>
+//             <boxGeometry args={[1, 1, 1]} />
+//             <meshStandardMaterial color="orange" />
+//           </mesh> */}
+//           <SceneModelView scene={scene} />
+//           {/* <primitive object={phone} /> */}
+//           <DeviceOrientationControls
+//             deviceOrientation={
+//               alpha !== null && beta !== null && gamma !== null && deviceOrientation
+//                 ? deviceOrientation
+//                 : {
+//                     alpha: rotation.x,
+//                     beta: rotation.y,
+//                     gamma: rotation.z,
+//                   }
+//             }
+//           />
+//           {/* <CameraControls /> */}
+//           {/* <OrbitControls /> */}
+//         </Canvas>
+//       </div>
+//     </div>
+//   )
+// }
 
 const App = () => {
   const scene = useMemo(() => {
