@@ -13,6 +13,7 @@ export const useDeviceOrientation = (enabled = true) => {
   const [deviceOrientation, setDeviceOrientation] = useState<DeviceOrientationEvent | null>(null)
   const [screenOrientation, setScreenOrientation] = useState(0)
   const [permission, setPermission] = useState<OrientationPermission>('idle')
+  const [euler, setEuler] = useState<Euler | null>(null)
   const screenOrientationRef = useRef(0)
   // const supported = typeof window !== 'undefined' && 'DeviceOrientationEvent' in window
   // const deviceRotation = useMemo(() => new Quaternion(-Math.SQRT1_2, 0, 0, Math.SQRT1_2), [])
@@ -71,35 +72,41 @@ export const useDeviceOrientation = (enabled = true) => {
         new Quaternion().setFromAxisAngle(new Vector3(0, 0, 1), -screenOrientationRef.current),
       )
       setQuaternion(quaternion)
+      setEuler(new Euler().setFromQuaternion(quaternion))
     }
 
     updateScreenOrientation()
     window.addEventListener('orientationchange', updateScreenOrientation)
-    if (enabled) {
-      window.addEventListener('deviceorientationabsolute', onDeviceOrientation)
-    } else {
-      window.addEventListener('deviceorientation', onDeviceOrientation)
-    }
+    // if (enabled) {
+    // window.addEventListener('deviceorientationabsolute', onDeviceOrientation)
+    // } else {
+    window.addEventListener('deviceorientation', onDeviceOrientation)
+    // }
     console.log(
       `Adding device orientation listeners for ${enabled ? 'absolute' : 'relative'} orientation`,
     )
 
     return () => {
       window.removeEventListener('orientationchange', updateScreenOrientation)
-      if (enabled) {
-        window.removeEventListener('deviceorientationabsolute', onDeviceOrientation)
-      } else {
-        window.removeEventListener('deviceorientation', onDeviceOrientation)
-      }
+      // if (enabled) {
+      // window.removeEventListener('deviceorientationabsolute', onDeviceOrientation)
+      // } else {
+      window.removeEventListener('deviceorientation', onDeviceOrientation)
+      // }
       console.log(
         `Cleaning up device orientation listeners for ${enabled ? 'absolute' : 'relative'} orientation`,
       )
     }
   }, [enabled, permission])
 
+  useEffect(() => {
+    if (enabled) enable()
+  }, [enabled])
+
   return {
     heading,
     quaternion,
+    euler,
     deviceOrientation,
     screenOrientation,
     permission: permission,

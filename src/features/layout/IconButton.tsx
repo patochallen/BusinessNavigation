@@ -21,7 +21,7 @@ export const IconButton = ({ icon, position, onClick, ...props }: IconButtonProp
         bottom: position === 'bottomLeft' || position === 'bottomRight' ? '1rem' : 'auto',
         right: position === 'topRight' || position === 'bottomRight' ? '1rem' : 'auto',
         left: position === 'topLeft' || position === 'bottomLeft' ? '1rem' : 'auto',
-        border: '0',
+        border: '0.1px solid #283632',
         backgroundColor: '#fff',
         borderRadius: '50%',
         background: 'rgba(246, 244, 238, 0.78)',

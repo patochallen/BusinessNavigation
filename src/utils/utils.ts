@@ -66,6 +66,14 @@ export function angle2D(v1: Vector2, v2: Vector2): number {
   return angle % 360
 }
 
+export function toXZ(v: Vector3): Vector2 {
+  return new Vector2(v.x, v.z)
+}
+
+export function toV3(v: Vector2, y: number = 0): Vector3 {
+  return new Vector3(v.x, y, v.y)
+}
+
 export function toVector3(Coordinate: Coordinate): Vector3 {
   const lat = degToRad(Coordinate.latitude)
   const lng = degToRad(Coordinate.longitude)

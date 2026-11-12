@@ -1,6 +1,7 @@
 import { degToRad, radToDeg } from 'three/src/math/MathUtils.js'
 import type { Coordinate } from '../domain/types'
 import { Earth } from './utils'
+import type { Vector2 } from 'three'
 
 export type DistanceAndHeading = {
   distanceMeters: number
@@ -38,6 +39,12 @@ export const getDistanceAndHeadingBetweenLocations = (
 export const locToString = (location: GeolocationCoordinates | null): string => {
   if (!location) return 'N/A'
   return `${location.latitude.toFixed(5)}, ${location.longitude.toFixed(5)}`
+}
+
+export const moveLocationByOffset = (location: Coordinate, offset: Vector2): Coordinate => {
+  const newLong = moveLatLng(location, offset.x, 90)
+  const newLocation = moveLatLng(newLong, offset.y, 0)
+  return newLocation
 }
 
 export const moveLocation = (
