@@ -120,7 +120,7 @@ export const FirstPersonViewContent = ({
   }, [fov, height, rotation])
 
   return (
-    <div className="content">
+    <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
       <Canvas camera={camera}>
         <directionalLight position={[1, 3, 1]} intensity={5} color="#fff" />
         <directionalLight position={[-1, 3, -1]} intensity={5} color="#fff" />
