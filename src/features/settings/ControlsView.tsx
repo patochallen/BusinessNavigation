@@ -80,7 +80,7 @@ export const Controls: ControlsConfig[] = [
     read: (settings) => `${radToDeg(settings.headingOffset).toFixed()}º`,
     write: (settings, value) =>
       settings.setHeadingOffset(
-        Math.max(-Math.PI, Math.min(Math.PI, settings.headingOffset + degToRad(value.x * 0.5))),
+        Math.max(-Math.PI, Math.min(Math.PI, settings.headingOffset + degToRad(value.x))),
       ),
     reset: (settings) => settings.removeHeadingOffset(),
     icon: () => <RotateCcw />,

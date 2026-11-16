@@ -19,7 +19,7 @@ body {
   margin: 0;
   min-width: 320px;
   overflow: hidden;
-  height: 100vh;
+  height: 100svh;
 }
 main {
   flex: 1;
