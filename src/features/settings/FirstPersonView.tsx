@@ -11,7 +11,7 @@ import { useDeviceOrientation } from '../../services/device-orientation'
 import { useDeviceMotion } from '../../services/device-motion'
 import './FirstPersonView.css'
 import { getDistanceAndHeadingBetweenLocations } from '../../utils/location'
-import { degToRad, radToDeg } from 'three/src/math/MathUtils.js'
+import { degToRad } from 'three/src/math/MathUtils.js'
 
 export const FirstPersonView = ({
   scene,
