@@ -1,7 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Euler, PerspectiveCamera, Vector2, Vector3 } from 'three'
-import { degToRad, radToDeg } from 'three/src/math/MathUtils.js'
 import { useSettings } from '../../data/useSettings'
 import {
   LOCATION_OFFSET_DEFAULT,
@@ -9,7 +8,6 @@ import {
   OPACITY_DEFAULT,
   CAMERA_FOV_DEFAULT,
   CAMERA_HEIGHT_DEFAULT,
-  CAMERA_ROTATION_DEFAULT,
   LocationStorage,
   Settings,
   SnapshotRepository,
@@ -23,8 +21,6 @@ import { SceneModelView } from '../map/SceneModelView'
 import { toV3 } from '../../utils/utils'
 import { SnapshotList } from './snapshots/SnapshotList'
 import { MapSync } from './MapSync'
-
-import { FirstPersonView } from './FirstPersonView'
 
 export const SettingsIdle = ({
   scene,
@@ -92,7 +88,7 @@ export const SettingsApp = ({ scene, position }: { scene: SceneObject; position:
   const [showIdle, setShowIdle] = useState(false)
   const [, setSettingsVersion] = useState(0)
   const settings = useSettings()
-  return <FirstPersonView scene={scene} position={position} />
+  // return <FirstPersonView scene={scene} position={position} />
   return showSnapshotList ? (
     <SnapshotList scene={scene} onClose={() => setShowSnapshotList(false)} />
   ) : showIdle ? (
@@ -122,7 +118,7 @@ export const SettingsApp = ({ scene, position }: { scene: SceneObject; position:
         opacity={settings.opacity}
         fov={settings.cameraFov}
         height={settings.cameraHeight}
-        rotation={settings.cameraRotation}
+        rotation={new Euler(0, settings.headingOffset, 0)}
       />
       <SettingsScreen
         open={showSettings}
@@ -280,31 +276,31 @@ const SETTINGS: SettingConfig[] = [
     format: (s) => formatNumber(s.cameraHeight),
     isCustomized: (s) => s.cameraHeight !== CAMERA_HEIGHT_DEFAULT,
   },
-  {
-    id: 'cameraRotation',
-    label: 'Camera rotation',
-    storageKey: 'cameraRotation',
-    reset: (s) => s.removeCameraRotation(),
-    // Stored in radians, edited in degrees.
-    fields: [
-      { key: 'x', label: 'X (pitch)', unit: '°', min: -180, max: 180, step: 1, slider: true },
-      { key: 'y', label: 'Y (yaw)', unit: '°', min: -180, max: 180, step: 1, slider: true },
-      { key: 'z', label: 'Z (roll)', unit: '°', min: -180, max: 180, step: 1, slider: true },
-    ],
-    read: (s) => {
-      const { x, y, z } = s.cameraRotation
-      return [radToDeg(x), radToDeg(y), radToDeg(z)]
-    },
-    write: (s, [x, y, z]) =>
-      s.setCameraRotation(
-        new Euler(degToRad(x!), degToRad(y!), degToRad(z!), s.cameraRotation.order || 'XYZ'),
-      ),
-    format: (s) => {
-      const { x, y, z } = s.cameraRotation
-      return `X ${formatNumber(radToDeg(x), 1)}° · Y ${formatNumber(radToDeg(y), 1)}° · Z ${formatNumber(radToDeg(z), 1)}°`
-    },
-    isCustomized: (s) => !s.cameraRotation.equals(CAMERA_ROTATION_DEFAULT),
-  },
+  // {
+  //   id: 'cameraRotation',
+  //   label: 'Camera rotation',
+  //   storageKey: 'cameraRotation',
+  //   reset: (s) => s.removeCameraRotation(),
+  //   // Stored in radians, edited in degrees.
+  //   fields: [
+  //     { key: 'x', label: 'X (pitch)', unit: '°', min: -180, max: 180, step: 1, slider: true },
+  //     { key: 'y', label: 'Y (yaw)', unit: '°', min: -180, max: 180, step: 1, slider: true },
+  //     { key: 'z', label: 'Z (roll)', unit: '°', min: -180, max: 180, step: 1, slider: true },
+  //   ],
+  //   read: (s) => {
+  //     const { x, y, z } = s.cameraRotation
+  //     return [radToDeg(x), radToDeg(y), radToDeg(z)]
+  //   },
+  //   write: (s, [x, y, z]) =>
+  //     s.setCameraRotation(
+  //       new Euler(degToRad(x!), degToRad(y!), degToRad(z!), s.cameraRotation.order || 'XYZ'),
+  //     ),
+  //   format: (s) => {
+  //     const { x, y, z } = s.cameraRotation
+  //     return `X ${formatNumber(radToDeg(x), 1)}° · Y ${formatNumber(radToDeg(y), 1)}° · Z ${formatNumber(radToDeg(z), 1)}°`
+  //   },
+  //   isCustomized: (s) => !s.cameraRotation.equals(CAMERA_ROTATION_DEFAULT),
+  // },
 ]
 
 const toDraft = (values: (number | null)[]) =>

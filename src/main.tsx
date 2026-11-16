@@ -2,14 +2,11 @@ import { StrictMode, useEffect, useMemo } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import i18n from './i18n/i18n'
-import { degToRad } from 'three/src/math/MathUtils.js'
-import { Vector3 } from 'three'
 import { useLoader } from '@react-three/fiber'
 import { GLTFLoader } from 'three/examples/jsm/Addons.js'
 import { SceneModel } from './domain/scene-model'
-import { SettingsApp } from './features/settings/SettingsScreen'
 import { useGeolocation } from './services/location'
-import { getDistanceAndHeadingBetweenLocations } from './utils/location'
+import { FirstPersonView } from './features/settings/FirstPersonView'
 
 document.documentElement.lang = i18n.language
 
@@ -356,25 +353,27 @@ const App = () => {
   }, [])
   const { position: geoPosition } = useGeolocation()
   const location = useMemo(() => geoPosition?.coords, [geoPosition])
-  const position = useMemo(() => {
-    if (!location) return new Vector3(0, 0, 0)
-    const { distanceMeters, headingDegrees } = getDistanceAndHeadingBetweenLocations(
-      location,
-      ParkLocation,
-    )
-    const p = new Vector3(
-      distanceMeters * Math.sin(degToRad(headingDegrees)),
-      0,
-      -distanceMeters * Math.cos(degToRad(headingDegrees)),
-    )
-    return p
-  }, [location])
+  // const { locationEnabled } = useSettings()
+  // const position = useMemo(() => {
+  //   if (!location) return new Vector3(0, 0, 0)
+  //   const { distanceMeters, headingDegrees } = getDistanceAndHeadingBetweenLocations(
+  //     location,
+  //     ParkLocation,
+  //   )
+  //   const p = new Vector3(
+  //     distanceMeters * Math.sin(degToRad(headingDegrees)),
+  //     0,
+  //     -distanceMeters * Math.cos(degToRad(headingDegrees)),
+  //   )
+  //   return p
+  // }, [location])
   useEffect(() => {
     const handleContextMenu = (e: MouseEvent) => e.preventDefault()
     document.addEventListener('contextmenu', handleContextMenu)
     return () => document.removeEventListener('contextmenu', handleContextMenu)
   }, [])
-  return <SettingsApp scene={scene} position={position} />
+  return <FirstPersonView scene={scene} location={location} destination={ParkLocation} /> //position={locationEnabled ? position : new Vector3(0, 0, 0)} />
+  // return <SettingsApp scene={scene} position={position} />
 }
 
 createRoot(document.getElementById('root')!).render(

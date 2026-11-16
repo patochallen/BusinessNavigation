@@ -25,7 +25,7 @@
   padding: 15px;
   align-items: flex-start;
   justify-content: flex-end;
-  gap: 15px;
+  gap: 10px;
   margin-top: auto;
 }
 .control-item {
@@ -96,6 +96,20 @@
   color: white;
   z-index: 12;
   animation: expand 0.3s ease-in-out;
+}
+.controls-reset-button {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 35px;
+  height: 35px;
+  margin: 15px;
+  display: flex;
+  color: red;
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+  align-items: center;
 }
 
 @keyframes expand {

@@ -1,13 +1,14 @@
-import { Euler, Vector2, type EulerOrder } from 'three'
+import { Euler, Vector2 } from 'three'
 import type { Coordinate } from '../domain/types'
 
+export const MANUAL_ORIENTATION_DEFAULT = false
+export const LOCATION_ENABLED_DEFAULT = true
 export const LOCATION_OFFSET_DEFAULT = new Vector2(0, 0)
 export const HEADING_OFFSET_DEFAULT = 0
 export const OPACITY_DEFAULT = 1
 
 export const CAMERA_FOV_DEFAULT = 60
 export const CAMERA_HEIGHT_DEFAULT = 1.8
-export const CAMERA_ROTATION_DEFAULT = new Euler(0, 0, 0, 'XYZ')
 
 export type StateSnapshot = {
   timestamp?: number
@@ -29,36 +30,42 @@ export type StoredSnapshot = {
 }
 
 export type SettingsSnapshot = {
+  manualOrientation: boolean
+  locationEnabled: boolean
   location: Coordinate | null
   locationOffset: Vector2
   headingOffset: number
   opacity: number
   cameraFov: number
   cameraHeight: number
-  cameraRotation: Euler
 }
 
 export class Settings {
   private static instance: Settings | null = null
+  private _manualOrientation: boolean
+  private _locationEnabled: boolean
   private _location: Coordinate | null
   private _locationOffset: Vector2
   private _headingOffset: number
   private _cameraFov: number
-  private _cameraRotation: Euler
   private _cameraHeight: number
   private _opacity: number
   private constructor() {
+    this._manualOrientation = LocationStorage.getManualOrientation()
+    this._locationEnabled = LocationStorage.getLocationEnabled()
     this._location = LocationStorage.getLocation()
     this._locationOffset = LocationStorage.getLocationOffset()
     this._headingOffset = LocationStorage.getHeadingOffset()
     this._cameraFov = LocationStorage.getCameraFov()
-    this._cameraRotation = LocationStorage.getCameraRotation()
     this._cameraHeight = LocationStorage.getCameraHeight()
     this._opacity = LocationStorage.getOpacity()
   }
 
   get location(): Coordinate | null {
     return this._location
+  }
+  get locationEnabled(): boolean {
+    return this._locationEnabled
   }
   get locationOffset(): Vector2 {
     return this._locationOffset
@@ -69,11 +76,11 @@ export class Settings {
   get cameraFov(): number {
     return this._cameraFov
   }
-  get cameraRotation(): Euler {
-    return this._cameraRotation
-  }
   get cameraHeight(): number {
     return this._cameraHeight
+  }
+  get manualOrientation(): boolean {
+    return this._manualOrientation
   }
   get opacity(): number {
     return this._opacity
@@ -88,8 +95,24 @@ export class Settings {
 
   clear() {
     LocationStorage.clear()
+    this._manualOrientation = false
+    this._locationEnabled = LOCATION_ENABLED_DEFAULT
+    this._location = null
+    this._locationOffset = LOCATION_OFFSET_DEFAULT
+    this._headingOffset = HEADING_OFFSET_DEFAULT
+    this._cameraFov = CAMERA_FOV_DEFAULT
+    this._cameraHeight = CAMERA_HEIGHT_DEFAULT
+    this._opacity = OPACITY_DEFAULT
   }
 
+  setManualOrientation(manual: boolean) {
+    LocationStorage.setManualOrientation(manual)
+    this._manualOrientation = manual
+  }
+  setLocationEnabled(enabled: boolean) {
+    LocationStorage.setLocationEnabled(enabled)
+    this._locationEnabled = enabled
+  }
   setLocation(location: Coordinate) {
     LocationStorage.setLocation(location)
     this._location = location
@@ -106,10 +129,6 @@ export class Settings {
     LocationStorage.setCameraFov(fov)
     this._cameraFov = fov
   }
-  setCameraRotation(rotation: Euler) {
-    LocationStorage.setCameraRotation(rotation)
-    this._cameraRotation = rotation
-  }
   setCameraHeight(height: number) {
     LocationStorage.setCameraHeight(height)
     this._cameraHeight = height
@@ -119,6 +138,14 @@ export class Settings {
     this._opacity = opacity
   }
 
+  removeManualOrientation() {
+    LocationStorage.removeManualOrientation()
+    this._manualOrientation = false
+  }
+  removeLocationEnabled() {
+    LocationStorage.removeLocationEnabled()
+    this._locationEnabled = LOCATION_ENABLED_DEFAULT
+  }
   removeLocation() {
     LocationStorage.removeLocation()
     this._location = null
@@ -143,20 +170,17 @@ export class Settings {
     LocationStorage.removeOpacity()
     this._opacity = OPACITY_DEFAULT
   }
-  removeCameraRotation() {
-    LocationStorage.removeCameraRotation()
-    this._cameraRotation = CAMERA_ROTATION_DEFAULT
-  }
 
   getSnapshot(): SettingsSnapshot {
     return {
+      manualOrientation: this._manualOrientation,
+      locationEnabled: this._locationEnabled,
       location: this._location,
       locationOffset: this._locationOffset,
       headingOffset: this._headingOffset,
       opacity: this._opacity,
       cameraFov: this._cameraFov,
       cameraHeight: this._cameraHeight,
-      cameraRotation: this._cameraRotation,
     }
   }
 }
@@ -214,6 +238,10 @@ const reviveSnapshotValue = (key: string, value: unknown): unknown => {
 }
 
 export const LocationStorage = {
+  setManualOrientation: (manual: boolean) =>
+    StorageRepository.setItem('manualOrientation', manual.toString()),
+  setLocationEnabled: (enabled: boolean) =>
+    StorageRepository.setItem('locationEnabled', enabled.toString()),
   setLocation: (location: Coordinate) =>
     StorageRepository.setItem('location', JSON.stringify(location)),
   setLocationOffset: (offset: Vector2) =>
@@ -223,9 +251,15 @@ export const LocationStorage = {
   setOpacity: (opacity: number) => StorageRepository.setItem('opacity', opacity.toString()),
   setCameraFov: (fov: number) => StorageRepository.setItem('cameraFov', fov.toString()),
   setCameraHeight: (height: number) => StorageRepository.setItem('cameraHeight', height.toString()),
-  setCameraRotation: (rotation: Euler) =>
-    StorageRepository.setItem('cameraRotation', rotation.toArray().toString()),
 
+  getManualOrientation: (): boolean => {
+    const manual = StorageRepository.getItem('manualOrientation')
+    return manual ? manual === 'true' : MANUAL_ORIENTATION_DEFAULT
+  },
+  getLocationEnabled: (): boolean => {
+    const enabled = StorageRepository.getItem('locationEnabled')
+    return enabled ? enabled === 'true' : LOCATION_ENABLED_DEFAULT
+  },
   getLocation: (): Coordinate | null => {
     const location = StorageRepository.getItem('location')
     return location ? JSON.parse(location) : null
@@ -250,44 +284,15 @@ export const LocationStorage = {
     const fov = StorageRepository.getItem('cameraFov')
     return fov ? parseFloat(fov) : CAMERA_FOV_DEFAULT
   },
-  getCameraRotation: (): Euler => {
-    const rotation = StorageRepository.getItem('cameraRotation')
-    if (!rotation) return CAMERA_ROTATION_DEFAULT
 
-    const [x, y, z, w] = rotation.split(',')
-    let order: EulerOrder
-    switch (w) {
-      case 'XYZ':
-        order = 'XYZ'
-        break
-      case 'YXZ':
-        order = 'YXZ'
-        break
-      case 'ZXY':
-        order = 'ZXY'
-        break
-      case 'ZYX':
-        order = 'ZYX'
-        break
-      case 'YZX':
-        order = 'YZX'
-        break
-      case 'XZY':
-        order = 'XZY'
-        break
-      default:
-        throw new Error(`Invalid stored camera rotation order: ${w}`)
-    }
-    return new Euler(parseFloat(x), parseFloat(y), parseFloat(z), order)
-  },
-
+  removeManualOrientation: () => StorageRepository.removeItem('manualOrientation'),
+  removeLocationEnabled: () => StorageRepository.removeItem('locationEnabled'),
   removeLocation: () => StorageRepository.removeItem('location'),
   removeLocationOffset: () => StorageRepository.removeItem('locationOffset'),
   removeHeadingOffset: () => StorageRepository.removeItem('headingOffset'),
   removeOpacity: () => StorageRepository.removeItem('opacity'),
   removeCameraFov: () => StorageRepository.removeItem('cameraFov'),
   removeCameraHeight: () => StorageRepository.removeItem('cameraHeight'),
-  removeCameraRotation: () => StorageRepository.removeItem('cameraRotation'),
 
   addSnapshot: (snapshot: SettingsSnapshot) => {
     const snapshots = StorageRepository.getItem('snapshots')
@@ -328,13 +333,14 @@ export const LocationStorage = {
   },
   removeStateSnapshots: () => StorageRepository.removeItem('stateSnapshots'),
   clear: () => {
+    StorageRepository.removeItem('manualOrientation')
+    StorageRepository.removeItem('locationEnabled')
     StorageRepository.removeItem('location')
     StorageRepository.removeItem('locationOffset')
     StorageRepository.removeItem('headingOffset')
     StorageRepository.removeItem('opacity')
     StorageRepository.removeItem('cameraFov')
     StorageRepository.removeItem('cameraHeight')
-    StorageRepository.removeItem('cameraRotation')
     StorageRepository.removeItem('snapshots')
     StorageRepository.removeItem('stateSnapshots')
   },

@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { Vector2 } from 'three'
-
-export type GestureMode = 'displacement' | 'rotation'
+import type { GestureMode } from './ControlsView'
 
 interface GestureControlsProps {
   mode: GestureMode

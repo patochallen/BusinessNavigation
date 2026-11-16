@@ -4,9 +4,12 @@ import {
   CameraIcon,
   ChartSplineIcon,
   CheckIcon,
+  LocateIcon,
+  LocateOffIcon,
   Move3dIcon,
   MoveVertical,
-  Rotate3dIcon,
+  PointerIcon,
+  PointerOffIcon,
   RotateCcw,
   SettingsIcon,
   Trash2Icon,
@@ -18,19 +21,22 @@ import {
   HEADING_OFFSET_DEFAULT,
   LOCATION_OFFSET_DEFAULT,
   OPACITY_DEFAULT,
+  MANUAL_ORIENTATION_DEFAULT,
   type Settings,
-  CAMERA_ROTATION_DEFAULT,
+  LOCATION_ENABLED_DEFAULT,
 } from '../../data/storage-repository'
-import { GestureControls, type GestureMode } from './GestureControls'
-import { Euler, Vector2 } from 'three'
+import { GestureControls } from './GestureControls'
+import { Vector2 } from 'three'
 import { degToRad, radToDeg } from 'three/src/math/MathUtils.js'
+
+export type GestureMode = 'displacement' | 'rotation' | 'toggle'
 
 export type ControlsConfig = {
   label: string
   read: (settings: Settings) => string
   write: (settings: Settings, value: Vector2) => void
   reset: (settings: Settings) => void
-  icon: React.ReactNode
+  icon: (settings: Settings) => React.ReactNode
   default: string
   hasChanged: (settings: Settings) => boolean
   mode: GestureMode
@@ -38,13 +44,33 @@ export type ControlsConfig = {
 
 export const Controls: ControlsConfig[] = [
   {
+    label: 'Location Enabled',
+    read: (settings) => (settings.locationEnabled ? 'On' : 'Off'),
+    write: (settings) => settings.setLocationEnabled(!settings.locationEnabled),
+    reset: (settings) => settings.removeLocationEnabled(),
+    icon: (settings) => (settings.locationEnabled ? <LocateIcon /> : <LocateOffIcon />),
+    default: LOCATION_ENABLED_DEFAULT ? 'On' : 'Off',
+    hasChanged: (settings) => settings.locationEnabled !== LOCATION_ENABLED_DEFAULT,
+    mode: 'toggle',
+  },
+  {
+    label: 'Manual Orientation',
+    read: (settings) => `${settings.manualOrientation ? 'On' : 'Off'}`,
+    write: (settings) => settings.setManualOrientation(!settings.manualOrientation),
+    reset: (settings) => settings.removeManualOrientation(),
+    icon: (settings) => (settings.manualOrientation ? <PointerIcon /> : <PointerOffIcon />),
+    default: MANUAL_ORIENTATION_DEFAULT ? 'On' : 'Off',
+    hasChanged: (settings) => settings.manualOrientation !== MANUAL_ORIENTATION_DEFAULT,
+    mode: 'toggle',
+  },
+  {
     label: 'Location Offset',
     read: (settings) =>
       `(${settings.locationOffset.x.toFixed()}, ${settings.locationOffset.y.toFixed()})`,
     write: (settings, value) =>
       settings.setLocationOffset(settings.locationOffset.clone().add(value.multiplyScalar(0.1))),
     reset: (settings) => settings.removeLocationOffset(),
-    icon: <Move3dIcon />,
+    icon: () => <Move3dIcon />,
     default: `(${LOCATION_OFFSET_DEFAULT.x.toFixed()}, ${LOCATION_OFFSET_DEFAULT.y.toFixed()})`,
     hasChanged: (settings) => !settings.locationOffset.equals(LOCATION_OFFSET_DEFAULT),
     mode: 'displacement',
@@ -57,7 +83,7 @@ export const Controls: ControlsConfig[] = [
         Math.max(-Math.PI, Math.min(Math.PI, settings.headingOffset + degToRad(value.x * 0.5))),
       ),
     reset: (settings) => settings.removeHeadingOffset(),
-    icon: <RotateCcw />,
+    icon: () => <RotateCcw />,
     default: `${HEADING_OFFSET_DEFAULT.toFixed()}º`,
     hasChanged: (settings) => settings.headingOffset !== HEADING_OFFSET_DEFAULT,
     mode: 'rotation',
@@ -66,9 +92,9 @@ export const Controls: ControlsConfig[] = [
     label: 'Opacity',
     read: (settings) => `${settings.opacity.toFixed(2)}`,
     write: (settings, value) =>
-      settings.setOpacity(Math.min(1, Math.max(0, settings.opacity + value.x * -0.001))),
+      settings.setOpacity(Math.min(1, Math.max(0, settings.opacity + value.x * -0.005))),
     reset: (settings) => settings.removeOpacity(),
-    icon: <ChartSplineIcon />,
+    icon: () => <ChartSplineIcon />,
     default: `${OPACITY_DEFAULT.toFixed(2)}`,
     hasChanged: (settings) => settings.opacity !== OPACITY_DEFAULT,
     mode: 'displacement',
@@ -78,10 +104,10 @@ export const Controls: ControlsConfig[] = [
     read: (settings) => `${settings.cameraFov.toFixed()}º`,
     write: (settings, value) =>
       settings.setCameraFov(
-        Math.max(30, Math.min(90, settings.cameraFov + (value.x - value.y) * -0.05)),
+        Math.max(30, Math.min(90, settings.cameraFov + (value.x - value.y) * -0.1)),
       ),
     reset: (settings) => settings.removeCameraFov(),
-    icon: <CameraIcon />,
+    icon: () => <CameraIcon />,
     default: `${CAMERA_FOV_DEFAULT.toFixed()}º`,
     hasChanged: (settings) => settings.cameraFov !== CAMERA_FOV_DEFAULT,
     mode: 'displacement',
@@ -92,37 +118,10 @@ export const Controls: ControlsConfig[] = [
     write: (settings, value) =>
       settings.setCameraHeight(Math.max(0.5, settings.cameraHeight + value.y * 0.01)),
     reset: (settings) => settings.removeCameraHeight(),
-    icon: <MoveVertical />,
+    icon: () => <MoveVertical />,
     default: `${CAMERA_HEIGHT_DEFAULT.toFixed(1)} m`,
     hasChanged: (settings) => settings.cameraHeight !== CAMERA_HEIGHT_DEFAULT,
     mode: 'displacement',
-  },
-  {
-    label: 'Camera Rotation',
-    read: (settings) =>
-      `(${radToDeg(settings.cameraRotation.x).toFixed()}, ${radToDeg(settings.cameraRotation.y).toFixed()}, ${radToDeg(settings.cameraRotation.z).toFixed()}, ${settings.cameraRotation.order})`,
-    write: (settings, value) => {
-      console.log('Camera rotation change:', value)
-      settings.setCameraRotation(
-        new Euler(
-          Math.max(
-            -Math.PI / 2,
-            Math.min(Math.PI / 2, settings.cameraRotation.x + degToRad(value.y)),
-          ),
-          settings.cameraRotation.y,
-          Math.max(
-            -Math.PI / 2,
-            Math.min(Math.PI / 2, settings.cameraRotation.z + degToRad(value.x * 0.5)),
-          ),
-          'XYZ',
-        ),
-      )
-    },
-    reset: (settings) => settings.removeCameraRotation(),
-    icon: <Rotate3dIcon />,
-    default: `${radToDeg(CAMERA_ROTATION_DEFAULT.x).toFixed()}, ${radToDeg(CAMERA_ROTATION_DEFAULT.y).toFixed()}, ${radToDeg(CAMERA_ROTATION_DEFAULT.z).toFixed()}, ${CAMERA_ROTATION_DEFAULT.order}`,
-    hasChanged: (settings) => !settings.cameraRotation.equals(CAMERA_ROTATION_DEFAULT),
-    mode: 'rotation',
   },
 ]
 
@@ -133,6 +132,7 @@ export const ControlsView = ({
   setShowControls,
   setExpandedControl,
   onSettingsChange,
+  scale = 1,
 }: {
   settings: Settings
   expandedControl: ControlsConfig | null
@@ -140,9 +140,8 @@ export const ControlsView = ({
   setShowControls: (show: boolean) => void
   setExpandedControl: (control: ControlsConfig | null) => void
   onSettingsChange: () => void
+  scale?: number
 }) => {
-  // const [showControls, setShowControls] = useState(false)
-
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return
@@ -166,6 +165,7 @@ export const ControlsView = ({
           settings={settings}
           onSettingsChange={onSettingsChange}
           onClose={() => setExpandedControl(null)}
+          scale={scale}
         />
       ) : (
         <div className="controls-view">
@@ -179,8 +179,16 @@ export const ControlsView = ({
                 label={control.label}
                 value={control.read(settings)}
                 defaultValue={control.default}
-                icon={control.icon}
-                onClick={() => setExpandedControl(control)}
+                icon={control.icon(settings)}
+                onClick={() => {
+                  if (control.mode === 'toggle') {
+                    control.write(settings, new Vector2())
+                    onSettingsChange()
+                  } else {
+                    setExpandedControl(control)
+                  }
+                }}
+                mode={control.mode}
                 onReset={
                   control.hasChanged(settings)
                     ? () => {
@@ -192,6 +200,17 @@ export const ControlsView = ({
               />
             ))}
           </div>
+          <button
+            type="button"
+            className="controls-reset-button"
+            title="Reset to default"
+            onClick={() => {
+              settings.clear()
+              onSettingsChange()
+            }}
+          >
+            <Trash2Icon />
+          </button>
         </div>
       )}
     </>
@@ -202,6 +221,7 @@ export const ControlItem = ({
   label,
   value,
   icon,
+  mode,
   onClick,
   onReset,
 }: {
@@ -209,6 +229,7 @@ export const ControlItem = ({
   value: string
   defaultValue: string
   icon: React.ReactNode
+  mode: GestureMode
   onClick: () => void
   onReset?: () => void
 }) => {
@@ -219,7 +240,7 @@ export const ControlItem = ({
         <span className="control-item-label">{label}</span>
         <span className="control-item-value">{value}</span>
       </div>
-      {onReset && (
+      {mode !== 'toggle' && onReset && (
         <Trash2Icon
           className="control-item-delete-icon"
           size={18}
@@ -238,18 +259,20 @@ const ExpandedControl = ({
   settings,
   onSettingsChange,
   onClose,
+  scale = 1,
 }: {
   control: ControlsConfig
   settings: Settings
   onSettingsChange: () => void
   onClose: () => void
+  scale?: number
 }) => {
   return (
     <>
       <GestureControls
         mode={control.mode}
         onChange={(values) => {
-          control.write(settings, values)
+          control.write(settings, values.multiplyScalar(scale))
           onSettingsChange()
         }}
       />

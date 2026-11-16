@@ -5,7 +5,7 @@ import { remap } from '../utils/utils'
 const GRAVITY_SMOOTHING_MS = 100
 const GRAVITY = 9.8
 
-export const useDeviceMotion = (manual: boolean) => {
+export const useDeviceMotion = () => {
   const [euler, setEuler] = useState<Euler>(new Euler())
   const smoothedGravityRef = useRef<Vector3 | null>(null)
   const lastMotionTimeRef = useRef<number | null>(null)
@@ -56,6 +56,6 @@ export const useDeviceMotion = (manual: boolean) => {
       console.log('Device motion handler removed')
       window.removeEventListener('devicemotion', handleDeviceMotion)
     }
-  }, [manual])
+  }, [])
   return euler
 }

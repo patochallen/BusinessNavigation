@@ -2,35 +2,58 @@ import { SceneObject } from '../../domain/scene-model'
 import { Euler, PerspectiveCamera, Vector3 } from 'three'
 import { Canvas } from '@react-three/fiber'
 import { useSettings } from '../../data/useSettings'
+import type { Coordinate } from '../../domain/types'
 import { ControlsView, type ControlsConfig } from './ControlsView'
 import { useEffect, useMemo, useState } from 'react'
 import { toV3 } from '../../utils/utils'
 import { SceneModelView } from '../map/SceneModelView'
 import { useDeviceOrientation } from '../../services/device-orientation'
-import { IconButton } from '../layout/IconButton'
-import { PointerIcon, PointerOffIcon } from 'lucide-react'
 import { useDeviceMotion } from '../../services/device-motion'
+import './FirstPersonView.css'
+import { getDistanceAndHeadingBetweenLocations } from '../../utils/location'
+import { degToRad } from 'three/src/math/MathUtils.js'
 
-export const FirstPersonView = ({ scene, position }: { scene: SceneObject; position: Vector3 }) => {
+export const FirstPersonView = ({
+  scene,
+  location,
+  destination,
+}: {
+  scene: SceneObject
+  location: GeolocationCoordinates | undefined
+  destination: Coordinate
+}) => {
   const [, setSettingsVersion] = useState(0)
   const [expandedControl, setExpandedControl] = useState<ControlsConfig | null>(null)
-  const [manualOrientation, setManualOrientation] = useState(false)
   const [showControls, setShowControls] = useState(false)
-  const euler = useOrientation(manualOrientation)
   const settings = useSettings()
+  const [loc, setLoc] = useState<GeolocationCoordinates | undefined>(undefined)
+  const position = useMemo(() => {
+    if (!loc) return new Vector3(0, 0, 0)
+    const { distanceMeters, headingDegrees } = getDistanceAndHeadingBetweenLocations(
+      loc,
+      destination,
+    )
+    const p = new Vector3(
+      distanceMeters * Math.sin(degToRad(headingDegrees)),
+      0,
+      -distanceMeters * Math.cos(degToRad(headingDegrees)),
+    )
+    return p
+  }, [loc])
   const offsetPosition = useMemo(
     () => position.clone().sub(toV3(settings.locationOffset)),
     [position, settings.locationOffset],
   )
+  const euler = useOrientation(settings.manualOrientation)
   const rotation = useMemo(
     () =>
       new Euler(
-        settings.cameraRotation.x + (euler?.x ?? 0),
-        settings.cameraRotation.y + settings.headingOffset + (euler?.y ?? 0),
-        settings.cameraRotation.z + (euler?.z ?? 0),
+        euler?.x ?? 0,
+        settings.headingOffset + (euler?.y ?? 0),
+        euler?.z ?? 0,
         euler?.order ?? 'XYZ',
       ),
-    [euler, settings.cameraRotation, settings.headingOffset],
+    [euler, settings.headingOffset],
   )
   const [height, setHeight] = useState(150)
   const showTop = useMemo(
@@ -45,12 +68,20 @@ export const FirstPersonView = ({ scene, position }: { scene: SceneObject; posit
   }, [height, settings.cameraHeight, showTop])
 
   useEffect(() => {
+    if (!location) return
+    if (!settings.locationEnabled && loc !== undefined) return
+    setLoc(location)
+  }, [location, settings.locationEnabled])
+
+  useEffect(() => {
     scene.setSceneOpacity(settings.opacity)
     return () => scene.setSceneOpacity(1)
   }, [settings.opacity])
 
+  const scale = useMemo(() => Math.max(0.5, height / 100), [height])
+
   return (
-    <div style={{ width: '100%', height: '100%' }}>
+    <div className="first-person-view">
       <FirstPersonViewContent
         scene={scene}
         pos={offsetPosition}
@@ -65,30 +96,15 @@ export const FirstPersonView = ({ scene, position }: { scene: SceneObject; posit
         showControls={showControls}
         setShowControls={setShowControls}
         onSettingsChange={() => setSettingsVersion((v) => v + 1)}
+        scale={scale}
       />
-      {showControls && (
-        <IconButton
-          position="topLeft"
-          icon={manualOrientation ? <PointerIcon /> : <PointerOffIcon />}
-          onClick={() => setManualOrientation(!manualOrientation)}
-        />
-      )}
       {showTop && <div className="position-marker" />}
       {expandedControl?.label === 'Location Offset' && (
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            padding: '10px',
-            display: 'flex',
-            gap: '5px',
-          }}
-          onPointerDown={(e) => e.stopPropagation()}
-        >
+        <div className="camera-height-control" onPointerDown={(e) => e.stopPropagation()}>
           <input
             type="range"
             min={settings.cameraHeight}
-            max="1000"
+            max={1000}
             value={height}
             onChange={(e) => setHeight(parseFloat(e.target.value))}
           />
@@ -120,7 +136,7 @@ export const FirstPersonViewContent = ({
   }, [fov, height, rotation])
 
   return (
-    <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
+    <div className="first-person-view-content">
       <Canvas camera={camera}>
         <directionalLight position={[1, 3, 1]} intensity={5} color="#fff" />
         <directionalLight position={[-1, 3, -1]} intensity={5} color="#fff" />
@@ -139,7 +155,9 @@ export const FirstPersonViewContent = ({
 }
 
 const useOrientation = (manual: boolean): Euler => {
-  const { euler } = useDeviceOrientation()
-  const motionEuler = useDeviceMotion(manual)
-  return manual ? motionEuler : (euler ?? new Euler(0, 0, 0, 'XYZ'))
+  const motionEuler = useDeviceMotion()
+  const { euler: orientationEuler } = useDeviceOrientation()
+  const fallbackEuler = useMemo(() => new Euler(0, 0, 0, 'XYZ'), [])
+
+  return manual ? motionEuler : (orientationEuler ?? fallbackEuler)
 }
