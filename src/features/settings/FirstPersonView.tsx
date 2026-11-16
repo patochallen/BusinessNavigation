@@ -12,6 +12,7 @@ import { useDeviceMotion } from '../../services/device-motion'
 import './FirstPersonView.css'
 import { getDistanceAndHeadingBetweenLocations } from '../../utils/location'
 import { degToRad } from 'three/src/math/MathUtils.js'
+import { CameraView } from '../camera/CameraView'
 
 export const FirstPersonView = ({
   scene,
@@ -134,6 +135,7 @@ export const FirstPersonViewContent = ({
 
   return (
     <div className="first-person-view-content">
+      <CameraView />
       <Canvas camera={camera}>
         <directionalLight position={[1, 3, 1]} intensity={5} color="#fff" />
         <directionalLight position={[-1, 3, -1]} intensity={5} color="#fff" />
