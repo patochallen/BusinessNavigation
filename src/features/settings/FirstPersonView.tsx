@@ -11,7 +11,7 @@ import { useDeviceOrientation } from '../../services/device-orientation'
 import { useDeviceMotion } from '../../services/device-motion'
 import './FirstPersonView.css'
 import { getDistanceAndHeadingBetweenLocations } from '../../utils/location'
-import { degToRad } from 'three/src/math/MathUtils.js'
+import { degToRad, radToDeg } from 'three/src/math/MathUtils.js'
 
 export const FirstPersonView = ({
   scene,
@@ -45,16 +45,12 @@ export const FirstPersonView = ({
     [position, settings.locationOffset],
   )
   const euler = useOrientation(settings.manualOrientation)
-  const rotation = useMemo(
-    () =>
-      new Euler(
-        euler?.x ?? 0,
-        settings.headingOffset + (euler?.y ?? 0),
-        euler?.z ?? 0,
-        euler?.order ?? 'XYZ',
-      ),
-    [euler, settings.headingOffset],
-  )
+  const rotation = useMemo(() => {
+    const e = euler.clone().reorder('YXZ')
+    e.y += settings.headingOffset
+    e.reorder('XYZ')
+    return e
+  }, [euler, settings.headingOffset])
   const [height, setHeight] = useState(150)
   const showTop = useMemo(
     () =>
@@ -67,6 +63,8 @@ export const FirstPersonView = ({
     return settings.cameraHeight
   }, [height, settings.cameraHeight, showTop])
 
+  const scale = useMemo(() => Math.max(0.1, height / 100), [height])
+
   useEffect(() => {
     if (!location) return
     if (!settings.locationEnabled && loc !== undefined) return
@@ -77,8 +75,6 @@ export const FirstPersonView = ({
     scene.setSceneOpacity(settings.opacity)
     return () => scene.setSceneOpacity(1)
   }, [settings.opacity])
-
-  const scale = useMemo(() => Math.max(0.5, height / 100), [height])
 
   return (
     <div className="first-person-view">
@@ -96,7 +92,8 @@ export const FirstPersonView = ({
         showControls={showControls}
         setShowControls={setShowControls}
         onSettingsChange={() => setSettingsVersion((v) => v + 1)}
-        scale={scale}
+        scale={showTop ? scale : 1}
+        heading={!showTop ? rotation.y : 0}
       />
       {showTop && <div className="position-marker" />}
       {expandedControl?.label === 'Location Offset' && (

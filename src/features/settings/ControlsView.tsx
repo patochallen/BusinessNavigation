@@ -68,7 +68,7 @@ export const Controls: ControlsConfig[] = [
     read: (settings) =>
       `(${settings.locationOffset.x.toFixed()}, ${settings.locationOffset.y.toFixed()})`,
     write: (settings, value) =>
-      settings.setLocationOffset(settings.locationOffset.clone().add(value.multiplyScalar(0.1))),
+      settings.setLocationOffset(settings.locationOffset.clone().add(value.multiplyScalar(0.05))),
     reset: (settings) => settings.removeLocationOffset(),
     icon: () => <Move3dIcon />,
     default: `(${LOCATION_OFFSET_DEFAULT.x.toFixed()}, ${LOCATION_OFFSET_DEFAULT.y.toFixed()})`,
@@ -133,6 +133,7 @@ export const ControlsView = ({
   setExpandedControl,
   onSettingsChange,
   scale = 1,
+  heading,
 }: {
   settings: Settings
   expandedControl: ControlsConfig | null
@@ -141,6 +142,7 @@ export const ControlsView = ({
   setExpandedControl: (control: ControlsConfig | null) => void
   onSettingsChange: () => void
   scale?: number
+  heading: number
 }) => {
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -166,6 +168,7 @@ export const ControlsView = ({
           onSettingsChange={onSettingsChange}
           onClose={() => setExpandedControl(null)}
           scale={scale}
+          heading={heading}
         />
       ) : (
         <div className="controls-view">
@@ -260,19 +263,22 @@ const ExpandedControl = ({
   onSettingsChange,
   onClose,
   scale = 1,
+  heading,
 }: {
   control: ControlsConfig
   settings: Settings
   onSettingsChange: () => void
   onClose: () => void
   scale?: number
+  heading: number
 }) => {
   return (
     <>
       <GestureControls
         mode={control.mode}
         onChange={(values) => {
-          control.write(settings, values.multiplyScalar(scale))
+          const value = values.clone().multiplyScalar(scale).rotateAround(new Vector2(), heading)
+          control.write(settings, value)
           onSettingsChange()
         }}
       />
