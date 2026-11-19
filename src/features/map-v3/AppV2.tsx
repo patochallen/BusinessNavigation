@@ -326,7 +326,7 @@ const MapScene = ({
   )
 }
 
-const AttractionList = ({
+export const AttractionList = ({
   position,
   offset,
   attractions,
@@ -364,6 +364,14 @@ const AttractionItem = ({
   onSelect: (attraction: AttractionModel) => void
 }) => {
   const attractionPosition = toXZ(attraction.getPosition())
+  const distance = position.distanceTo(attractionPosition)
+  if (attraction.getName() === 'Carousel')
+    console.log(
+      `Distance to attraction ${attraction.getName()}`,
+      position,
+      attractionPosition,
+      distance,
+    )
   const angle = angle2D(position, attractionPosition) + 90
   const angleDifference = useMemo(() => {
     let ang = (angle - offset) % 360
@@ -379,7 +387,7 @@ const AttractionItem = ({
       }}
     >
       {attraction.getName()} &ensp;
-      {position.distanceTo(attractionPosition).toFixed()} mts &ensp;
+      {distance.toFixed()} mts &ensp;
       {/* Pos({position.x.toFixed()}, {position.y.toFixed()})&ensp; */}
       {angleDifference.toFixed(1)}º &ensp;
       <ArrowUp style={{ transform: `rotate(${angleDifference}deg)` }} />

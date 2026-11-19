@@ -2,7 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import i18n from './i18n/i18n'
-import { App } from './features/settings/SelectModelScreen'
+import { App } from './features/settings/business/App'
 
 document.documentElement.lang = i18n.language
 

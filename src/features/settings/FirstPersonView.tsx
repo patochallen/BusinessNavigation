@@ -77,7 +77,11 @@ export const FirstPersonView = ({
   }, [settings.opacity])
 
   return (
-    <div className="first-person-view">
+    <div
+      className="first-person-view"
+      onKeyDown={(e) => e.key === ' ' && setShowControls(true)}
+      tabIndex={0}
+    >
       <FirstPersonViewContent
         scene={scene}
         pos={offsetPosition}

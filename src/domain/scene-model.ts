@@ -98,7 +98,7 @@ export class SceneObject {
   // private selectedAttraction: AttractionModel | null = null
 
   constructor(scene: Group) {
-    // this.position.copy(scene.children[0].position)
+    this.position.copy(scene.children[0].position)
     this.attractions = (scene.getObjectByName('Attractions') as Object3D)?.children?.map(
       (child) => new AttractionModel(child),
     )

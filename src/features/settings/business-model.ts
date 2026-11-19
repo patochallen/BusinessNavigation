@@ -15,7 +15,7 @@ export const businessModels: BusinessModel[] = [
     name: 'Parque Saavedra',
     description: 'Parque Saavedra is a public park located in Buenos Aires, Argentina.',
     imageUrl: 'https://i.pinimg.com/736x/ed/a9/fb/eda9fbffc10ca2c1b752eb163b039995.jpg',
-    location: { latitude: -34.550539413457, longitude: -58.48003697685765 },
+    location: { latitude: -34.55068, longitude: -58.47995 },
     sceneUrl: 'scene3.glb',
   },
   {
