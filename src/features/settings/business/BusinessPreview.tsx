@@ -49,7 +49,9 @@ export const BusinessPreview = () => {
         position={position}
         offset={0}
         attractions={model.getAttractions()}
-        onSelect={(attraction) => console.log('Selected attraction:', attraction)}
+        onSelect={(attraction) =>
+          navigate(`/attraction`, { state: { business, attractionName: attraction.getName() } })
+        }
       />
     </div>
   )

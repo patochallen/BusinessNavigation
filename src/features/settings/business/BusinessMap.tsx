@@ -4,11 +4,15 @@ import { useGeolocation } from '../../../services/location'
 import { FirstPersonView } from '../FirstPersonView'
 import { useLoader } from '@react-three/fiber'
 import { useLocation } from 'react-router-dom'
+import { SceneObject } from '../../../domain/scene-model'
 
 export const BusinessMap = () => {
   const { business } = useLocation().state
   const model = useMemo(
-    () => useLoader(GLTFLoader, `${import.meta.env.BASE_URL}${business.sceneUrl}`).scene.clone(),
+    () =>
+      new SceneObject(
+        useLoader(GLTFLoader, `${import.meta.env.BASE_URL}${business.sceneUrl}`).scene.clone(),
+      ),
     [business.sceneUrl],
   )
   const { position: geoPosition } = useGeolocation()

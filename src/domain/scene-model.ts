@@ -94,7 +94,7 @@ export class SceneObject {
   private paths: Mesh | null = null
   private sceneWireframe: boolean = false
   private sceneOpacity: number = 1
-  private scene: Group | null = null
+  private scene: Group
   // private selectedAttraction: AttractionModel | null = null
 
   constructor(scene: Group) {
@@ -122,7 +122,7 @@ export class SceneObject {
   }
 
   getScene() {
-    return this.scene?.clone()
+    return this.scene.clone()
   }
 
   setSceneWireframe(wireframe: boolean) {

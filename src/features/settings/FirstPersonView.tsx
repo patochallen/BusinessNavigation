@@ -1,4 +1,5 @@
 import { Euler, PerspectiveCamera, Vector3 } from 'three'
+import type { SceneObject } from '../../domain/scene-model'
 import { Canvas } from '@react-three/fiber'
 import { useSettings } from '../../data/useSettings'
 import type { Coordinate } from '../../domain/types'
@@ -17,7 +18,7 @@ export const FirstPersonView = ({
   destination,
   businessId,
 }: {
-  scene: any
+  scene: SceneObject
   location: GeolocationCoordinates | undefined
   destination: Coordinate
   businessId: string
@@ -72,8 +73,8 @@ export const FirstPersonView = ({
   }, [location, settings.locationEnabled])
 
   useEffect(() => {
-    // scene.setSceneOpacity(settings.opacity)
-    // return () => scene.setSceneOpacity(1)
+    scene.setSceneOpacity(settings.opacity)
+    return () => scene.setSceneOpacity(1)
   }, [settings.opacity])
 
   return (
@@ -123,7 +124,7 @@ export const FirstPersonViewContent = ({
   height,
   rotation,
 }: {
-  scene: any
+  scene: SceneObject
   pos: Vector3
   fov: number
   height: number
@@ -142,7 +143,7 @@ export const FirstPersonViewContent = ({
       <Canvas camera={camera}>
         <directionalLight position={[1, 3, 1]} intensity={5} color="#fff" />
         <directionalLight position={[-1, 3, -1]} intensity={5} color="#fff" />
-        <primitive object={scene} position={pos} />
+        <primitive object={scene.getScene()} position={pos} />
         <mesh>
           <sphereGeometry args={[1, 32, 32]} />
           <meshStandardMaterial color="green" />
