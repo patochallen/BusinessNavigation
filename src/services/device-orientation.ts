@@ -82,9 +82,9 @@ export const useDeviceOrientation = (enabled = true) => {
     // } else {
     window.addEventListener('deviceorientation', onDeviceOrientation)
     // }
-    console.log(
-      `Adding device orientation listeners for ${enabled ? 'absolute' : 'relative'} orientation`,
-    )
+    // console.log(
+    //   `Adding device orientation listeners for ${enabled ? 'absolute' : 'relative'} orientation`,
+    // )
 
     return () => {
       window.removeEventListener('orientationchange', updateScreenOrientation)
@@ -93,9 +93,9 @@ export const useDeviceOrientation = (enabled = true) => {
       // } else {
       window.removeEventListener('deviceorientation', onDeviceOrientation)
       // }
-      console.log(
-        `Cleaning up device orientation listeners for ${enabled ? 'absolute' : 'relative'} orientation`,
-      )
+      // console.log(
+      //   `Cleaning up device orientation listeners for ${enabled ? 'absolute' : 'relative'} orientation`,
+      // )
     }
   }, [enabled, permission])
 

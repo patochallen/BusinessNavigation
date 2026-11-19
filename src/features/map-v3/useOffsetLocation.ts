@@ -10,7 +10,9 @@ import { toV3 } from '../../utils/utils'
 export const useOffsetLocation = ({ bussinesLocation }: { bussinesLocation: Coordinate }) => {
   const { position: geoPosition } = useGeolocation()
   const location = useMemo(() => geoPosition?.coords, [geoPosition])
-  const [offset, setOffset] = useState(LocationStorage.getLocationOffset())
+  const [offset, setOffset] = useState(
+    LocationStorage.getLocationOffset(bussinesLocation.toString()),
+  )
   const position = useMemo(() => {
     if (!location) return new Vector3(0, 0, 0)
     const { distanceMeters, headingDegrees } = getDistanceAndHeadingBetweenLocations(
@@ -28,12 +30,12 @@ export const useOffsetLocation = ({ bussinesLocation }: { bussinesLocation: Coor
 
   const updateOffset = (newOffset: Vector2) => {
     setOffset(newOffset)
-    LocationStorage.setLocationOffset(newOffset)
+    LocationStorage.setLocationOffset(bussinesLocation.toString(), newOffset)
   }
 
   const clearOffset = () => {
     setOffset(new Vector2(0, 0))
-    LocationStorage.removeLocationOffset()
+    LocationStorage.removeLocationOffset(bussinesLocation.toString())
   }
 
   return { location, position, offset, offsetPosition, updateOffset, clearOffset }

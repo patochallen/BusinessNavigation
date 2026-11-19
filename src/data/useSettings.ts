@@ -1,5 +1,5 @@
-export const useSettings = () => {
-  const settings = useMemo(() => Settings.getInstance(), [])
+export const useSettings = (businessId: string) => {
+  const settings = useMemo(() => Settings.getInstance(businessId), [businessId])
   return settings
 }
 

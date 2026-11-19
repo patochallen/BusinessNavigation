@@ -50,10 +50,10 @@ export const useDeviceMotion = () => {
       const newEuler = new Euler(beta, alpha, -gamma, 'YXZ')
       setEuler(newEuler)
     }
-    console.log('Device motion handler added')
+    // console.log('Device motion handler added')
     window.addEventListener('devicemotion', handleDeviceMotion)
     return () => {
-      console.log('Device motion handler removed')
+      // console.log('Device motion handler removed')
       window.removeEventListener('devicemotion', handleDeviceMotion)
     }
   }, [])

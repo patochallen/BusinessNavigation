@@ -42,6 +42,7 @@ export type SettingsSnapshot = {
 
 export class Settings {
   private static instance: Settings | null = null
+  private _businessId: string
   private _manualOrientation: boolean
   private _locationEnabled: boolean
   private _location: Coordinate | null
@@ -50,15 +51,20 @@ export class Settings {
   private _cameraFov: number
   private _cameraHeight: number
   private _opacity: number
-  private constructor() {
-    this._manualOrientation = LocationStorage.getManualOrientation()
-    this._locationEnabled = LocationStorage.getLocationEnabled()
-    this._location = LocationStorage.getLocation()
-    this._locationOffset = LocationStorage.getLocationOffset()
-    this._headingOffset = LocationStorage.getHeadingOffset()
-    this._cameraFov = LocationStorage.getCameraFov()
-    this._cameraHeight = LocationStorage.getCameraHeight()
-    this._opacity = LocationStorage.getOpacity()
+  private constructor(businessId: string) {
+    this._businessId = businessId
+    this._manualOrientation = LocationStorage.getManualOrientation(businessId)
+    this._locationEnabled = LocationStorage.getLocationEnabled(businessId)
+    this._location = LocationStorage.getLocation(businessId)
+    this._locationOffset = LocationStorage.getLocationOffset(businessId)
+    this._headingOffset = LocationStorage.getHeadingOffset(businessId)
+    this._cameraFov = LocationStorage.getCameraFov(businessId)
+    this._cameraHeight = LocationStorage.getCameraHeight(businessId)
+    this._opacity = LocationStorage.getOpacity(businessId)
+  }
+
+  get businessId(): string {
+    return this._businessId
   }
 
   get location(): Coordinate | null {
@@ -86,15 +92,15 @@ export class Settings {
     return this._opacity
   }
 
-  static getInstance(): Settings {
-    if (!Settings.instance) {
-      Settings.instance = new Settings()
+  static getInstance(businessId: string): Settings {
+    if (!Settings.instance || Settings.instance.businessId !== businessId) {
+      Settings.instance = new Settings(businessId)
     }
     return Settings.instance
   }
 
   clear() {
-    LocationStorage.clear()
+    LocationStorage.clear(this._businessId)
     this._manualOrientation = false
     this._locationEnabled = LOCATION_ENABLED_DEFAULT
     this._location = null
@@ -106,68 +112,68 @@ export class Settings {
   }
 
   setManualOrientation(manual: boolean) {
-    LocationStorage.setManualOrientation(manual)
+    LocationStorage.setManualOrientation(this._businessId, manual)
     this._manualOrientation = manual
   }
   setLocationEnabled(enabled: boolean) {
-    LocationStorage.setLocationEnabled(enabled)
+    LocationStorage.setLocationEnabled(this._businessId, enabled)
     this._locationEnabled = enabled
   }
   setLocation(location: Coordinate) {
-    LocationStorage.setLocation(location)
+    LocationStorage.setLocation(this._businessId, location)
     this._location = location
   }
   setLocationOffset(offset: Vector2) {
-    LocationStorage.setLocationOffset(offset)
+    LocationStorage.setLocationOffset(this._businessId, offset)
     this._locationOffset = offset
   }
   setHeadingOffset(offset: number) {
-    LocationStorage.setHeadingOffset(offset)
+    LocationStorage.setHeadingOffset(this._businessId, offset)
     this._headingOffset = offset
   }
   setCameraFov(fov: number) {
-    LocationStorage.setCameraFov(fov)
+    LocationStorage.setCameraFov(this._businessId, fov)
     this._cameraFov = fov
   }
   setCameraHeight(height: number) {
-    LocationStorage.setCameraHeight(height)
+    LocationStorage.setCameraHeight(this._businessId, height)
     this._cameraHeight = height
   }
   setOpacity(opacity: number) {
-    LocationStorage.setOpacity(opacity)
+    LocationStorage.setOpacity(this._businessId, opacity)
     this._opacity = opacity
   }
 
   removeManualOrientation() {
-    LocationStorage.removeManualOrientation()
+    LocationStorage.removeManualOrientation(this._businessId)
     this._manualOrientation = false
   }
   removeLocationEnabled() {
-    LocationStorage.removeLocationEnabled()
+    LocationStorage.removeLocationEnabled(this._businessId)
     this._locationEnabled = LOCATION_ENABLED_DEFAULT
   }
   removeLocation() {
-    LocationStorage.removeLocation()
+    LocationStorage.removeLocation(this._businessId)
     this._location = null
   }
   removeLocationOffset() {
-    LocationStorage.removeLocationOffset()
+    LocationStorage.removeLocationOffset(this._businessId)
     this._locationOffset = LOCATION_OFFSET_DEFAULT
   }
   removeHeadingOffset() {
-    LocationStorage.removeHeadingOffset()
+    LocationStorage.removeHeadingOffset(this._businessId)
     this._headingOffset = HEADING_OFFSET_DEFAULT
   }
   removeCameraFov() {
-    LocationStorage.removeCameraFov()
+    LocationStorage.removeCameraFov(this._businessId)
     this._cameraFov = CAMERA_FOV_DEFAULT
   }
   removeCameraHeight() {
-    LocationStorage.removeCameraHeight()
+    LocationStorage.removeCameraHeight(this._businessId)
     this._cameraHeight = CAMERA_HEIGHT_DEFAULT
   }
   removeOpacity() {
-    LocationStorage.removeOpacity()
+    LocationStorage.removeOpacity(this._businessId)
     this._opacity = OPACITY_DEFAULT
   }
 
@@ -238,61 +244,80 @@ const reviveSnapshotValue = (key: string, value: unknown): unknown => {
 }
 
 export const LocationStorage = {
-  setManualOrientation: (manual: boolean) =>
-    StorageRepository.setItem('manualOrientation', manual.toString()),
-  setLocationEnabled: (enabled: boolean) =>
-    StorageRepository.setItem('locationEnabled', enabled.toString()),
-  setLocation: (location: Coordinate) =>
-    StorageRepository.setItem('location', JSON.stringify(location)),
-  setLocationOffset: (offset: Vector2) =>
-    StorageRepository.setItem('locationOffset', offset.toArray().toString()),
-  setHeadingOffset: (offset: number) =>
-    StorageRepository.setItem('headingOffset', offset.toString()),
-  setOpacity: (opacity: number) => StorageRepository.setItem('opacity', opacity.toString()),
-  setCameraFov: (fov: number) => StorageRepository.setItem('cameraFov', fov.toString()),
-  setCameraHeight: (height: number) => StorageRepository.setItem('cameraHeight', height.toString()),
+  setCurrentBusiness: (businessId?: string | null) => {
+    if (businessId) {
+      StorageRepository.setItem('currentBusiness', businessId)
+    } else {
+      StorageRepository.removeItem('currentBusiness')
+    }
+  },
+  setManualOrientation: (businessId: string, manual: boolean) =>
+    StorageRepository.setItem(`manualOrientation-${businessId}`, manual.toString()),
+  setLocationEnabled: (businessId: string, enabled: boolean) =>
+    StorageRepository.setItem(`locationEnabled-${businessId}`, enabled.toString()),
+  setLocation: (businessId: string, location: Coordinate) =>
+    StorageRepository.setItem(`location-${businessId}`, JSON.stringify(location)),
+  setLocationOffset: (businessId: string, offset: Vector2) =>
+    StorageRepository.setItem(`locationOffset-${businessId}`, offset.toArray().toString()),
+  setHeadingOffset: (businessId: string, offset: number) =>
+    StorageRepository.setItem(`headingOffset-${businessId}`, offset.toString()),
+  setOpacity: (businessId: string, opacity: number) =>
+    StorageRepository.setItem(`opacity-${businessId}`, opacity.toString()),
+  setCameraFov: (businessId: string, fov: number) =>
+    StorageRepository.setItem(`cameraFov-${businessId}`, fov.toString()),
+  setCameraHeight: (businessId: string, height: number) =>
+    StorageRepository.setItem(`cameraHeight-${businessId}`, height.toString()),
 
-  getManualOrientation: (): boolean => {
-    const manual = StorageRepository.getItem('manualOrientation')
+  getCurrentBusiness: () => {
+    const business = StorageRepository.getItem('currentBusiness')
+    return business
+  },
+  getManualOrientation: (businessId: string): boolean => {
+    const manual = StorageRepository.getItem(`manualOrientation-${businessId}`)
     return manual ? manual === 'true' : MANUAL_ORIENTATION_DEFAULT
   },
-  getLocationEnabled: (): boolean => {
-    const enabled = StorageRepository.getItem('locationEnabled')
+  getLocationEnabled: (businessId: string): boolean => {
+    const enabled = StorageRepository.getItem(`locationEnabled-${businessId}`)
     return enabled ? enabled === 'true' : LOCATION_ENABLED_DEFAULT
   },
-  getLocation: (): Coordinate | null => {
-    const location = StorageRepository.getItem('location')
+  getLocation: (businessId: string): Coordinate | null => {
+    const location = StorageRepository.getItem(`location-${businessId}`)
     return location ? JSON.parse(location) : null
   },
-  getLocationOffset: (): Vector2 => {
-    const offset = StorageRepository.getItem('locationOffset')
+  getLocationOffset: (businessId: string): Vector2 => {
+    const offset = StorageRepository.getItem(`locationOffset-${businessId}`)
     return offset ? new Vector2(...offset.split(',').map(parseFloat)) : LOCATION_OFFSET_DEFAULT
   },
-  getHeadingOffset: (): number => {
-    const offset = StorageRepository.getItem('headingOffset')
+  getHeadingOffset: (businessId: string): number => {
+    const offset = StorageRepository.getItem(`headingOffset-${businessId}`)
     return offset ? parseFloat(offset) : HEADING_OFFSET_DEFAULT
   },
-  getOpacity: (): number => {
-    const opacity = StorageRepository.getItem('opacity')
+  getOpacity: (businessId: string): number => {
+    const opacity = StorageRepository.getItem(`opacity-${businessId}`)
     return opacity ? parseFloat(opacity) : OPACITY_DEFAULT
   },
-  getCameraHeight: (): number => {
-    const height = StorageRepository.getItem('cameraHeight')
+  getCameraHeight: (businessId: string): number => {
+    const height = StorageRepository.getItem(`cameraHeight-${businessId}`)
     return height ? parseFloat(height) : CAMERA_HEIGHT_DEFAULT
   },
-  getCameraFov: (): number => {
-    const fov = StorageRepository.getItem('cameraFov')
+  getCameraFov: (businessId: string): number => {
+    const fov = StorageRepository.getItem(`cameraFov-${businessId}`)
     return fov ? parseFloat(fov) : CAMERA_FOV_DEFAULT
   },
 
-  removeManualOrientation: () => StorageRepository.removeItem('manualOrientation'),
-  removeLocationEnabled: () => StorageRepository.removeItem('locationEnabled'),
-  removeLocation: () => StorageRepository.removeItem('location'),
-  removeLocationOffset: () => StorageRepository.removeItem('locationOffset'),
-  removeHeadingOffset: () => StorageRepository.removeItem('headingOffset'),
-  removeOpacity: () => StorageRepository.removeItem('opacity'),
-  removeCameraFov: () => StorageRepository.removeItem('cameraFov'),
-  removeCameraHeight: () => StorageRepository.removeItem('cameraHeight'),
+  removeManualOrientation: (businessId: string) =>
+    StorageRepository.removeItem(`manualOrientation-${businessId}`),
+  removeLocationEnabled: (businessId: string) =>
+    StorageRepository.removeItem(`locationEnabled-${businessId}`),
+  removeLocation: (businessId: string) => StorageRepository.removeItem(`location-${businessId}`),
+  removeLocationOffset: (businessId: string) =>
+    StorageRepository.removeItem(`locationOffset-${businessId}`),
+  removeHeadingOffset: (businessId: string) =>
+    StorageRepository.removeItem(`headingOffset-${businessId}`),
+  removeOpacity: (businessId: string) => StorageRepository.removeItem(`opacity-${businessId}`),
+  removeCameraFov: (businessId: string) => StorageRepository.removeItem(`cameraFov-${businessId}`),
+  removeCameraHeight: (businessId: string) =>
+    StorageRepository.removeItem(`cameraHeight-${businessId}`),
 
   addSnapshot: (snapshot: SettingsSnapshot) => {
     const snapshots = StorageRepository.getItem('snapshots')
@@ -332,15 +357,15 @@ export const LocationStorage = {
     StorageRepository.setItem('stateSnapshots', JSON.stringify(snapshots))
   },
   removeStateSnapshots: () => StorageRepository.removeItem('stateSnapshots'),
-  clear: () => {
-    StorageRepository.removeItem('manualOrientation')
-    StorageRepository.removeItem('locationEnabled')
-    StorageRepository.removeItem('location')
-    StorageRepository.removeItem('locationOffset')
-    StorageRepository.removeItem('headingOffset')
-    StorageRepository.removeItem('opacity')
-    StorageRepository.removeItem('cameraFov')
-    StorageRepository.removeItem('cameraHeight')
+  clear: (businessId: string) => {
+    StorageRepository.removeItem(`manualOrientation-${businessId}`)
+    StorageRepository.removeItem(`locationEnabled-${businessId}`)
+    StorageRepository.removeItem(`location-${businessId}`)
+    StorageRepository.removeItem(`locationOffset-${businessId}`)
+    StorageRepository.removeItem(`headingOffset-${businessId}`)
+    StorageRepository.removeItem(`opacity-${businessId}`)
+    StorageRepository.removeItem(`cameraFov-${businessId}`)
+    StorageRepository.removeItem(`cameraHeight-${businessId}`)
     StorageRepository.removeItem('snapshots')
     StorageRepository.removeItem('stateSnapshots')
   },

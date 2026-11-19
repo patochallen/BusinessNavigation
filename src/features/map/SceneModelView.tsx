@@ -20,6 +20,15 @@ export const SceneModelView = ({
         const floor = attraction.getFloor()
         const building = attraction.getBuilding()
         const position = attraction.getPosition()
+        console.log(
+          attraction.getName(),
+          'floor',
+          floor,
+          'building',
+          building,
+          'scene',
+          scene.getFloor(),
+        )
         return (
           <group
             key={index}

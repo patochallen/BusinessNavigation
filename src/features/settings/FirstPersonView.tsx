@@ -1,4 +1,3 @@
-import { SceneObject } from '../../domain/scene-model'
 import { Euler, PerspectiveCamera, Vector3 } from 'three'
 import { Canvas } from '@react-three/fiber'
 import { useSettings } from '../../data/useSettings'
@@ -6,27 +5,27 @@ import type { Coordinate } from '../../domain/types'
 import { ControlsView, type ControlsConfig } from './ControlsView'
 import { useEffect, useMemo, useState } from 'react'
 import { toV3 } from '../../utils/utils'
-import { SceneModelView } from '../map/SceneModelView'
 import { useDeviceOrientation } from '../../services/device-orientation'
 import { useDeviceMotion } from '../../services/device-motion'
 import './FirstPersonView.css'
 import { getDistanceAndHeadingBetweenLocations } from '../../utils/location'
 import { degToRad } from 'three/src/math/MathUtils.js'
-import { CameraView } from '../camera/CameraView'
 
 export const FirstPersonView = ({
   scene,
   location,
   destination,
+  businessId,
 }: {
-  scene: SceneObject
+  scene: any
   location: GeolocationCoordinates | undefined
   destination: Coordinate
+  businessId: string
 }) => {
   const [, setSettingsVersion] = useState(0)
   const [expandedControl, setExpandedControl] = useState<ControlsConfig | null>(null)
   const [showControls, setShowControls] = useState(false)
-  const settings = useSettings()
+  const settings = useSettings(businessId)
   const [loc, setLoc] = useState<GeolocationCoordinates | undefined>(undefined)
   const position = useMemo(() => {
     if (!loc) return new Vector3(0, 0, 0)
@@ -73,8 +72,8 @@ export const FirstPersonView = ({
   }, [location, settings.locationEnabled])
 
   useEffect(() => {
-    scene.setSceneOpacity(settings.opacity)
-    return () => scene.setSceneOpacity(1)
+    // scene.setSceneOpacity(settings.opacity)
+    // return () => scene.setSceneOpacity(1)
   }, [settings.opacity])
 
   return (
@@ -120,7 +119,7 @@ export const FirstPersonViewContent = ({
   height,
   rotation,
 }: {
-  scene: SceneObject
+  scene: any
   pos: Vector3
   fov: number
   height: number
@@ -135,12 +134,12 @@ export const FirstPersonViewContent = ({
 
   return (
     <div className="first-person-view-content">
-      <CameraView />
+      {/* <CameraView /> */}
       <Canvas camera={camera}>
         <directionalLight position={[1, 3, 1]} intensity={5} color="#fff" />
         <directionalLight position={[-1, 3, -1]} intensity={5} color="#fff" />
-        <SceneModelView scene={scene} position={pos} />
-        <mesh position={scene.getPosition()}>
+        <primitive object={scene} position={pos} />
+        <mesh>
           <sphereGeometry args={[1, 32, 32]} />
           <meshStandardMaterial color="green" />
         </mesh>

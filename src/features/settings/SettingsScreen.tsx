@@ -82,12 +82,20 @@ export const SettingsIdle = ({
   )
 }
 
-export const SettingsApp = ({ scene, position }: { scene: SceneObject; position: Vector3 }) => {
+export const SettingsApp = ({
+  scene,
+  position,
+  businessId,
+}: {
+  scene: SceneObject
+  position: Vector3
+  businessId: string
+}) => {
   const [showSettings, setShowSettings] = useState(false)
   const [showSnapshotList, setShowSnapshotList] = useState(false)
   const [showIdle, setShowIdle] = useState(false)
   const [, setSettingsVersion] = useState(0)
-  const settings = useSettings()
+  const settings = useSettings(businessId)
   // return <FirstPersonView scene={scene} position={position} />
   return showSnapshotList ? (
     <SnapshotList scene={scene} onClose={() => setShowSnapshotList(false)} />
@@ -122,6 +130,7 @@ export const SettingsApp = ({ scene, position }: { scene: SceneObject; position:
       />
       <SettingsScreen
         open={showSettings}
+        businessId={businessId}
         onClose={() => setShowSettings(false)}
         onChange={() => setSettingsVersion((v) => v + 1)}
       />
@@ -144,6 +153,7 @@ export const SettingsApp = ({ scene, position }: { scene: SceneObject; position:
 
 interface SettingsScreenProps {
   open: boolean
+  businessId: string
   onClose: () => void
   onChange: () => void
 }
@@ -491,15 +501,16 @@ const SettingEditor = ({
   )
 }
 
-export const SettingsScreen = ({ open, onClose, onChange }: SettingsScreenProps) =>
+export const SettingsScreen = ({ open, onClose, onChange, businessId }: SettingsScreenProps) =>
   // Mounted only while open, so the editing state resets every time it's closed.
-  open ? <SettingsDialog onClose={onClose} onChange={onChange} /> : null
+  open ? <SettingsDialog onClose={onClose} onChange={onChange} businessId={businessId} /> : null
 
 const SettingsDialog = ({
+  businessId,
   onClose,
   onChange,
-}: Pick<SettingsScreenProps, 'onClose' | 'onChange'>) => {
-  const settings = useSettings()
+}: Pick<SettingsScreenProps, 'onClose' | 'onChange' | 'businessId'>) => {
+  const settings = useSettings(businessId)
   const [editingId, setEditingId] = useState<string | null>(null)
   // Settings is a mutable singleton, so force a re-render after saving.
   const [, setVersion] = useState(0)

@@ -1,16 +1,11 @@
-import { StrictMode, useEffect, useMemo } from 'react'
+import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import i18n from './i18n/i18n'
-import { useLoader } from '@react-three/fiber'
-import { GLTFLoader } from 'three/examples/jsm/Addons.js'
-import { SceneModel } from './domain/scene-model'
-import { useGeolocation } from './services/location'
-import { FirstPersonView } from './features/settings/FirstPersonView'
+import { App } from './features/settings/SelectModelScreen'
 
 document.documentElement.lang = i18n.language
 
-const ParkLocation = { latitude: -34.550539413457, longitude: -58.48003697685765 }
 // const ParkLocation = { latitude: -34.550539413457, longitude: -58.48003697685765 }
 
 // export const CameraCanvas = () => {
@@ -342,45 +337,56 @@ export const DEFAULT_BUSINESS_ID = import.meta.env.VITE_DEFAULT_BUSINESS_ID
 //   )
 // }
 
-const App = () => {
-  const scene = useMemo(() => {
-    console.log('Loading scene model')
-    const model = useLoader(GLTFLoader, `${import.meta.env.BASE_URL}scene3.glb`)
-    const sceneModel = new SceneModel(model.scene.clone())
-    const sc = sceneModel.getScene()
-    // sc.setSceneOpacity(0.2)
-    return sc
-  }, [])
-  const { position: geoPosition } = useGeolocation()
-  const location = useMemo(() => geoPosition?.coords, [geoPosition])
-  // const { locationEnabled } = useSettings()
-  // const position = useMemo(() => {
-  //   if (!location) return new Vector3(0, 0, 0)
-  //   const { distanceMeters, headingDegrees } = getDistanceAndHeadingBetweenLocations(
-  //     location,
-  //     ParkLocation,
-  //   )
-  //   const p = new Vector3(
-  //     distanceMeters * Math.sin(degToRad(headingDegrees)),
-  //     0,
-  //     -distanceMeters * Math.cos(degToRad(headingDegrees)),
-  //   )
-  //   return p
-  // }, [location])
-  useEffect(() => {
-    const handleContextMenu = (e: MouseEvent) => e.preventDefault()
-    document.addEventListener('contextmenu', handleContextMenu)
-    return () => document.removeEventListener('contextmenu', handleContextMenu)
-  }, [])
-  return <FirstPersonView scene={scene} location={location} destination={ParkLocation} /> //position={locationEnabled ? position : new Vector3(0, 0, 0)} />
-  // return <SettingsApp scene={scene} position={position} />
-}
+// const App = () => {
+//   const scene = useMemo(() => {
+//     console.log('Loading scene model')
+//     const model = useLoader(GLTFLoader, `${import.meta.env.BASE_URL}scene.glb`)
+//     // const sceneModel = new SceneModel(model.scene.clone())
+//     // const sc = sceneModel.getScene()
+//     // // sc.setSceneOpacity(0.2)
+//     // return sc
+//     return model.scene.clone()
+//   }, [])
+//   const { position: geoPosition } = useGeolocation()
+//   const location = useMemo(() => geoPosition?.coords, [geoPosition])
+//   // const { locationEnabled } = useSettings()
+//   // const position = useMemo(() => {
+//   //   if (!location) return new Vector3(0, 0, 0)
+//   //   const { distanceMeters, headingDegrees } = getDistanceAndHeadingBetweenLocations(
+//   //     location,
+//   //     ParkLocation,
+//   //   )
+//   //   const p = new Vector3(
+//   //     distanceMeters * Math.sin(degToRad(headingDegrees)),
+//   //     0,
+//   //     -distanceMeters * Math.cos(degToRad(headingDegrees)),
+//   //   )
+//   //   return p
+//   // }, [location])
+//   useEffect(() => {
+//     const handleContextMenu = (e: MouseEvent) => e.preventDefault()
+//     document.addEventListener('contextmenu', handleContextMenu)
+//     return () => document.removeEventListener('contextmenu', handleContextMenu)
+//   }, [])
+//   return (
+//     <FirstPersonView
+//       scene={scene}
+//       location={location}
+//       // destination={ParkLocation}
+//       destination={{ latitude: -34.550539413457, longitude: -58.48003697685765 }}
+//       businessId="default"
+//       // destination={{ latitude: -34.55317554356185, longitude: -58.476032809630276 }}
+//     />
+//   ) //position={locationEnabled ? position : new Vector3(0, 0, 0)} />
+//   // return <SettingsApp scene={scene} position={position} />
+// }
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     {/* <HomeV3 /> */}
     {/* <TestComponent /> */}
     <App />
+    {/* <BusinessApp /> */}
   </StrictMode>,
 )
 

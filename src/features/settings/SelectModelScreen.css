@@ -1,0 +1,174 @@
+.model-selection {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+}
+
+.model-selection-header {
+  flex-shrink: 0;
+  padding: max(16px, env(safe-area-inset-top)) 16px 16px;
+  border-bottom: 1px solid #e2dfd5;
+  background: #fffdf8;
+  color: #253a35;
+}
+
+.model-selection-header h1 {
+  max-width: 936px;
+  margin: 0 auto;
+  font-size: clamp(20px, 4vw, 28px);
+  line-height: 1.25;
+}
+
+.model-selection-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.model-list {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr));
+  gap: 16px;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: clamp(16px, 4vw, 32px);
+  list-style: none;
+}
+
+.business-model-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #e2dfd5;
+  border-radius: 18px;
+  background: #fffdf8;
+  color: #253a35;
+  font: inherit;
+  text-align: left;
+  box-shadow: 0 4px 16px rgb(37 58 53 / 8%);
+  cursor: pointer;
+}
+
+.business-model-card-preview {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #e4eae3;
+}
+
+.business-model-card-preview img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.business-model-card-placeholder {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 16px;
+  color: #4f625c;
+  font-size: 13px;
+  text-align: center;
+}
+
+.business-model-card-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  max-width: calc(100% - 24px);
+  padding: 4px 9px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  background: #253a35;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.business-model-card-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  overflow-wrap: anywhere;
+}
+
+.business-model-card-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: clamp(18px, 3vw, 22px);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.business-model-card-description {
+  color: #4f625c;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.business-model-card-details {
+  display: grid;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #e2dfd5;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.business-model-card-detail {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.business-model-card-detail > span {
+  min-width: 0;
+}
+
+.business-model-card-label {
+  display: block;
+  margin-bottom: 2px;
+  color: #4f625c;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.business-model-card svg {
+  flex-shrink: 0;
+}
+
+.business-model-card:focus-visible {
+  outline: 3px solid #4f625c;
+  outline-offset: 3px;
+}
+
+.business-details {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+@media (hover: hover) {
+  .business-model-card:hover {
+    border-color: #8c9f8c;
+    box-shadow: 0 8px 24px rgb(37 58 53 / 14%);
+  }
+}

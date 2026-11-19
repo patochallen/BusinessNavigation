@@ -104,7 +104,7 @@ export class SceneObject {
     )
     this.floor = scene.getObjectByName('Floor2') as Mesh | null
     this.paths = scene.getObjectByName('Paths') as Mesh | null
-    this.floor!.children.length = 0
+    if (this.floor?.children) this.floor.children.length = 0
     this.scene = scene
   }
 
