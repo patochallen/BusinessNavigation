@@ -10,9 +10,9 @@ export const AttractionMarker = ({ attraction, height }: { attraction: Mesh; hei
           [0, height / 8, 0],
         ]}
         color="#66def3"
-        lineWidth={2}
+        lineWidth={8}
         depthTest={false}
-        renderOrder={10}
+        renderOrder={-1}
       />
       <Html position-y={height / 8} center zIndexRange={[10, 0]} style={{ pointerEvents: 'none' }}>
         <span className="navigation-attraction-label">{attraction.name}</span>

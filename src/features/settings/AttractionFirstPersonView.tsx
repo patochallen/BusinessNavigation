@@ -13,6 +13,7 @@ import { getDistanceAndHeadingBetweenLocations } from '../../utils/location'
 import { degToRad } from 'three/src/math/MathUtils.js'
 import { MapComposer } from '../map-v2/MapComposer'
 import { AttractionMarker } from '../map-v2/AttractionMarker'
+import { CameraView } from '../camera/CameraView'
 
 export const AttractionFirstPersonView = ({
   scene,
@@ -67,7 +68,6 @@ export const AttractionFirstPersonView = ({
     if (showTop) return height
     return settings.cameraHeight
   }, [height, settings.cameraHeight, showTop])
-  const [attractionPosition, setAttractionPosition] = useState(attraction.position.clone())
 
   const scale = useMemo(() => Math.max(0.1, height / 100), [height])
 
@@ -82,10 +82,6 @@ export const AttractionFirstPersonView = ({
     return () => scene.setSceneOpacity(1)
   }, [settings.opacity])
 
-  useEffect(() => {
-    setAttractionPosition(attraction.position.clone().add(position))
-  }, [position])
-
   return (
     <div
       className="first-person-view"
@@ -99,7 +95,6 @@ export const AttractionFirstPersonView = ({
         height={totalHeight}
         rotation={!showTop ? rotation : new Euler(-Math.PI / 2, 0, 0)}
         attraction={attraction}
-        attractionPosition={attractionPosition}
       />
       <ControlsView
         settings={settings}
@@ -135,7 +130,6 @@ const FirstPersonViewContent = ({
   height,
   rotation,
   attraction,
-  attractionPosition,
 }: {
   scene: SceneObject
   pos: Vector3
@@ -143,7 +137,6 @@ const FirstPersonViewContent = ({
   height: number
   rotation: Euler
   attraction: Mesh
-  attractionPosition: Vector3
 }) => {
   const camera = useMemo(() => {
     const cam = new PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.5, 2000)
@@ -154,7 +147,6 @@ const FirstPersonViewContent = ({
 
   return (
     <div className="first-person-view-content">
-      {/* <CameraView /> */}
       <div
         style={{
           width: '100%',
@@ -165,15 +157,16 @@ const FirstPersonViewContent = ({
           left: 0,
         }}
       />
+      <CameraView />
       <Canvas camera={camera}>
         <directionalLight position={[1, 3, 1]} intensity={5} color="#fff" />
         <directionalLight position={[-1, 3, -1]} intensity={5} color="#fff" />
         <MapComposer />
-        <primitive object={scene.getScene()} position={pos} />
-        {/* <group position={pos}> */}
-        <primitive object={attraction} position={attractionPosition} />
-        {/* </group> */}
-        <AttractionMarker attraction={attraction} height={100} />
+        <group position={pos}>
+          <primitive object={scene.getScene()} />
+          <primitive object={attraction} position={attraction.position} />
+          <AttractionMarker attraction={attraction} height={100} />
+        </group>
         <mesh>
           <sphereGeometry args={[1, 32, 32]} />
           <meshStandardMaterial color="green" />
